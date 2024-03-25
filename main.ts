@@ -26,7 +26,7 @@ export default class MyPlugin extends Plugin {
 
 		// This adds a status bar item to the bottom of the app. Does not work on mobile apps.
 		const statusBarItemEl = this.addStatusBarItem();
-		statusBarItemEl.setText('Status Bar Text');
+		statusBarItemEl.setText('Using Meeting Composer');
 
 		// This adds a simple command that can be triggered anywhere
 		this.addCommand({
@@ -76,6 +76,13 @@ export default class MyPlugin extends Plugin {
 
 		// When registering intervals, this function will automatically clear the interval when the plugin is disabled.
 		this.registerInterval(window.setInterval(() => console.log('setInterval'), 5 * 60 * 1000));
+
+
+		//my code
+
+		this.addRibbonIcon('dice', 'Greet', () => {
+			new Notice('Hello, world!');
+		  });
 	}
 
 	onunload() {
@@ -89,6 +96,8 @@ export default class MyPlugin extends Plugin {
 	async saveSettings() {
 		await this.saveData(this.settings);
 	}
+
+	
 }
 
 class SampleModal extends Modal {
@@ -131,4 +140,6 @@ class SampleSettingTab extends PluginSettingTab {
 					await this.plugin.saveSettings();
 				}));
 	}
+
 }
+
