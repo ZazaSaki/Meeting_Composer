@@ -1,5 +1,15 @@
-import { App, Editor, MarkdownView, Modal, Notice, Plugin, PluginSettingTab, Setting } from 'obsidian';
+import { App, Editor, MarkdownView, Modal, Notice, Plugin, PluginSettingTab, Setting, View } from 'obsidian';
+import { editorInfoField } from 'obsidian';
+import { ItemView, WorkspaceLeaf } from "obsidian";
 
+export const VIEW_TYPE_EXAMPLE = "example-view";
+import {basicSetup} from 'codemirror';
+import {
+	ViewUpdate,
+	PluginValue,
+	EditorView,
+	ViewPlugin,
+  } from "@codemirror/view";
 // Remember to rename these classes and interfaces!
 
 interface MyPluginSettings {
@@ -11,10 +21,19 @@ const DEFAULT_SETTINGS: MyPluginSettings = {
 }
 
 export default class MyPlugin extends Plugin {
-	settings: MyPluginSettings;
+	settings: MyPluginSettings;	
 
 	async onload() {
 		await this.loadSettings();
+
+		this.registerView(
+			VIEW_TYPE_EXAMPLE,
+			(leaf) => new ExampleView(leaf)
+		  );
+	  
+		  this.addRibbonIcon("dice", "Activate view", () => {
+			this.activateView();
+		  });
 
 		// This creates an icon in the left ribbon.
 		const ribbonIconEl = this.addRibbonIcon('dice', 'Sample Plugin', (evt: MouseEvent) => {
@@ -74,6 +93,7 @@ export default class MyPlugin extends Plugin {
 			console.log('click', evt);
 		});
 
+		
 		// When registering intervals, this function will automatically clear the interval when the plugin is disabled.
 		this.registerInterval(window.setInterval(() => console.log('setInterval'), 5 * 60 * 1000));
 
@@ -83,6 +103,8 @@ export default class MyPlugin extends Plugin {
 		this.addRibbonIcon('dice', 'Greet', () => {
 			new Notice('Hello, world!');
 		  });
+
+				  
 	}
 
 	onunload() {
@@ -97,7 +119,116 @@ export default class MyPlugin extends Plugin {
 		await this.saveData(this.settings);
 	}
 
+	async activateView() {
+		const { workspace } = this.app;
 	
+		let leaf: WorkspaceLeaf | null = null;
+		const leaves = workspace.getLeavesOfType(VIEW_TYPE_EXAMPLE);
+	
+		if (leaves.length > 0) {
+		  // A leaf with our view already exists, use that
+		  leaf = leaves[0];
+		} else {
+		  // Our view could not be found in the workspace, create a new leaf
+		  // in the right sidebar for it
+		  leaf = workspace.getRightLeaf(false);
+		  if (leaf) {
+			await leaf.setViewState({ type: VIEW_TYPE_EXAMPLE, active: true });
+			// "Reveal" the leaf in case it is in a collapsed sidebar
+			workspace.revealLeaf(leaf);
+		  }
+		  
+		}
+	
+		
+	  }
+	
+
+	
+}
+
+export class ExampleView extends ItemView {
+	constructor(leaf: WorkspaceLeaf) {
+	  super(leaf);
+	}
+  
+	getViewType() {
+
+	  return VIEW_TYPE_EXAMPLE;
+	}
+  
+	getDisplayText() {
+	  return "Meeting Composer";
+	}
+  
+	async onOpen() {
+	  const container = this.containerEl.children[1];
+	  const {contentEl} = this;
+	  container.empty();
+	  container.createEl("h4", { text: "Meetting Composer" });
+      let search : string = "";
+	  
+	  new Setting(contentEl).setName(":::").addText(item => {
+	    item.onChange(string =>{
+			new Notice(string);
+			search = string;
+		});
+
+		new Notice(item.getValue())
+	  }).addButton(item =>{
+		item.setButtonText("search");
+	    item.onClick(async ()=>{
+			const file = await this.app.vault.getFileByPath('test.md');
+			const Work = this.app.workspace.getLeaf("tab");
+			
+			let markdownView = this.app.workspace.getActiveViewOfType(MarkdownView);
+
+			if (markdownView) {
+				Work.setViewState({type: "markdown", active : true});
+				new Notice(new MarkdownView(Work).getViewType());
+			}
+			
+			markdownView = this.app.workspace.getActiveViewOfType(MarkdownView);
+
+			if (markdownView) {
+				//Work.getCursor();
+				
+			}
+			
+			if (file) {
+				Work.openFile(file);
+			}
+			
+			//this.app.workspace.openPopoutLeaf();
+			new Notice("should open");
+		})
+		
+	  });
+		
+	  const b = ()=>{console.log()};
+	  container.createEl('button',{text : "click me"})
+	
+	  container.getElementsByTagName("button")
+	}
+  
+	async onClose() {
+	  // Nothing to clean up.
+	}
+  }
+  
+
+class EditorTab implements PluginValue {
+	constructor(view : EditorView) {
+		
+	}
+	
+	update(update: ViewUpdate) {
+	// ...
+	}
+
+	destroy() {
+	// ...
+	}
 }
 
 class SampleModal extends Modal {
@@ -142,4 +273,8 @@ class SampleSettingTab extends PluginSettingTab {
 	}
 
 }
+
+
+
+
 
