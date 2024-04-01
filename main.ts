@@ -2,6 +2,7 @@ import { App, Editor, MarkdownView, Modal, Notice, Plugin, PluginSettingTab, Set
 import { editorInfoField } from 'obsidian';
 import { ItemView, WorkspaceLeaf } from "obsidian";
 
+
 export const VIEW_TYPE_EXAMPLE = "example-view";
 import {basicSetup} from 'codemirror';
 import {
@@ -177,9 +178,23 @@ export class ExampleView extends ItemView {
 		new Notice(item.getValue())
 	  }).addButton(item =>{
 		item.setButtonText("search");
-	    item.onClick(async ()=>{
+	    
+		let Work : WorkspaceLeaf | null = null;
+		item.onClick(async ()=>{
 			const file = await this.app.vault.getFileByPath('test.md');
-			const Work = this.app.workspace.getLeaf("tab");
+			//Work = this.app.workspace.getLeaf("tab");
+
+			
+			
+			if (!Work) {
+				Work = this.app.workspace.getLeaf("tab");
+				//this.app.workspace.getMostRecentLeaf();
+				
+			}
+            
+
+			
+			
 			
 			let markdownView = this.app.workspace.getActiveViewOfType(MarkdownView);
 
@@ -197,6 +212,7 @@ export class ExampleView extends ItemView {
 			
 			if (file) {
 				Work.openFile(file);
+				
 			}
 			
 			//this.app.workspace.openPopoutLeaf();
@@ -204,10 +220,16 @@ export class ExampleView extends ItemView {
 		})
 		
 	  });
-		
+	  
+	  const t = "wo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieubvrwnvrwvnwrijnonbno";
 	  const b = ()=>{console.log()};
 	  container.createEl('button',{text : "click me"})
-	
+	  container.createDiv();
+	  container.createEl('br', {title : t});
+
+	  container.createEl('textarea', {text : t, attr :{width : '100%'}, }).setCssStyles({width : "100%", height : "70vh"});
+
+	  
 	  container.getElementsByTagName("button")
 	}
   
@@ -261,10 +283,10 @@ class SampleSettingTab extends PluginSettingTab {
 		containerEl.empty();
 
 		new Setting(containerEl)
-			.setName('Setting #1')
-			.setDesc('It\'s a secret')
+			.setName('Meenutes Settings')
+			.setDesc('Meenutes Directory')
 			.addText(text => text
-				.setPlaceholder('Enter your secret')
+				.setPlaceholder('Use the Relarive Pah')
 				.setValue(this.plugin.settings.mySetting)
 				.onChange(async (value) => {
 					this.plugin.settings.mySetting = value;
