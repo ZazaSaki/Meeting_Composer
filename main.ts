@@ -1,7 +1,9 @@
 import { App, Editor, MarkdownView, Modal, Notice, Plugin, PluginSettingTab, Setting, View } from 'obsidian';
 import { editorInfoField } from 'obsidian';
 import { ItemView, WorkspaceLeaf } from "obsidian";
+import { MarkdownParser } from './DataMeenutes/App';
 
+const MDParser = new MarkdownParser();
 
 export const VIEW_TYPE_EXAMPLE = "example-view";
 import {basicSetup} from 'codemirror';
@@ -18,7 +20,7 @@ interface MyPluginSettings {
 }
 
 const DEFAULT_SETTINGS: MyPluginSettings = {
-	mySetting: 'default'
+	mySetting: './Atas'
 }
 
 export default class MyPlugin extends Plugin {
@@ -169,12 +171,12 @@ export class ExampleView extends ItemView {
 	  container.createEl("h4", { text: "Meetting Composer" });
       let search : string = "";
 	  
-	  new Setting(contentEl).setName(":::").addText(item => {
+	  new Setting(contentEl).setName("Search").addText(item => {
 	    item.onChange(string =>{
 			new Notice(string);
 			search = string;
 		});
-
+		
 		new Notice(item.getValue())
 	  }).addButton(item =>{
 		item.setButtonText("search");
