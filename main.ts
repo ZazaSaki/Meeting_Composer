@@ -365,10 +365,11 @@ class SampleSettingTab extends PluginSettingTab {
 					await this.plugin.saveSettings();
 				}));
 
-		new Setting(containerEl).setName('Reload').addButton((item)=>{
+		new Setting(containerEl).setName('Reload the Files').addButton((item)=>{
 			item.onClick(()=>{
 				this.plugin.reloadTree();
 			});
+			item.setButtonText("Reload");
 		});
 	}
 
