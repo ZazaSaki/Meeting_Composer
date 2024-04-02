@@ -46,6 +46,11 @@ export default class MyPlugin extends Plugin {
 
 	}
 
+	async reloadTree(){
+		MDParser.resetTree();
+		await this.loadTree();
+	}
+
 	async onload() {
 		await this.loadSettings();
 		this.loadTree();
@@ -289,7 +294,7 @@ export class ExampleView extends ItemView {
 	  
 	  const display = MDParser.getOrganizedTopics("Reunião",true);
 	  const print = MDParser.convertOrganizedTopicToMD(display);
-	  container.createEl('button',{text : "click me"})
+	  
 	  container.createDiv();
 	  container.createEl('br');
 
@@ -359,6 +364,12 @@ class SampleSettingTab extends PluginSettingTab {
 					this.plugin.settings.MeenutesDir = value;
 					await this.plugin.saveSettings();
 				}));
+
+		new Setting(containerEl).setName('Reload').addButton((item)=>{
+			item.onClick(()=>{
+				this.plugin.reloadTree();
+			});
+		});
 	}
 
 }
