@@ -2,8 +2,9 @@ import { App, Editor, MarkdownView, Modal, Notice, Plugin, PluginSettingTab, Set
 import { editorInfoField } from 'obsidian';
 import { ItemView, WorkspaceLeaf } from "obsidian";
 import { MarkdownParser } from './DataMeenutes/App';
-
 const MDParser = new MarkdownParser();
+
+//const MDParser = new MarkdownParser();
 
 export const VIEW_TYPE_EXAMPLE = "example-view";
 import {basicSetup} from 'codemirror';
@@ -13,22 +14,41 @@ import {
 	EditorView,
 	ViewPlugin,
   } from "@codemirror/view";
+import { writeAnswer } from 'DataMeenutes/FileReader';
 // Remember to rename these classes and interfaces!
 
 interface MyPluginSettings {
-	mySetting: string;
+	MeenutesDir: string;
 }
 
 const DEFAULT_SETTINGS: MyPluginSettings = {
-	mySetting: './Atas'
+	MeenutesDir: 'Atas'
 }
 
 export default class MyPlugin extends Plugin {
 	settings: MyPluginSettings;	
 
+	async loadTree(){
+		if (!this.app.vault.getFolderByPath(DEFAULT_SETTINGS.MeenutesDir)) {
+			this.app.vault.createFolder(DEFAULT_SETTINGS.MeenutesDir)
+		} 
+
+		const folder = this.app.vault.getFolderByPath(DEFAULT_SETTINGS.MeenutesDir);
+
+		await folder?.children.forEach(async (file)=>{
+			const realPath = this.app.vault.adapter.basePath+ '/' + file.path;
+			console.log(realPath);
+			console.log(file.name.replace('.md','').trim());
+			const name : string = await file.name.replace('.md','').trim();
+			MDParser.AppendToExistingTreeFromPath(realPath, name);
+		});
+
+
+	}
+
 	async onload() {
 		await this.loadSettings();
-
+		this.loadTree();
 		this.registerView(
 			VIEW_TYPE_EXAMPLE,
 			(leaf) => new ExampleView(leaf)
@@ -165,6 +185,12 @@ export class ExampleView extends ItemView {
 	}
   
 	async onOpen() {
+	  const MainDir = 'Meeting_Composer_Search/';
+	  const MainOutputName = 'output.md';
+	  const MainOutput = MainDir + MainOutputName;
+	  const realMainDir = this.app.vault.adapter.basePath+ '/' + MainDir;
+	  const realMainOutput = this.app.vault.adapter.basePath + '/' + MainOutput;
+
 	  const container = this.containerEl.children[1];
 	  const {contentEl} = this;
 	  container.empty();
@@ -183,11 +209,9 @@ export class ExampleView extends ItemView {
 	    
 		let Work : WorkspaceLeaf | null = null;
 		item.onClick(async ()=>{
-			const file = await this.app.vault.getFileByPath('test.md');
+			const file = await this.app.vault.getFileByPath(MainOutput);
 			//Work = this.app.workspace.getLeaf("tab");
 
-			
-			
 			if (!Work) {
 				Work = this.app.workspace.getLeaf("tab");
 				//this.app.workspace.getMostRecentLeaf();
@@ -218,19 +242,50 @@ export class ExampleView extends ItemView {
 			}
 			
 			//this.app.workspace.openPopoutLeaf();
-			new Notice("should open");
+			new Notice("should open");	
+
+
+			const display = MDParser.getOrganizedTopics(search,true);
+			const print = MDParser.convertOrganizedTopicToMD(display);
+			//container.createEl('textarea', {text : print, attr :{width : '100%'}, }).setCssStyles({width : "100%", height : "70vh"});
+			
+			writeAnswer(realMainDir,MainOutputName,print);
+
 		})
 		
 	  });
+	  const vault = this.app.vault;
 	  
-	  const t = "wo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieuwo \n wo \n vieubvrwnvrwvnwrijnonbno";
-	  const b = ()=>{console.log()};
+
+	  console.log(MainOutput);
+	  
+	  if (!vault.getFolderByPath(MainDir)) {
+		vault.createFolder(MainDir);
+	  } 
+
+	  const folder = vault.getFolderByPath(MainDir);
+
+	  if (!vault.getFileByPath(MainOutput)) {
+		vault.create(MainOutput, "");
+	  }
+
+
+	  const file = vault.getFileByPath(MainOutput);
+	  console.log(file);
+	  
+	  if (file) {
+		console.log(realMainDir);
+	  }
+	  
+	  const display = MDParser.getOrganizedTopics("Reunião",true);
+	  const print = MDParser.convertOrganizedTopicToMD(display);
 	  container.createEl('button',{text : "click me"})
 	  container.createDiv();
-	  container.createEl('br', {title : t});
+	  container.createEl('br');
 
-	  container.createEl('textarea', {text : t, attr :{width : '100%'}, }).setCssStyles({width : "100%", height : "70vh"});
-
+	  //container.createEl('textarea', {text : print, attr :{width : '100%'}, }).setCssStyles({width : "100%", height : "70vh"});
+	  
+	  writeAnswer(realMainDir,MainOutputName,print);
 	  
 	  container.getElementsByTagName("button")
 	}
@@ -289,9 +344,9 @@ class SampleSettingTab extends PluginSettingTab {
 			.setDesc('Meenutes Directory')
 			.addText(text => text
 				.setPlaceholder('Use the Relarive Pah')
-				.setValue(this.plugin.settings.mySetting)
+				.setValue(this.plugin.settings.MeenutesDir)
 				.onChange(async (value) => {
-					this.plugin.settings.mySetting = value;
+					this.plugin.settings.MeenutesDir = value;
 					await this.plugin.saveSettings();
 				}));
 	}
