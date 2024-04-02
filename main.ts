@@ -199,7 +199,7 @@ export class ExampleView extends ItemView {
 	  
 	  new Setting(contentEl).setName("Search").addText(item => {
 	    item.onChange(string =>{
-			new Notice(string);
+			
 			search = string;
 		});
 		
@@ -244,12 +244,22 @@ export class ExampleView extends ItemView {
 			//this.app.workspace.openPopoutLeaf();
 			new Notice("should open");	
 
+			if (!search.includes('#')) {
+				const display = MDParser.getOrganizedTopics(search,true);
+				const print = MDParser.convertOrganizedTopicToMD(display);
+				writeAnswer(realMainDir,MainOutputName,print);
+			}else{
+				const ss = search.replace('#','');
+				console.log(ss);
+				const display = MDParser.getOrganizedTags(ss);
+				const print = MDParser.convertOrganizedTopicToMD(display);
+				writeAnswer(realMainDir,MainOutputName,print);
+			}
 
-			const display = MDParser.getOrganizedTopics(search,true);
-			const print = MDParser.convertOrganizedTopicToMD(display);
+			
 			//container.createEl('textarea', {text : print, attr :{width : '100%'}, }).setCssStyles({width : "100%", height : "70vh"});
 			
-			writeAnswer(realMainDir,MainOutputName,print);
+			
 
 		})
 		
