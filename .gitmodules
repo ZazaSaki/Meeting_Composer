@@ -1,0 +1,3 @@
+[submodule "DataMeenutes"]
+	path = DataMeenutes
+	url = https://github.com/ZazaSaki/DataMeenutes.git
