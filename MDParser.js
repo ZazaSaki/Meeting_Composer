@@ -1,8 +1,10 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const MarkdownParser = /** @class */ (function () {
+export const MarkdownParser = /** @class */ (function () {
     function MarkdownParser() {
     }
+
+
     MarkdownParser.prototype.parseMarkdown = function (markdownText) {
         var lines = markdownText.split('\n');
         var headings = [];
@@ -141,7 +143,7 @@ function nameGetter (name) {
 // historic: let [], list of parents [it starts as an empty local array]
 // 
 // return : {Object}
-function getTopicFirtsApearence(topic, Dict, historic = []) {
+export function getTopicFirtsApearence(topic, Dict, historic = []) {
 
     
 
@@ -164,7 +166,7 @@ function getTopicFirtsApearence(topic, Dict, historic = []) {
 }
 
 
-function getTopicToList(topic, Dict, historic = [], answer = []) {
+export function getTopicToList(topic, Dict, historic = [], answer = []) {
     historic
     let done = null;
     
@@ -201,7 +203,7 @@ function getTopicToList(topic, Dict, historic = [], answer = []) {
 // historic:[], list of parents
 // 
 // return :[{ {Object}, [Parents of the object] }]
-function getTopics(Topic, Tree) {
+export function getTopics(Topic, Tree) {
     let out = [];
     let list = []
     const ans = getTopicToList(Topic, Tree, list, out);

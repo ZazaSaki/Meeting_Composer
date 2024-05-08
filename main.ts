@@ -1,12 +1,17 @@
-import { App, Editor, MarkdownView, Modal, Notice, Plugin, PluginSettingTab, Setting, View } from 'obsidian';
+import { App, Component, Editor, MarkdownView, Modal, Notice, Plugin, PluginSettingTab, Setting, TFolder, View } from 'obsidian';
 import { editorInfoField } from 'obsidian';
 import { ItemView, WorkspaceLeaf } from "obsidian";
 import { MarkdownParser } from './DataMeenutes/App';
+import { createRoot, Root } from 'react-dom/client';
+import {StrictMode} from 'react';
+import FileTree from './FileTree';
 const MDParser = new MarkdownParser();
 
 //const MDParser = new MarkdownParser();
 
 export const VIEW_TYPE_EXAMPLE = "example-view";
+export const VIEW_TYPE_FILE = "file-view";
+
 import {basicSetup} from 'codemirror';
 import {
 	ViewUpdate,
@@ -15,6 +20,7 @@ import {
 	ViewPlugin,
   } from "@codemirror/view";
 import { writeAnswer } from 'DataMeenutes/FileReader';
+import { render } from 'react-dom';
 // Remember to rename these classes and interfaces!
 
 interface MyPluginSettings {
@@ -25,8 +31,30 @@ const DEFAULT_SETTINGS: MyPluginSettings = {
 	MeenutesDir: 'Atas'
 }
 
+class TreeFolder {
+	name: string;
+	children: TreeFolder[];
+  
+	constructor(name: string) {
+	  this.name = name;
+	  this.children = [];
+	}
+  }
+
+  	let TreeView : MyFolderItemView | null = null;
 export default class MyPlugin extends Plugin {
 	settings: MyPluginSettings;	
+	createTreeView(leaf: WorkspaceLeaf, folder: TreeFolder): ItemView {
+		const view = new MyFolderItemView(leaf, this,folder);
+		TreeView = view;
+		// Recursively add child ItemViews
+		for (const child of folder.children) {
+		  view.addChild(this.createTreeView(leaf, child));
+		  console.log(child.name);
+		}
+		console.log(view);
+		return view;
+	  }
 
 	async loadTree(){
 		if (!this.app.vault.getFolderByPath(DEFAULT_SETTINGS.MeenutesDir)) {
@@ -48,6 +76,7 @@ export default class MyPlugin extends Plugin {
 
 	async reloadTree(){
 		MDParser.resetTree();
+		TreeView?.onOpen()
 		await this.loadTree();
 	}
 
@@ -58,18 +87,20 @@ export default class MyPlugin extends Plugin {
 			VIEW_TYPE_EXAMPLE,
 			(leaf) => new ExampleView(leaf)
 		  );
-	  
-		  this.addRibbonIcon("dice", "Activate view", () => {
-			this.activateView();
-		  });
 
-		// This creates an icon in the left ribbon.
-		const ribbonIconEl = this.addRibbonIcon('dice', 'Sample Plugin', (evt: MouseEvent) => {
-			// Called when the user clicks the icon.
-			new Notice('This is a notice!');
-		});
-		// Perform additional things with the ribbon
-		ribbonIconEl.addClass('my-plugin-ribbon-class');
+		  const folder = new TreeFolder("test");
+		  folder.children = [new TreeFolder("ff"),new TreeFolder("aa"),new TreeFolder("rrr")];
+
+		this.registerView(
+			VIEW_TYPE_FILE,
+			(leaf) => this.createTreeView(leaf,folder)
+		);
+
+		
+		  this.addRibbonIcon("scroll-text", "Activate view", () => {
+			this.activateView();
+			this.activateFileView();
+		  });
 
 		// This adds a status bar item to the bottom of the app. Does not work on mobile apps.
 		const statusBarItemEl = this.addStatusBarItem();
@@ -166,18 +197,198 @@ export default class MyPlugin extends Plugin {
 			workspace.revealLeaf(leaf);
 		  }
 		  
-		}
+		}		
+	  }
+
+	  async activateFileView() {
+		const { workspace } = this.app;
 	
-		
+		let leaf: WorkspaceLeaf | null = null;
+		const leaves = workspace.getLeavesOfType(VIEW_TYPE_FILE);
+	
+		if (leaves.length > 0) {
+		  // A leaf with our view already exists, use that
+		  leaf = leaves[0];
+		} else {
+		  // Our view could not be found in the workspace, create a new leaf
+		  // in the right sidebar for it
+		  leaf = workspace.getRightLeaf(false);
+		  if (leaf) {
+			await leaf.setViewState({ type: VIEW_TYPE_FILE, active: true });
+			// "Reveal" the leaf in case it is in a collapsed sidebar
+			workspace.revealLeaf(leaf);
+		  }
+		  
+		}
 	  }
 	
 
 	
 }
 
+interface Folder {
+	name: string;
+	children?: Folder[];
+	toggleFolder : Function;
+	isOpen : Boolean;
+  }
+  
+
+class MyFolderItemView extends ItemView {
+	plugin: MyPlugin;
+	folder: any;
+	isOpen: boolean = false;
+	children: ItemView[] = [];
+
+	root : Root;
+  
+	constructor(leaf: WorkspaceLeaf, plugin: MyPlugin) {
+	  super(leaf);
+	  this.plugin = plugin;
+	  
+	}
+  
+	getViewType(): string {
+	  return VIEW_TYPE_FILE; // differentiate folder view type
+	}
+  
+	getDisplayText(): string {
+	  return "Tree up up hehe";
+	}
+	
+	async renderTreeContainer(TopicTree : any){
+		const container = this.containerEl.children[1];
+		const {contentEl} = this;
+		container.empty();
+		const pointer = container.createEl("h4", { text: "Tree is up up " });
+		
+		// const toggleFolder = (data:any)=>{
+		// 	data.isOpen = !data.isOpen;
+		// 	console.log(data.name);
+		// 	console.log(data.isOpen);
+		// 	console.log('toggle');
+		// 	console.log(data.isOpen);
+		// };
+
+		// var myData : any = {
+		// name: 'Root Folder',
+		// 	children: [
+		// 	{ name: 'Folder 1', 
+		// 			children: [{ name: 'File A' }, { name: 'File B' }],
+		// 			isOpen : true,
+		// 			toggleFolder: toggleFolder,
+		// 		},
+		// 	  { name: 'Folder 2', 
+		// 	  		children: [
+		// 				{ name: 'File C',
+		// 				children: [{ name: 'File A' }, { name: 'File B' }],
+		// 				isOpen : true,
+		// 				toggleFolder: toggleFolder,
+		// 				}],
+		// 			isOpen : true,
+		// 			toggleFolder: toggleFolder,
+		// 		},
+		// 	],
+		// 	isOpen : true,
+		// 	toggleFolder: toggleFolder,
+			
+
+		//   };
+		
+		
+		
+		//console.log(TopicTree);
+
+		this.root = createRoot(container);
+		const funcfunc = ()=>{
+			console.log('\n wbhfiuwehbfbawbfoeigy \n\n wbhfiuwehbfbawbfoeigy \n\n wbhfiuwehbfbawbfoeigy \n')
+		};
+		pointer.onClickEvent(funcfunc);
+
+		
+		this.root.render(FileTree(TopicTree, 0, TopicTree));
+		// this.containerEl.children[0].;
+		
+	}
+
+	async onOpen(){
+		
+		
+		const toggleFolder = (data:Folder, root :Folder, self:any = true, name = '')=>{
+			
+			console.log(name);
+			
+			//console.log(data.isOpen);
+			if(!(root.name == data.name)){	
+				console.log(data.name);
+				console.log(name);
+				console.log(self);
+				console.log('in');
+				console.log(data.name == name);
+
+				//	console.log(this);
+				
+
+				if (data.name == name) {
+					if (self) {
+					data.isOpen = !data.isOpen;
+					console.log(data.name);
+					console.log(root);
+					console.log('in not self');
+
+					data.children?.forEach(element => {
+						element.toggleFolder(element, root, false)
+					});
+					console.log(root);
+
+					if (self) {
+						this.renderTreeContainer(root);
+					}
+				}else{
+					//data.isOpen = true;
+				} 
+				
+				// data.children?.forEach(element => {
+				// 	element.toggleFolder(element, root, false)
+				// });
+				}
+			}
+			
+		};
+		const TopicTree = MDParser.GenerateTopicTree(false, toggleFolder);
+		this.renderTreeContainer(TopicTree);
+		
+	  //this.plugin.app.vault.postMessage({ type: "folder-toggle", folder: this.folder, isOpen: this.isOpen });
+	}
+
+	async onClose(): Promise<void> {
+		this.root?.unmount();
+	}
+	
+	
+
+	addChild<T extends Component>(child: T): T {
+		this.children.push(child as unknown as ItemView); // Cast child to ItemView
+		return child;
+  }
+
+  }
+  
+  // Respond to messages from the main view to update the dropdown state
+// //   addCachedData({
+// // 	type: "folder-toggle",
+// // 	handler: (data: { folder: TFolder; isOpen: boolean }) => {
+// // 	  // Find the corresponding ItemView and update its state
+// // 	  // ... (implementation to find and update the ItemView)
+// // 	},
+// //   });
+
 export class ExampleView extends ItemView {
+	root : Root;
+	
 	constructor(leaf: WorkspaceLeaf) {
 	  super(leaf);
+	  
 	}
   
 	getViewType() {
@@ -202,7 +413,7 @@ export class ExampleView extends ItemView {
 	  container.createEl("h4", { text: "Meetting Composer" });
       let search : string = "";
 	  
-	  new Setting(contentEl).setName("Search").addText(item => {
+	  const SearchArea = new Setting(contentEl).setName("Search").addText(item => {
 	    item.onChange(string =>{
 			
 			search = string;
@@ -212,6 +423,8 @@ export class ExampleView extends ItemView {
 	  }).addButton(item =>{
 		item.setButtonText("search");
 	    
+
+
 		let Work : WorkspaceLeaf | null = null;
 		item.onClick(async ()=>{
 			const file = await this.app.vault.getFileByPath(MainOutput);
@@ -264,8 +477,6 @@ export class ExampleView extends ItemView {
 			
 			//container.createEl('textarea', {text : print, attr :{width : '100%'}, }).setCssStyles({width : "100%", height : "70vh"});
 			
-			
-
 		})
 		
 	  });
@@ -292,17 +503,119 @@ export class ExampleView extends ItemView {
 		console.log(realMainDir);
 	  }
 	  
-	  const display = MDParser.getOrganizedTopics("Reunião",true);
-	  const print = MDParser.convertOrganizedTopicToMD(display);
+	  const inner : string = `<!DOCTYPE html>
+	  <html>
+	  <head>
+	  <meta name="viewport" content="width=device-width, initial-scale=1">
+	  <style>
+	  ul, #myUL {
+		list-style-type: none;
+	  }
 	  
-	  container.createDiv();
-	  container.createEl('br');
+	  #myUL {
+		margin: 0;
+		padding: 0;
+	  }
+	  
+	  .caret {
+		cursor: pointer;
+		-webkit-user-select: none; /* Safari 3.1+ */
+		-moz-user-select: none; /* Firefox 2+ */
+		-ms-user-select: none; /* IE 10+ */
+		user-select: none;
+	  }
+	  
+	  .caret::before {
+		content: "\\25B6";
+		color: black;
+		display: inline-block;
+		margin-right: 6px;
+	  }
+	  
+	  .caret-down::before {
+		-ms-transform: rotate(90deg); /* IE 9 */
+		-webkit-transform: rotate(90deg); /* Safari */'
+		transform: rotate(90deg);  
+	  }
+	  
+	  .nested {
+		display: none;
+	  }
+	  
+	  .active {
+		display: block;
+	  }
+	  </style>
+	  </head>
+	  <body>
+	  
+	  <h2>Tree View</h2>
+	  <p>A tree view represents a hierarchical view of information, where each item can have a number of subitems.</p>
+	  <p>Click on the arrow(s) to open or close the tree branches.</p>
+	  
+	  <ul id="myUL">
+		<li><span class="caret">Beverages</span>
+		  <ul class="nested">
+			<li>Water</li>
+			<li>Coffee</li>
+			<li><span class="caret">Tea</span>
+			  <ul class="nested">
+				<li>Black Tea</li>
+				<li>White Tea</li>
+				<li><span class="caret">Green Tea</span>
+				  <ul class="nested">
+					<li>Sencha</li>
+					<li>Gyokuro</li>
+					<li>Matcha</li>
+					<li>Pi Lo Chun</li>
+				  </ul>
+				</li>
+			  </ul>
+			</li>  
+		  </ul>
+		</li>
+	  </ul>
+	  
+	  <script>
+	  var toggler = document.getElementsByClassName("caret");
+	  var i;
+	  
+	  for (i = 0; i < toggler.length; i++) {
+		toggler[i].addEventListener("click", function() {
+		  this.parentElement.querySelector(".nested").classList.toggle("active");
+		  this.classList.toggle("caret-down");
+		});
+	  }
+	  </script>
+	  
+	  </body>
+	  </html>
+	  `
+	  
+	  const div = container.createEl("li", "Name",(Root) => {
+		//Root.appendChild();
+	  });
+	  
+	  const bb = new Setting(div).addButton((bbb)=>{
+		bbb.setButtonText("name");
+	  });
 
+	  new Setting(div).addColorPicker(()=>{
+
+	  });
+	  
+	  new Setting(div).setHeading().setName("File");
+
+	  div.onClickEvent((event)=>{
+		console.log("here it is");
+		console.log(event);
+		console.log("here it was");
+
+	  });
 	  //container.createEl('textarea', {text : print, attr :{width : '100%'}, }).setCssStyles({width : "100%", height : "70vh"});
+
 	  
-	  writeAnswer(realMainDir,MainOutputName,print);
 	  
-	  container.getElementsByTagName("button")
 	}
   
 	async onClose() {
@@ -368,6 +681,7 @@ class SampleSettingTab extends PluginSettingTab {
 		new Setting(containerEl).setName('Reload the Files').addButton((item)=>{
 			item.onClick(()=>{
 				this.plugin.reloadTree();
+				this.plugin.activateFileView();
 			});
 			item.setButtonText("Reload");
 		});
