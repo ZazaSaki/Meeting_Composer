@@ -6,7 +6,7 @@ import { createRoot, Root } from 'react-dom/client';
 import {StrictMode} from 'react';
 import FileTree from './FileTree';
 const MDParser = new MarkdownParser();
-
+var OutputWindow :WorkspaceLeaf | null = null;
 //const MDParser = new MarkdownParser();
 
 export const VIEW_TYPE_EXAMPLE = "example-view";
@@ -21,14 +21,19 @@ import {
   } from "@codemirror/view";
 import { writeAnswer } from 'DataMeenutes/FileReader';
 import { render } from 'react-dom';
+import { cursorTo } from 'readline';
 // Remember to rename these classes and interfaces!
 
 interface MyPluginSettings {
 	MeenutesDir: string;
+	OutputFileName : string;
+	OutputDir : string;
 }
 
 const DEFAULT_SETTINGS: MyPluginSettings = {
-	MeenutesDir: 'Atas'
+	MeenutesDir: 'Atas',
+	OutputFileName: 'output.md',
+	OutputDir : 'Meeting_Composer_Search/',
 }
 
 class TreeFolder {
@@ -352,6 +357,14 @@ class MyFolderItemView extends ItemView {
 				// 	element.toggleFolder(element, root, false)
 				// });
 				}
+
+				
+
+				if (!OutputWindow || OutputWindow.getViewState().type == 'empty') {
+					OutputWindow = this.app.workspace.getLeaf("tab");
+					
+				}
+				this.printSearch(data.name, OutputWindow);
 			}
 			
 		};
@@ -359,6 +372,47 @@ class MyFolderItemView extends ItemView {
 		this.renderTreeContainer(TopicTree);
 		
 	  //this.plugin.app.vault.postMessage({ type: "folder-toggle", folder: this.folder, isOpen: this.isOpen });
+	}
+
+	async printSearch(search:string, WindowRef : WorkspaceLeaf) {
+		const MainOutput = DEFAULT_SETTINGS.OutputDir + DEFAULT_SETTINGS.OutputFileName;
+		const realMainDir = this.app.vault.adapter.basePath+ '/' + DEFAULT_SETTINGS.OutputDir;
+		const realMainOutput = this.app.vault.adapter.basePath + '/' + MainOutput;
+		const file = await this.app.vault.getFileByPath(MainOutput);
+		let markdownView = this.app.workspace.getActiveViewOfType(MarkdownView);
+		
+
+		if (markdownView) {
+			WindowRef.setViewState({type: "markdown", active : true});
+			new Notice(new MarkdownView(WindowRef).getViewType());
+		}
+		
+		markdownView = this.app.workspace.getActiveViewOfType(MarkdownView);
+
+		if (markdownView) {
+			//Work.getCursor();
+			
+		}
+		
+		if (file) {
+			WindowRef.openFile(file);
+			
+		}
+		
+		//this.app.workspace.openPopoutLeaf();
+		new Notice("should open");	
+
+		if (!search.includes('#')) {
+			const display = MDParser.getOrganizedTopics(search,true);
+			const print = MDParser.convertOrganizedTopicToMD(display);
+			writeAnswer(realMainDir,DEFAULT_SETTINGS.OutputFileName,print);
+		}else{
+			const ss = search.replace('#','');
+			console.log(ss);
+			const display = MDParser.getOrganizedTags(ss);
+			const print = MDParser.convertOrganizedTopicToMD(display);
+			writeAnswer(realMainDir,DEFAULT_SETTINGS.OutputFileName,print);
+		}
 	}
 
 	async onClose(): Promise<void> {
@@ -399,13 +453,55 @@ export class ExampleView extends ItemView {
 	getDisplayText() {
 	  return "Meeting Composer";
 	}
-  
+	
+	async printSearch(search:string, WindowRef : WorkspaceLeaf) {
+		const MainOutput = DEFAULT_SETTINGS.OutputDir + DEFAULT_SETTINGS.OutputFileName;
+		const realMainDir = this.app.vault.adapter.basePath+ '/' + DEFAULT_SETTINGS.OutputDir;
+		const realMainOutput = this.app.vault.adapter.basePath + '/' + MainOutput;
+		const file = await this.app.vault.getFileByPath(MainOutput);
+		let markdownView = this.app.workspace.getActiveViewOfType(MarkdownView);
+		
+
+		if (markdownView) {
+			WindowRef.setViewState({type: "markdown", active : false, pinned: false});
+			new Notice(new MarkdownView(WindowRef).getViewType());
+		}
+		
+		markdownView = this.app.workspace.getActiveViewOfType(MarkdownView);
+		
+		if (markdownView) {
+			//Work.getCursor();
+			
+		}
+		
+		if (file) {
+			// WindowRef.getViewState();
+			WindowRef.openFile(file);
+			
+		}
+		
+		//this.app.workspace.openPopoutLeaf();
+		new Notice("should open m8 m8 ");	
+
+		if (!search.includes('#')) {
+			const display = MDParser.getOrganizedTopics(search,true);
+			const print = MDParser.convertOrganizedTopicToMD(display);
+			writeAnswer(realMainDir,DEFAULT_SETTINGS.OutputFileName,print);
+		}else{
+			const ss = search.replace('#','');
+			console.log(ss);
+			const display = MDParser.getOrganizedTags(ss);
+			const print = MDParser.convertOrganizedTopicToMD(display);
+			writeAnswer(realMainDir,DEFAULT_SETTINGS.OutputFileName,print);
+		}
+	}
+
 	async onOpen() {
-	  const MainDir = 'Meeting_Composer_Search/';
-	  const MainOutputName = 'output.md';
-	  const MainOutput = MainDir + MainOutputName;
-	  const realMainDir = this.app.vault.adapter.basePath+ '/' + MainDir;
-	  const realMainOutput = this.app.vault.adapter.basePath + '/' + MainOutput;
+		const MainDir = 'Meeting_Composer_Search/';
+		const MainOutputName = 'output.md';
+		const MainOutput = MainDir + MainOutputName;
+		// const realMainDir = this.app.vault.adapter.basePath+ '/' + MainDir;
+		// const realMainOutput = this.app.vault.adapter.basePath + '/' + MainOutput;
 
 	  const container = this.containerEl.children[1];
 	  const {contentEl} = this;
@@ -417,6 +513,33 @@ export class ExampleView extends ItemView {
 	    item.onChange(string =>{
 			
 			search = string;
+			
+			// // // const file = await this.app.vault.getFileByPath(MainOutput);
+			// // // //Work = this.app.workspace.getLeaf("tab");
+
+			// if (!OutputWindow || OutputWindow.getViewState().type == 'empty') {
+			// 	OutputWindow = this.app.workspace.getLeaf("tab");
+				
+				
+				
+			// 	//this.app.workspace.getMostRecentLeaf();
+			// 	OutputWindow.getContainer().on('quit',()=>{
+			// 		console.log('Is really really closed');
+			// 	});
+				
+			// }
+
+			
+
+			// if(OutputWindow.getRoot().getContainer().win.closed){
+			// 	console.log('Is really really closed');
+			// }
+			
+
+			// this.printSearch(search, OutputWindow);
+			
+			
+		
 		});
 		
 		new Notice(item.getValue())
@@ -424,58 +547,31 @@ export class ExampleView extends ItemView {
 		item.setButtonText("search");
 	    
 
-
-		let Work : WorkspaceLeaf | null = null;
+		
 		item.onClick(async ()=>{
-			const file = await this.app.vault.getFileByPath(MainOutput);
-			//Work = this.app.workspace.getLeaf("tab");
+			// // const file = await this.app.vault.getFileByPath(MainOutput);
+			// // //Work = this.app.workspace.getLeaf("tab");
 
-			if (!Work) {
-				Work = this.app.workspace.getLeaf("tab");
-				//this.app.workspace.getMostRecentLeaf();
+			if (!OutputWindow || await OutputWindow.getViewState().type == 'empty') {
+				OutputWindow = this.app.workspace.getLeaf("tab");
 				
+				
+				//this.app.workspace.getMostRecentLeaf();
+				OutputWindow.getContainer().on('quit',()=>{
+					console.log('Is really really closed');
+				});
+				
+			}
+
+			
+
+			if(OutputWindow.getRoot().getContainer().win.closed){
+				console.log('Is really really closed');
 			}
             
 
+			this.printSearch(search, OutputWindow);
 			
-			
-			
-			let markdownView = this.app.workspace.getActiveViewOfType(MarkdownView);
-
-			if (markdownView) {
-				Work.setViewState({type: "markdown", active : true});
-				new Notice(new MarkdownView(Work).getViewType());
-			}
-			
-			markdownView = this.app.workspace.getActiveViewOfType(MarkdownView);
-
-			if (markdownView) {
-				//Work.getCursor();
-				
-			}
-			
-			if (file) {
-				Work.openFile(file);
-				
-			}
-			
-			//this.app.workspace.openPopoutLeaf();
-			new Notice("should open");	
-
-			if (!search.includes('#')) {
-				const display = MDParser.getOrganizedTopics(search,true);
-				const print = MDParser.convertOrganizedTopicToMD(display);
-				writeAnswer(realMainDir,MainOutputName,print);
-			}else{
-				const ss = search.replace('#','');
-				console.log(ss);
-				const display = MDParser.getOrganizedTags(ss);
-				const print = MDParser.convertOrganizedTopicToMD(display);
-				writeAnswer(realMainDir,MainOutputName,print);
-			}
-
-			
-			//container.createEl('textarea', {text : print, attr :{width : '100%'}, }).setCssStyles({width : "100%", height : "70vh"});
 			
 		})
 		
@@ -499,9 +595,9 @@ export class ExampleView extends ItemView {
 	  const file = vault.getFileByPath(MainOutput);
 	  console.log(file);
 	  
-	  if (file) {
-		console.log(realMainDir);
-	  }
+	//   if (file) {
+	// 	console.log(realMainDir);
+	//   }
 	  
 	  const inner : string = `<!DOCTYPE html>
 	  <html>
@@ -668,8 +764,8 @@ class SampleSettingTab extends PluginSettingTab {
 		containerEl.empty();
 
 		new Setting(containerEl)
-			.setName('Meenutes Settings')
-			.setDesc('Meenutes Directory')
+			.setName('Meenutes Directory')
+			.setDesc('Where are the meenutes store relative to the vault')
 			.addText(text => text
 				.setPlaceholder('Use the Relarive Pah')
 				.setValue(this.plugin.settings.MeenutesDir)
@@ -677,6 +773,28 @@ class SampleSettingTab extends PluginSettingTab {
 					this.plugin.settings.MeenutesDir = value;
 					await this.plugin.saveSettings();
 				}));
+
+				new Setting(containerEl)
+				.setName('Meenutes Output File Name')
+				.setDesc('Output File Name the print the search results')
+				.addText(text => text
+					.setPlaceholder('Use the Relarive Pah')
+					.setValue(this.plugin.settings.OutputFileName)
+					.onChange(async (value) => {
+						this.plugin.settings.OutputFileName = value;
+						await this.plugin.saveSettings();
+					}));
+
+				new Setting(containerEl)
+				.setName('Meenutes Output Directory Name')
+				.setDesc('Output Directory Name the print the search results')
+				.addText(text => text
+					.setPlaceholder('Use the Relarive Pah')
+					.setValue(this.plugin.settings.OutputDir)
+					.onChange(async (value) => {
+						this.plugin.settings.OutputFileName = value;
+						await this.plugin.saveSettings();
+					}));
 
 		new Setting(containerEl).setName('Reload the Files').addButton((item)=>{
 			item.onClick(()=>{
