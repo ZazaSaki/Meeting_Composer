@@ -1,4 +1,4 @@
-import { App, AbstractInputSuggest, MarkdownView, Notice, Plugin, PluginSettingTab, Setting, TFile, ItemView, WorkspaceLeaf } from 'obsidian';
+import { App, AbstractInputSuggest, Editor, EditorPosition, EditorSuggest, EditorSuggestContext, EditorSuggestTriggerInfo, MarkdownView, Notice, Plugin, PluginSettingTab, Setting, TFile, ItemView, WorkspaceLeaf } from 'obsidian';
 import { MarkdownParser, DEFAULT_PRIORITY_BEFORE_CITIES, DEFAULT_PRIORITY_AFTER_CITIES, DEFAULT_CITIES } from './DataMeenutes/App';
 import { createRoot, Root } from 'react-dom/client';
 import { FileTreeRoot } from './FileTree';
@@ -93,6 +93,7 @@ export default class MyPlugin extends Plugin {
 		});
 
 		this.addSettingTab(new MeetingComposerSettingTab(this.app, this));
+		this.registerEditorSuggest(new TopicEditorSuggest(this.app, this));
 	}
 
 	onunload() {}
@@ -235,6 +236,41 @@ class MyFolderItemView extends ItemView {
 	async onClose(): Promise<void> {
 		this.root?.unmount();
 		this.root = null as any;
+	}
+}
+
+class TopicEditorSuggest extends EditorSuggest<string> {
+	plugin: MyPlugin;
+
+	constructor(app: App, plugin: MyPlugin) {
+		super(app);
+		this.plugin = plugin;
+	}
+
+	onTrigger(cursor: EditorPosition, editor: Editor, file: TFile): EditorSuggestTriggerInfo | null {
+		if (!this.plugin.settings.autoComplete) return null;
+		const line = editor.getLine(cursor.line);
+		const match = line.match(/^(#{1,6} )(.*)/);
+		if (!match) return null;
+		return {
+			start: { line: cursor.line, ch: match[1].length },
+			end: cursor,
+			query: match[2],
+		};
+	}
+
+	getSuggestions(context: EditorSuggestContext): string[] {
+		const lower = context.query.toLowerCase();
+		return MDParser.getAllTopicNames().filter(t => t.toLowerCase().includes(lower));
+	}
+
+	renderSuggestion(topic: string, el: HTMLElement): void {
+		el.createEl('div', { text: topic });
+	}
+
+	selectSuggestion(topic: string): void {
+		const { editor, start, end } = this.context;
+		editor.replaceRange(topic, start, end);
 	}
 }
 
