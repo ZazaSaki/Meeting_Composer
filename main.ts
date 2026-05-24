@@ -4,7 +4,7 @@ import { ItemView, WorkspaceLeaf } from "obsidian";
 import { MarkdownParser } from './DataMeenutes/App';
 import { createRoot, Root } from 'react-dom/client';
 import {StrictMode} from 'react';
-import FileTree from './FileTree';
+import FileTree, { FileTreeRoot } from './FileTree';
 const MDParser = new MarkdownParser();
 var OutputWindow :WorkspaceLeaf | null = null;
 //const MDParser = new MarkdownParser();
@@ -52,17 +52,11 @@ let currentToggle: Function = () => {};
 export default class MyPlugin extends Plugin {
 	settings: MyPluginSettings;
 	topicTree: any = null;
-	createTreeView(leaf: WorkspaceLeaf, folder: TreeFolder): ItemView {
-		const view = new MyFolderItemView(leaf, this,folder);
+	createTreeView(leaf: WorkspaceLeaf): ItemView {
+		const view = new MyFolderItemView(leaf, this);
 		TreeView = view;
-		// Recursively add child ItemViews
-		for (const child of folder.children) {
-		  view.addChild(this.createTreeView(leaf, child));
-		  console.log(child.name);
-		}
-		console.log(view);
 		return view;
-	  }
+	}
 
 	async loadTree(){
 		const dir = this.settings.MeenutesDir;
@@ -96,12 +90,9 @@ export default class MyPlugin extends Plugin {
 			(leaf) => new ExampleView(leaf)
 		  );
 
-		  const folder = new TreeFolder("test");
-		  folder.children = [new TreeFolder("ff"),new TreeFolder("aa"),new TreeFolder("rrr")];
-
 		this.registerView(
 			VIEW_TYPE_FILE,
-			(leaf) => this.createTreeView(leaf,folder)
+			(leaf) => this.createTreeView(leaf)
 		);
 
 		
@@ -272,7 +263,7 @@ class MyFolderItemView extends ItemView {
 			this.root = createRoot(container);
 		}
 
-		this.root.render(FileTree(TopicTree, 0, TopicTree));
+		this.root.render(FileTreeRoot(TopicTree, () => this.plugin.reloadTree()));
 	}
 
 	async onOpen(){
