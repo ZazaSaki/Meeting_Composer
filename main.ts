@@ -1,5 +1,5 @@
 import { App, MarkdownView, Notice, Plugin, PluginSettingTab, Setting, TFile, ItemView, WorkspaceLeaf } from 'obsidian';
-import { MarkdownParser, CITIES } from './DataMeenutes/App';
+import { MarkdownParser, DEFAULT_PRIORITY_BEFORE_CITIES, DEFAULT_PRIORITY_AFTER_CITIES, DEFAULT_CITIES } from './DataMeenutes/App';
 import { createRoot, Root } from 'react-dom/client';
 import { FileTreeRoot } from './FileTree';
 import { writeAnswer } from 'DataMeenutes/FileReader';
@@ -14,12 +14,18 @@ interface MyPluginSettings {
 	MeenutesDir: string;
 	OutputFileName: string;
 	OutputDir: string;
+	priorityBeforeCities: string[];
+	cities: string[];
+	priorityAfterCities: string[];
 }
 
 const DEFAULT_SETTINGS: MyPluginSettings = {
 	MeenutesDir: 'Atas',
 	OutputFileName: 'output.md',
 	OutputDir: 'Meeting_Composer_Search/',
+	priorityBeforeCities: [...DEFAULT_PRIORITY_BEFORE_CITIES],
+	cities: [...DEFAULT_CITIES],
+	priorityAfterCities: [...DEFAULT_PRIORITY_AFTER_CITIES],
 }
 
 interface Folder {
@@ -69,6 +75,11 @@ export default class MyPlugin extends Plugin {
 
 	async onload() {
 		await this.loadSettings();
+		MDParser.setPriorityLists(
+			this.settings.priorityBeforeCities,
+			this.settings.cities,
+			this.settings.priorityAfterCities,
+		);
 		this.app.workspace.onLayoutReady(() => this.loadTree());
 
 		this.registerView(VIEW_TYPE_EXAMPLE, (leaf) => new ExampleView(leaf));
@@ -196,7 +207,7 @@ class MyFolderItemView extends ItemView {
 		if (!search.includes('#')) {
 			let display;
 			const cityContext = this.plugin.scopedSearch &&
-				parentPath.find(p => CITIES.some(c => c.toLowerCase() === p.toLowerCase()));
+				parentPath.find(p => MDParser.cities.some(c => c.toLowerCase() === p.toLowerCase()));
 			if (cityContext) {
 				let subTree: any = MDParser.getTree();
 				for (const parent of parentPath) {
@@ -339,6 +350,57 @@ class MeetingComposerSettingTab extends PluginSettingTab {
 					this.plugin.settings.OutputDir = value;
 					await this.plugin.saveSettings();
 				}));
+
+		new Setting(containerEl)
+			.setName('Topic priority — before cities')
+			.setDesc('Topics sorted before city groups, one per line, top = highest priority')
+			.addTextArea(text => {
+				text.setValue(this.plugin.settings.priorityBeforeCities.join('\n'));
+				text.inputEl.rows = 8;
+				text.onChange(async (value) => {
+					this.plugin.settings.priorityBeforeCities = value.split('\n').map(s => s.trim()).filter(s => s.length > 0);
+					MDParser.setPriorityLists(
+						this.plugin.settings.priorityBeforeCities,
+						this.plugin.settings.cities,
+						this.plugin.settings.priorityAfterCities,
+					);
+					await this.plugin.saveSettings();
+				});
+			});
+
+		new Setting(containerEl)
+			.setName('Cities')
+			.setDesc('City names used for grouping, one per line')
+			.addTextArea(text => {
+				text.setValue(this.plugin.settings.cities.join('\n'));
+				text.inputEl.rows = 4;
+				text.onChange(async (value) => {
+					this.plugin.settings.cities = value.split('\n').map(s => s.trim()).filter(s => s.length > 0);
+					MDParser.setPriorityLists(
+						this.plugin.settings.priorityBeforeCities,
+						this.plugin.settings.cities,
+						this.plugin.settings.priorityAfterCities,
+					);
+					await this.plugin.saveSettings();
+				});
+			});
+
+		new Setting(containerEl)
+			.setName('Topic priority — after cities')
+			.setDesc('Topics sorted after city groups, one per line, top = highest priority')
+			.addTextArea(text => {
+				text.setValue(this.plugin.settings.priorityAfterCities.join('\n'));
+				text.inputEl.rows = 4;
+				text.onChange(async (value) => {
+					this.plugin.settings.priorityAfterCities = value.split('\n').map(s => s.trim()).filter(s => s.length > 0);
+					MDParser.setPriorityLists(
+						this.plugin.settings.priorityBeforeCities,
+						this.plugin.settings.cities,
+						this.plugin.settings.priorityAfterCities,
+					);
+					await this.plugin.saveSettings();
+				});
+			});
 
 		new Setting(containerEl)
 			.setName('Reload minutes')
