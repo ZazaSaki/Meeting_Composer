@@ -18,6 +18,7 @@ interface MyPluginSettings {
 	cities: string[];
 	priorityAfterCities: string[];
 	autoComplete: boolean;
+	autoReload: boolean;
 }
 
 const DEFAULT_SETTINGS: MyPluginSettings = {
@@ -27,7 +28,8 @@ const DEFAULT_SETTINGS: MyPluginSettings = {
 	priorityBeforeCities: [...DEFAULT_PRIORITY_BEFORE_CITIES],
 	cities: [...DEFAULT_CITIES],
 	priorityAfterCities: [...DEFAULT_PRIORITY_AFTER_CITIES],
-	autoComplete: false,
+	autoComplete: true,
+	autoReload: true,
 }
 
 interface Folder {
@@ -44,6 +46,7 @@ export default class MyPlugin extends Plugin {
 	settings: MyPluginSettings;
 	topicTree: any = null;
 	scopedSearch: boolean = false;
+	private reloadDebounce: ReturnType<typeof setTimeout> | null = null;
 
 	createTreeView(leaf: WorkspaceLeaf): ItemView {
 		const view = new MyFolderItemView(leaf, this);
@@ -94,6 +97,16 @@ export default class MyPlugin extends Plugin {
 
 		this.addSettingTab(new MeetingComposerSettingTab(this.app, this));
 		this.registerEditorSuggest(new TopicEditorSuggest(this.app, this));
+
+		this.registerEvent(this.app.workspace.on('editor-change', (editor, info) => {
+			if (!this.settings.autoReload) return;
+			const file = info.file;
+			if (!file || !file.path.startsWith(this.settings.MeenutesDir + '/')) return;
+			const line = editor.getLine(editor.getCursor().line);
+			if (!/^#{1,6} .+/.test(line)) return;
+			if (this.reloadDebounce) clearTimeout(this.reloadDebounce);
+			this.reloadDebounce = setTimeout(() => this.reloadTree(), 1000);
+		}));
 	}
 
 	onunload() {}
@@ -423,11 +436,21 @@ class MeetingComposerSettingTab extends PluginSettingTab {
 
 		new Setting(containerEl)
 			.setName('Search autocomplete')
-			.setDesc('Suggest topic names while typing in the search box')
+			.setDesc('Suggest topic names while typing in the search box and in heading lines')
 			.addToggle(toggle => toggle
 				.setValue(this.plugin.settings.autoComplete)
 				.onChange(async (value) => {
 					this.plugin.settings.autoComplete = value;
+					await this.plugin.saveSettings();
+				}));
+
+		new Setting(containerEl)
+			.setName('Auto-reload tree on new heading')
+			.setDesc('Refresh the topic tree whenever a heading is written in a minutes file')
+			.addToggle(toggle => toggle
+				.setValue(this.plugin.settings.autoReload)
+				.onChange(async (value) => {
+					this.plugin.settings.autoReload = value;
 					await this.plugin.saveSettings();
 				}));
 
