@@ -1,4 +1,4 @@
-import { App, Component, Editor, MarkdownView, Modal, Notice, Plugin, PluginSettingTab, Setting, TFolder, View } from 'obsidian';
+import { App, Component, Editor, MarkdownView, Modal, Notice, Plugin, PluginSettingTab, Setting, TFile, TFolder, View } from 'obsidian';
 import { editorInfoField } from 'obsidian';
 import { ItemView, WorkspaceLeaf } from "obsidian";
 import { MarkdownParser } from './DataMeenutes/App';
@@ -62,32 +62,32 @@ export default class MyPlugin extends Plugin {
 	  }
 
 	async loadTree(){
-		if (!this.app.vault.getFolderByPath(DEFAULT_SETTINGS.MeenutesDir)) {
-			this.app.vault.createFolder(DEFAULT_SETTINGS.MeenutesDir)
-		} 
+		const dir = this.settings.MeenutesDir;
+		if (!this.app.vault.getFolderByPath(dir)) {
+			await this.app.vault.createFolder(dir);
+		}
 
-		const folder = this.app.vault.getFolderByPath(DEFAULT_SETTINGS.MeenutesDir);
+		const folder = this.app.vault.getFolderByPath(dir);
+		if (!folder) return;
 
-		await folder?.children.forEach(async (file)=>{
-			const realPath = this.app.vault.adapter.basePath+ '/' + file.path;
-			console.log(realPath);
-			console.log(file.name.replace('.md','').trim());
-			const name : string = await file.name.replace('.md','').trim();
-			MDParser.AppendToExistingTreeFromPath(realPath, name);
-		});
-
-
+		for (const child of folder.children) {
+			if (!(child instanceof TFile) || !child.name.endsWith('.md')) continue;
+			const content = await this.app.vault.read(child);
+			const name = child.name.replace('.md', '').trim();
+			const filePath = child.path.replace('.md', '');
+			MDParser.AppendToExistingTree(content, name, filePath);
+		}
 	}
 
 	async reloadTree(){
-		MDParser.resetTree();
-		TreeView?.onOpen()
-		await this.loadTree();
+		this.topicTree = null;
+		if (TreeView) TreeView.root = null as any;
+		TreeView?.onOpen();
 	}
 
 	async onload() {
 		await this.loadSettings();
-		this.loadTree();
+		this.app.workspace.onLayoutReady(() => this.loadTree());
 		this.registerView(
 			VIEW_TYPE_EXAMPLE,
 			(leaf) => new ExampleView(leaf)
