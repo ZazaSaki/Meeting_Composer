@@ -352,8 +352,8 @@ class MeetingComposerSettingTab extends PluginSettingTab {
 				}));
 
 		new Setting(containerEl)
-			.setName('Topic priority — before cities')
-			.setDesc('Topics sorted before city groups, one per line, top = highest priority')
+			.setName('Organizations')
+			.setDesc('Topics sorted before sectors, one per line, top = highest priority')
 			.addTextArea(text => {
 				text.setValue(this.plugin.settings.priorityBeforeCities.join('\n'));
 				text.inputEl.rows = 8;
@@ -369,8 +369,8 @@ class MeetingComposerSettingTab extends PluginSettingTab {
 			});
 
 		new Setting(containerEl)
-			.setName('Cities')
-			.setDesc('City names used for grouping, one per line')
+			.setName('Sectors')
+			.setDesc('Sector names used for grouping and scoped search, one per line')
 			.addTextArea(text => {
 				text.setValue(this.plugin.settings.cities.join('\n'));
 				text.inputEl.rows = 4;
@@ -386,8 +386,8 @@ class MeetingComposerSettingTab extends PluginSettingTab {
 			});
 
 		new Setting(containerEl)
-			.setName('Topic priority — after cities')
-			.setDesc('Topics sorted after city groups, one per line, top = highest priority')
+			.setName('Important Topics')
+			.setDesc('Topics sorted after sectors, one per line, top = highest priority')
 			.addTextArea(text => {
 				text.setValue(this.plugin.settings.priorityAfterCities.join('\n'));
 				text.inputEl.rows = 4;
