@@ -5,12 +5,16 @@ interface Folder {
   children?: Folder[];
   toggleFolder : Function;
   isOpen : Boolean;
+  path?: string[];
 }
 
-export function FileTreeRoot(data: Folder, onRefresh: () => void) {
+export function FileTreeRoot(data: Folder, onRefresh: () => void, scopedSearch: boolean = false, onToggleScope: () => void = () => {}) {
   return (
     <div>
       <button onClick={onRefresh} style={{ marginBottom: '6px' }}>⟳ Refresh</button>
+      <button onClick={onToggleScope} style={{ marginBottom: '6px', marginLeft: '4px' }}>
+        {scopedSearch ? '📍 Scoped' : '🌐 Global'}
+      </button>
       {FileTree(data, 0, data)}
     </div>
   );
@@ -56,7 +60,7 @@ function FileTree(data: Folder, id:any=0, root = null){
     <span className="file-tree-item">
       {data.children ? (
         
-        <span onClick={(e)=>{e.stopPropagation(); data.toggleFolder(data, root, true, data.name)}} className={`folder ${data.isOpen ? 'open' : ''}`}>
+        <span onClick={(e)=>{e.stopPropagation(); data.toggleFolder(data, root, true, data.name, data.path || [])}} className={`folder ${data.isOpen ? 'open' : ''}`}>
           {space()}{data.name}{sign()}
           {data.isOpen && data.children && <span className="children">{renderChildren(data.children)}</span>}
 

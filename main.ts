@@ -1,7 +1,7 @@
 import { App, Component, Editor, MarkdownView, Modal, Notice, Plugin, PluginSettingTab, Setting, TFile, TFolder, View } from 'obsidian';
 import { editorInfoField } from 'obsidian';
 import { ItemView, WorkspaceLeaf } from "obsidian";
-import { MarkdownParser } from './DataMeenutes/App';
+import { MarkdownParser, CITIES } from './DataMeenutes/App';
 import { createRoot, Root } from 'react-dom/client';
 import {StrictMode} from 'react';
 import FileTree, { FileTreeRoot } from './FileTree';
@@ -52,6 +52,7 @@ let currentToggle: Function = () => {};
 export default class MyPlugin extends Plugin {
 	settings: MyPluginSettings;
 	topicTree: any = null;
+	scopedSearch: boolean = false;
 	createTreeView(leaf: WorkspaceLeaf): ItemView {
 		const view = new MyFolderItemView(leaf, this);
 		TreeView = view;
@@ -263,11 +264,19 @@ class MyFolderItemView extends ItemView {
 			this.root = createRoot(container);
 		}
 
-		this.root.render(FileTreeRoot(TopicTree, () => this.plugin.reloadTree()));
+		this.root.render(FileTreeRoot(
+			TopicTree,
+			() => this.plugin.reloadTree(),
+			this.plugin.scopedSearch,
+			() => {
+				this.plugin.scopedSearch = !this.plugin.scopedSearch;
+				this.renderTreeContainer(TopicTree);
+			}
+		));
 	}
 
 	async onOpen(){
-		currentToggle = (data:Folder, root:Folder, self:any = true, name = '') => {
+		currentToggle = (data:Folder, root:Folder, self:any = true, name = '', parentPath: string[] = []) => {
 			if (self && data !== root) {
 				data.isOpen = !data.isOpen;
 				this.renderTreeContainer(root);
@@ -276,14 +285,14 @@ class MyFolderItemView extends ItemView {
 				if (!OutputWindow || OutputWindow.getViewState().type == 'empty') {
 					OutputWindow = this.app.workspace.getLeaf("tab");
 				}
-				this.printSearch(data.name, OutputWindow);
+				this.printSearch(data.name, OutputWindow, parentPath);
 			}
 		};
 
 		if (!this.plugin.topicTree) {
 			MDParser.resetTree();
 			await this.plugin.loadTree();
-			const toogleWrapper = (data:any, root:any, self:any, name:string) => currentToggle(data, root, self, name);
+			const toogleWrapper = (data:any, root:any, self:any, name:string, parentPath:string[]) => currentToggle(data, root, self, name, parentPath);
 			this.plugin.topicTree = MDParser.GenerateTopicTree(false, toogleWrapper);
 			this.plugin.topicTree.isOpen = true;
 		}
@@ -293,36 +302,46 @@ class MyFolderItemView extends ItemView {
 	  //this.plugin.app.vault.postMessage({ type: "folder-toggle", folder: this.folder, isOpen: this.isOpen });
 	}
 
-	async printSearch(search:string, WindowRef : WorkspaceLeaf) {
+	async printSearch(search:string, WindowRef : WorkspaceLeaf, parentPath: string[] = []) {
 		const MainOutput = DEFAULT_SETTINGS.OutputDir + DEFAULT_SETTINGS.OutputFileName;
 		const realMainDir = this.app.vault.adapter.basePath+ '/' + DEFAULT_SETTINGS.OutputDir;
 		const realMainOutput = this.app.vault.adapter.basePath + '/' + MainOutput;
 		const file = await this.app.vault.getFileByPath(MainOutput);
 		let markdownView = this.app.workspace.getActiveViewOfType(MarkdownView);
-		
+
 
 		if (markdownView) {
 			WindowRef.setViewState({type: "markdown", active : true});
 			new Notice(new MarkdownView(WindowRef).getViewType());
 		}
-		
+
 		markdownView = this.app.workspace.getActiveViewOfType(MarkdownView);
 
 		if (markdownView) {
 			//Work.getCursor();
-			
+
 		}
-		
+
 		if (file) {
 			WindowRef.openFile(file);
-			
+
 		}
-		
+
 		//this.app.workspace.openPopoutLeaf();
-		new Notice("should open");	
+		new Notice("should open");
 
 		if (!search.includes('#')) {
-			const display = MDParser.getOrganizedTopics(search,true);
+			let display;
+			const cityContext = this.plugin.scopedSearch && parentPath.find(p => CITIES.some(c => c.toLowerCase() === p.toLowerCase()));
+			if (cityContext) {
+				let subTree: any = MDParser.getTree();
+				for (const parent of parentPath) {
+					if (subTree && subTree[parent]) subTree = subTree[parent];
+				}
+				display = MDParser.getOrganizedTopicsFromTree(search, subTree, false);
+			} else {
+				display = MDParser.getOrganizedTopics(search, true);
+			}
 			const print = MDParser.convertOrganizedTopicToMD(display);
 			writeAnswer(realMainDir,DEFAULT_SETTINGS.OutputFileName,print);
 		}else{
