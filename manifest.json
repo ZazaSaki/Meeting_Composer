@@ -3,9 +3,8 @@
 	"name": "Meeting Composer",
 	"version": "1.0.0",
 	"minAppVersion": "0.15.0",
-	"description": "Decompose a meeting report in a situation pre.",
-	"author": "Obsidian",
-	"authorUrl": "https://obsidian.md",
-	"fundingUrl": "https://obsidian.md/pricing",
-	"isDesktopOnly": false
+	"description": "Scan meeting minutes and navigate topics across all files. A sidebar topic tree lets you click any topic to compile all related content into a single output note.",
+	"author": "ZazaSaki",
+	"authorUrl": "https://github.com/ZazaSaki",
+	"isDesktopOnly": true
 }

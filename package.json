@@ -1,7 +1,7 @@
 {
-	"name": "obsidian-sample-plugin",
+	"name": "meeting-composer",
 	"version": "1.0.0",
-	"description": "This is a sample plugin for Obsidian (https://obsidian.md)",
+	"description": "Scan meeting minutes and navigate topics across all files from a sidebar topic tree",
 	"main": "main.js",
 	"scripts": {
 		"dev": "node esbuild.config.mjs",
