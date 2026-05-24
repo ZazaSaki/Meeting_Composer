@@ -17,6 +17,7 @@ interface MyPluginSettings {
 	priorityBeforeCities: string[];
 	cities: string[];
 	priorityAfterCities: string[];
+	autoComplete: boolean;
 }
 
 const DEFAULT_SETTINGS: MyPluginSettings = {
@@ -26,6 +27,7 @@ const DEFAULT_SETTINGS: MyPluginSettings = {
 	priorityBeforeCities: [...DEFAULT_PRIORITY_BEFORE_CITIES],
 	cities: [...DEFAULT_CITIES],
 	priorityAfterCities: [...DEFAULT_PRIORITY_AFTER_CITIES],
+	autoComplete: false,
 }
 
 interface Folder {
@@ -82,7 +84,7 @@ export default class MyPlugin extends Plugin {
 		);
 		this.app.workspace.onLayoutReady(() => this.loadTree());
 
-		this.registerView(VIEW_TYPE_EXAMPLE, (leaf) => new ExampleView(leaf));
+		this.registerView(VIEW_TYPE_EXAMPLE, (leaf) => new ExampleView(leaf, this));
 		this.registerView(VIEW_TYPE_FILE, (leaf) => this.createTreeView(leaf));
 
 		this.addRibbonIcon("scroll-text", "Open Meeting Composer", () => {
@@ -238,9 +240,11 @@ class MyFolderItemView extends ItemView {
 
 export class ExampleView extends ItemView {
 	root: Root;
+	plugin: MyPlugin;
 
-	constructor(leaf: WorkspaceLeaf) {
+	constructor(leaf: WorkspaceLeaf, plugin: MyPlugin) {
 		super(leaf);
+		this.plugin = plugin;
 	}
 
 	getViewType() {
@@ -286,6 +290,14 @@ export class ExampleView extends ItemView {
 			.setName("Search")
 			.addText(item => {
 				item.onChange(string => { search = string; });
+				if (this.plugin.settings.autoComplete) {
+					const datalist = contentEl.createEl('datalist');
+					datalist.id = 'mc-search-suggestions';
+					MDParser.getAllTopicNames().forEach(name => {
+						datalist.createEl('option').value = name;
+					});
+					item.inputEl.setAttribute('list', 'mc-search-suggestions');
+				}
 			})
 			.addButton(item => {
 				item.setButtonText("Search");
@@ -351,6 +363,16 @@ class MeetingComposerSettingTab extends PluginSettingTab {
 				.setValue(this.plugin.settings.OutputDir)
 				.onChange(async (value) => {
 					this.plugin.settings.OutputDir = value;
+					await this.plugin.saveSettings();
+				}));
+
+		new Setting(containerEl)
+			.setName('Search autocomplete')
+			.setDesc('Suggest topic names while typing in the search box')
+			.addToggle(toggle => toggle
+				.setValue(this.plugin.settings.autoComplete)
+				.onChange(async (value) => {
+					this.plugin.settings.autoComplete = value;
 					await this.plugin.saveSettings();
 				}));
 
