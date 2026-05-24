@@ -46,9 +46,12 @@ class TreeFolder {
 	}
   }
 
-  	let TreeView : MyFolderItemView | null = null;
+let TreeView : MyFolderItemView | null = null;
+let currentToggle: Function = () => {};
+
 export default class MyPlugin extends Plugin {
-	settings: MyPluginSettings;	
+	settings: MyPluginSettings;
+	topicTree: any = null;
 	createTreeView(leaf: WorkspaceLeaf, folder: TreeFolder): ItemView {
 		const view = new MyFolderItemView(leaf, this,folder);
 		TreeView = view;
@@ -263,113 +266,38 @@ class MyFolderItemView extends ItemView {
 	
 	async renderTreeContainer(TopicTree : any){
 		const container = this.containerEl.children[1];
-		const {contentEl} = this;
-		container.empty();
-		const pointer = container.createEl("h4", { text: "Tree is up up " });
-		
-		// const toggleFolder = (data:any)=>{
-		// 	data.isOpen = !data.isOpen;
-		// 	console.log(data.name);
-		// 	console.log(data.isOpen);
-		// 	console.log('toggle');
-		// 	console.log(data.isOpen);
-		// };
 
-		// var myData : any = {
-		// name: 'Root Folder',
-		// 	children: [
-		// 	{ name: 'Folder 1', 
-		// 			children: [{ name: 'File A' }, { name: 'File B' }],
-		// 			isOpen : true,
-		// 			toggleFolder: toggleFolder,
-		// 		},
-		// 	  { name: 'Folder 2', 
-		// 	  		children: [
-		// 				{ name: 'File C',
-		// 				children: [{ name: 'File A' }, { name: 'File B' }],
-		// 				isOpen : true,
-		// 				toggleFolder: toggleFolder,
-		// 				}],
-		// 			isOpen : true,
-		// 			toggleFolder: toggleFolder,
-		// 		},
-		// 	],
-		// 	isOpen : true,
-		// 	toggleFolder: toggleFolder,
-			
+		if (!this.root) {
+			container.empty();
+			this.root = createRoot(container);
+		}
 
-		//   };
-		
-		
-		
-		//console.log(TopicTree);
-
-		this.root = createRoot(container);
-		const funcfunc = ()=>{
-			console.log('\n wbhfiuwehbfbawbfoeigy \n\n wbhfiuwehbfbawbfoeigy \n\n wbhfiuwehbfbawbfoeigy \n')
-		};
-		pointer.onClickEvent(funcfunc);
-
-		
 		this.root.render(FileTree(TopicTree, 0, TopicTree));
-		// this.containerEl.children[0].;
-		
 	}
 
 	async onOpen(){
-		
-		
-		const toggleFolder = (data:Folder, root :Folder, self:any = true, name = '')=>{
-			
-			console.log(name);
-			
-			//console.log(data.isOpen);
-			if(!(root.name == data.name)){	
-				console.log(data.name);
-				console.log(name);
-				console.log(self);
-				console.log('in');
-				console.log(data.name == name);
-
-				//	console.log(this);
-				
-
-				if (data.name == name) {
-					if (self) {
-					data.isOpen = !data.isOpen;
-					console.log(data.name);
-					console.log(root);
-					console.log('in not self');
-
-					data.children?.forEach(element => {
-						element.toggleFolder(element, root, false)
-					});
-					console.log(root);
-
-					if (self) {
-						this.renderTreeContainer(root);
-					}
-				}else{
-					//data.isOpen = true;
-				} 
-				
-				// data.children?.forEach(element => {
-				// 	element.toggleFolder(element, root, false)
-				// });
-				}
-
-				
-
+		currentToggle = (data:Folder, root:Folder, self:any = true, name = '') => {
+			if (self && data !== root) {
+				data.isOpen = !data.isOpen;
+				this.renderTreeContainer(root);
+			}
+			if (root.name !== data.name) {
 				if (!OutputWindow || OutputWindow.getViewState().type == 'empty') {
 					OutputWindow = this.app.workspace.getLeaf("tab");
-					
 				}
 				this.printSearch(data.name, OutputWindow);
 			}
-			
 		};
-		const TopicTree = MDParser.GenerateTopicTree(false, toggleFolder);
-		this.renderTreeContainer(TopicTree);
+
+		if (!this.plugin.topicTree) {
+			MDParser.resetTree();
+			await this.plugin.loadTree();
+			const toogleWrapper = (data:any, root:any, self:any, name:string) => currentToggle(data, root, self, name);
+			this.plugin.topicTree = MDParser.GenerateTopicTree(false, toogleWrapper);
+			this.plugin.topicTree.isOpen = true;
+		}
+
+		this.renderTreeContainer(this.plugin.topicTree);
 		
 	  //this.plugin.app.vault.postMessage({ type: "folder-toggle", folder: this.folder, isOpen: this.isOpen });
 	}
@@ -417,6 +345,7 @@ class MyFolderItemView extends ItemView {
 
 	async onClose(): Promise<void> {
 		this.root?.unmount();
+		this.root = null as any;
 	}
 	
 	
