@@ -1,8 +1,30 @@
-/*
+.mc-priority-lists {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 16px;
+}
 
-This CSS file will be included with your plugin, and
-available in the app when your plugin is enabled.
+.mc-priority-col {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
 
-If your plugin does not need CSS, delete this file.
+.mc-priority-title {
+    font-weight: 600;
+    font-size: 0.9em;
+}
 
-*/
+.mc-priority-desc {
+    font-size: 0.8em;
+    color: var(--text-muted);
+    margin-bottom: 4px;
+}
+
+.mc-priority-textarea {
+    width: 100%;
+    resize: vertical;
+    font-size: 0.85em;
+    font-family: var(--font-monospace);
+}

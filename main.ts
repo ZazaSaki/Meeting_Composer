@@ -351,56 +351,60 @@ class MeetingComposerSettingTab extends PluginSettingTab {
 					await this.plugin.saveSettings();
 				}));
 
-		new Setting(containerEl)
-			.setName('Organizations')
-			.setDesc('Topics sorted before sectors, one per line, top = highest priority')
-			.addTextArea(text => {
-				text.setValue(this.plugin.settings.priorityBeforeCities.join('\n'));
-				text.inputEl.rows = 8;
-				text.onChange(async (value) => {
-					this.plugin.settings.priorityBeforeCities = value.split('\n').map(s => s.trim()).filter(s => s.length > 0);
-					MDParser.setPriorityLists(
-						this.plugin.settings.priorityBeforeCities,
-						this.plugin.settings.cities,
-						this.plugin.settings.priorityAfterCities,
-					);
-					await this.plugin.saveSettings();
-				});
-			});
+		new Setting(containerEl).setName('Topic ordering').setHeading();
 
-		new Setting(containerEl)
-			.setName('Sectors')
-			.setDesc('Sector names used for grouping and scoped search, one per line')
-			.addTextArea(text => {
-				text.setValue(this.plugin.settings.cities.join('\n'));
-				text.inputEl.rows = 4;
-				text.onChange(async (value) => {
-					this.plugin.settings.cities = value.split('\n').map(s => s.trim()).filter(s => s.length > 0);
-					MDParser.setPriorityLists(
-						this.plugin.settings.priorityBeforeCities,
-						this.plugin.settings.cities,
-						this.plugin.settings.priorityAfterCities,
-					);
-					await this.plugin.saveSettings();
-				});
-			});
+		const listsEl = containerEl.createDiv('mc-priority-lists');
 
-		new Setting(containerEl)
-			.setName('Important Topics')
-			.setDesc('Topics sorted after sectors, one per line, top = highest priority')
-			.addTextArea(text => {
-				text.setValue(this.plugin.settings.priorityAfterCities.join('\n'));
-				text.inputEl.rows = 4;
-				text.onChange(async (value) => {
-					this.plugin.settings.priorityAfterCities = value.split('\n').map(s => s.trim()).filter(s => s.length > 0);
-					MDParser.setPriorityLists(
-						this.plugin.settings.priorityBeforeCities,
-						this.plugin.settings.cities,
-						this.plugin.settings.priorityAfterCities,
-					);
-					await this.plugin.saveSettings();
-				});
+		const makeListSection = (
+			title: string,
+			desc: string,
+			getValue: () => string[],
+			setValue: (lines: string[]) => void,
+		) => {
+			const col = listsEl.createDiv('mc-priority-col');
+			col.createEl('div', { text: title, cls: 'mc-priority-title' });
+			col.createEl('div', { text: desc, cls: 'mc-priority-desc' });
+			const ta = col.createEl('textarea', { cls: 'mc-priority-textarea' });
+			ta.value = getValue().join('\n');
+			ta.rows = 14;
+			ta.addEventListener('change', () => {
+				const lines = ta.value.split('\n').map(s => s.trim()).filter(s => s.length > 0);
+				setValue(lines);
 			});
+		};
+
+		makeListSection(
+			'Organizations',
+			'Sorted before sectors, top = highest priority',
+			() => this.plugin.settings.priorityBeforeCities,
+			async (lines) => {
+				this.plugin.settings.priorityBeforeCities = lines;
+				MDParser.setPriorityLists(this.plugin.settings.priorityBeforeCities, this.plugin.settings.cities, this.plugin.settings.priorityAfterCities);
+				await this.plugin.saveSettings();
+			},
+		);
+
+		makeListSection(
+			'Sectors',
+			'Used for grouping and scoped search',
+			() => this.plugin.settings.cities,
+			async (lines) => {
+				this.plugin.settings.cities = lines;
+				MDParser.setPriorityLists(this.plugin.settings.priorityBeforeCities, this.plugin.settings.cities, this.plugin.settings.priorityAfterCities);
+				await this.plugin.saveSettings();
+			},
+		);
+
+		makeListSection(
+			'Important Topics',
+			'Sorted after sectors, top = highest priority',
+			() => this.plugin.settings.priorityAfterCities,
+			async (lines) => {
+				this.plugin.settings.priorityAfterCities = lines;
+				MDParser.setPriorityLists(this.plugin.settings.priorityBeforeCities, this.plugin.settings.cities, this.plugin.settings.priorityAfterCities);
+				await this.plugin.saveSettings();
+			},
+		);
 
 		new Setting(containerEl)
 			.setName('Reload minutes')
