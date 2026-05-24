@@ -1,4 +1,4 @@
-import { App, MarkdownView, Notice, Plugin, PluginSettingTab, Setting, TFile, ItemView, WorkspaceLeaf } from 'obsidian';
+import { App, AbstractInputSuggest, MarkdownView, Notice, Plugin, PluginSettingTab, Setting, TFile, ItemView, WorkspaceLeaf } from 'obsidian';
 import { MarkdownParser, DEFAULT_PRIORITY_BEFORE_CITIES, DEFAULT_PRIORITY_AFTER_CITIES, DEFAULT_CITIES } from './DataMeenutes/App';
 import { createRoot, Root } from 'react-dom/client';
 import { FileTreeRoot } from './FileTree';
@@ -238,6 +238,30 @@ class MyFolderItemView extends ItemView {
 	}
 }
 
+class TopicSuggest extends AbstractInputSuggest<string> {
+	private getTopics: () => string[];
+
+	constructor(app: App, inputEl: HTMLInputElement, getTopics: () => string[]) {
+		super(app, inputEl);
+		this.getTopics = getTopics;
+	}
+
+	getSuggestions(query: string): string[] {
+		const lower = query.toLowerCase();
+		return this.getTopics().filter(t => t.toLowerCase().includes(lower));
+	}
+
+	renderSuggestion(topic: string, el: HTMLElement): void {
+		el.createEl('div', { text: topic });
+	}
+
+	selectSuggestion(topic: string): void {
+		this.inputEl.value = topic;
+		this.inputEl.dispatchEvent(new Event('input'));
+		this.close();
+	}
+}
+
 export class ExampleView extends ItemView {
 	root: Root;
 	plugin: MyPlugin;
@@ -291,12 +315,7 @@ export class ExampleView extends ItemView {
 			.addText(item => {
 				item.onChange(string => { search = string; });
 				if (this.plugin.settings.autoComplete) {
-					const datalist = contentEl.createEl('datalist');
-					datalist.id = 'mc-search-suggestions';
-					MDParser.getAllTopicNames().forEach(name => {
-						datalist.createEl('option').value = name;
-					});
-					item.inputEl.setAttribute('list', 'mc-search-suggestions');
+					new TopicSuggest(this.app, item.inputEl, () => MDParser.getAllTopicNames());
 				}
 			})
 			.addButton(item => {
