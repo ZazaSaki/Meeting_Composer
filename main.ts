@@ -1,65 +1,49 @@
-import { App, Component, Editor, MarkdownView, Modal, Notice, Plugin, PluginSettingTab, Setting, TFile, TFolder, View } from 'obsidian';
-import { editorInfoField } from 'obsidian';
-import { ItemView, WorkspaceLeaf } from "obsidian";
+import { App, MarkdownView, Notice, Plugin, PluginSettingTab, Setting, TFile, ItemView, WorkspaceLeaf } from 'obsidian';
 import { MarkdownParser, CITIES } from './DataMeenutes/App';
 import { createRoot, Root } from 'react-dom/client';
-import {StrictMode} from 'react';
-import FileTree, { FileTreeRoot } from './FileTree';
+import { FileTreeRoot } from './FileTree';
+import { writeAnswer } from 'DataMeenutes/FileReader';
+
 const MDParser = new MarkdownParser();
-var OutputWindow :WorkspaceLeaf | null = null;
-//const MDParser = new MarkdownParser();
+let OutputWindow: WorkspaceLeaf | null = null;
 
 export const VIEW_TYPE_EXAMPLE = "example-view";
 export const VIEW_TYPE_FILE = "file-view";
 
-import {basicSetup} from 'codemirror';
-import {
-	ViewUpdate,
-	PluginValue,
-	EditorView,
-	ViewPlugin,
-  } from "@codemirror/view";
-import { writeAnswer } from 'DataMeenutes/FileReader';
-import { render } from 'react-dom';
-import { cursorTo } from 'readline';
-// Remember to rename these classes and interfaces!
-
 interface MyPluginSettings {
 	MeenutesDir: string;
-	OutputFileName : string;
-	OutputDir : string;
+	OutputFileName: string;
+	OutputDir: string;
 }
 
 const DEFAULT_SETTINGS: MyPluginSettings = {
 	MeenutesDir: 'Atas',
 	OutputFileName: 'output.md',
-	OutputDir : 'Meeting_Composer_Search/',
+	OutputDir: 'Meeting_Composer_Search/',
 }
 
-class TreeFolder {
+interface Folder {
 	name: string;
-	children: TreeFolder[];
-  
-	constructor(name: string) {
-	  this.name = name;
-	  this.children = [];
-	}
-  }
+	children?: Folder[];
+	toggleFolder: Function;
+	isOpen: Boolean;
+}
 
-let TreeView : MyFolderItemView | null = null;
+let TreeView: MyFolderItemView | null = null;
 let currentToggle: Function = () => {};
 
 export default class MyPlugin extends Plugin {
 	settings: MyPluginSettings;
 	topicTree: any = null;
 	scopedSearch: boolean = false;
+
 	createTreeView(leaf: WorkspaceLeaf): ItemView {
 		const view = new MyFolderItemView(leaf, this);
 		TreeView = view;
 		return view;
 	}
 
-	async loadTree(){
+	async loadTree() {
 		const dir = this.settings.MeenutesDir;
 		if (!this.app.vault.getFolderByPath(dir)) {
 			await this.app.vault.createFolder(dir);
@@ -77,7 +61,7 @@ export default class MyPlugin extends Plugin {
 		}
 	}
 
-	async reloadTree(){
+	async reloadTree() {
 		this.topicTree = null;
 		if (TreeView) TreeView.root = null as any;
 		TreeView?.onOpen();
@@ -86,89 +70,19 @@ export default class MyPlugin extends Plugin {
 	async onload() {
 		await this.loadSettings();
 		this.app.workspace.onLayoutReady(() => this.loadTree());
-		this.registerView(
-			VIEW_TYPE_EXAMPLE,
-			(leaf) => new ExampleView(leaf)
-		  );
 
-		this.registerView(
-			VIEW_TYPE_FILE,
-			(leaf) => this.createTreeView(leaf)
-		);
+		this.registerView(VIEW_TYPE_EXAMPLE, (leaf) => new ExampleView(leaf));
+		this.registerView(VIEW_TYPE_FILE, (leaf) => this.createTreeView(leaf));
 
-		
-		  this.addRibbonIcon("scroll-text", "Activate view", () => {
+		this.addRibbonIcon("scroll-text", "Open Meeting Composer", () => {
 			this.activateView();
 			this.activateFileView();
-		  });
-
-		// This adds a status bar item to the bottom of the app. Does not work on mobile apps.
-		const statusBarItemEl = this.addStatusBarItem();
-		statusBarItemEl.setText('Using Meeting Composer');
-
-		// This adds a simple command that can be triggered anywhere
-		this.addCommand({
-			id: 'open-sample-modal-simple',
-			name: 'Open sample modal (simple)',
-			callback: () => {
-				new SampleModal(this.app).open();
-			}
-		});
-		// This adds an editor command that can perform some operation on the current editor instance
-		this.addCommand({
-			id: 'sample-editor-command',
-			name: 'Sample editor command',
-			editorCallback: (editor: Editor, view: MarkdownView) => {
-				console.log(editor.getSelection());
-				editor.replaceSelection('Sample Editor Command');
-			}
-		});
-		// This adds a complex command that can check whether the current state of the app allows execution of the command
-		this.addCommand({
-			id: 'open-sample-modal-complex',
-			name: 'Open sample modal (complex)',
-			checkCallback: (checking: boolean) => {
-				// Conditions to check
-				const markdownView = this.app.workspace.getActiveViewOfType(MarkdownView);
-				if (markdownView) {
-					// If checking is true, we're simply "checking" if the command can be run.
-					// If checking is false, then we want to actually perform the operation.
-					if (!checking) {
-						new SampleModal(this.app).open();
-					}
-
-					// This command will only show up in Command Palette when the check function returns true
-					return true;
-				}
-			}
 		});
 
-		// This adds a settings tab so the user can configure various aspects of the plugin
-		this.addSettingTab(new SampleSettingTab(this.app, this));
-
-		// If the plugin hooks up any global DOM events (on parts of the app that doesn't belong to this plugin)
-		// Using this function will automatically remove the event listener when this plugin is disabled.
-		this.registerDomEvent(document, 'click', (evt: MouseEvent) => {
-			console.log('click', evt);
-		});
-
-		
-		// When registering intervals, this function will automatically clear the interval when the plugin is disabled.
-		this.registerInterval(window.setInterval(() => console.log('setInterval'), 5 * 60 * 1000));
-
-
-		//my code
-
-		this.addRibbonIcon('dice', 'Greet', () => {
-			new Notice('Hello, world!');
-		  });
-
-				  
+		this.addSettingTab(new MeetingComposerSettingTab(this.app, this));
 	}
 
-	onunload() {
-
-	}
+	onunload() {}
 
 	async loadSettings() {
 		this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData());
@@ -180,83 +94,52 @@ export default class MyPlugin extends Plugin {
 
 	async activateView() {
 		const { workspace } = this.app;
-	
-		let leaf: WorkspaceLeaf | null = null;
 		const leaves = workspace.getLeavesOfType(VIEW_TYPE_EXAMPLE);
-	
 		if (leaves.length > 0) {
-		  // A leaf with our view already exists, use that
-		  leaf = leaves[0];
-		} else {
-		  // Our view could not be found in the workspace, create a new leaf
-		  // in the right sidebar for it
-		  leaf = workspace.getRightLeaf(false);
-		  if (leaf) {
-			await leaf.setViewState({ type: VIEW_TYPE_EXAMPLE, active: true });
-			// "Reveal" the leaf in case it is in a collapsed sidebar
-			workspace.revealLeaf(leaf);
-		  }
-		  
-		}		
-	  }
-
-	  async activateFileView() {
-		const { workspace } = this.app;
-	
-		let leaf: WorkspaceLeaf | null = null;
-		const leaves = workspace.getLeavesOfType(VIEW_TYPE_FILE);
-	
-		if (leaves.length > 0) {
-		  // A leaf with our view already exists, use that
-		  leaf = leaves[0];
-		} else {
-		  // Our view could not be found in the workspace, create a new leaf
-		  // in the right sidebar for it
-		  leaf = workspace.getRightLeaf(false);
-		  if (leaf) {
-			await leaf.setViewState({ type: VIEW_TYPE_FILE, active: true });
-			// "Reveal" the leaf in case it is in a collapsed sidebar
-			workspace.revealLeaf(leaf);
-		  }
-		  
+			workspace.revealLeaf(leaves[0]);
+			return;
 		}
-	  }
-	
+		const leaf = workspace.getRightLeaf(false);
+		if (leaf) {
+			await leaf.setViewState({ type: VIEW_TYPE_EXAMPLE, active: true });
+			workspace.revealLeaf(leaf);
+		}
+	}
 
-	
+	async activateFileView() {
+		const { workspace } = this.app;
+		const leaves = workspace.getLeavesOfType(VIEW_TYPE_FILE);
+		if (leaves.length > 0) {
+			workspace.revealLeaf(leaves[0]);
+			return;
+		}
+		const leaf = workspace.getRightLeaf(false);
+		if (leaf) {
+			await leaf.setViewState({ type: VIEW_TYPE_FILE, active: true });
+			workspace.revealLeaf(leaf);
+		}
+	}
 }
-
-interface Folder {
-	name: string;
-	children?: Folder[];
-	toggleFolder : Function;
-	isOpen : Boolean;
-  }
-  
 
 class MyFolderItemView extends ItemView {
 	plugin: MyPlugin;
-	folder: any;
 	isOpen: boolean = false;
-	children: ItemView[] = [];
+	root: Root;
 
-	root : Root;
-  
 	constructor(leaf: WorkspaceLeaf, plugin: MyPlugin) {
-	  super(leaf);
-	  this.plugin = plugin;
-	  
+		super(leaf);
+		this.plugin = plugin;
 	}
-  
+
 	getViewType(): string {
-	  return VIEW_TYPE_FILE; // differentiate folder view type
+		return VIEW_TYPE_FILE;
 	}
-  
+
 	getDisplayText(): string {
-	  return "Tree up up hehe";
+		return "Topic Tree";
 	}
-	
-	async renderTreeContainer(TopicTree : any){
+
+	async renderTreeContainer(TopicTree: any) {
 		const container = this.containerEl.children[1];
 
 		if (!this.root) {
@@ -275,8 +158,8 @@ class MyFolderItemView extends ItemView {
 		));
 	}
 
-	async onOpen(){
-		currentToggle = (data:Folder, root:Folder, self:any = true, name = '', parentPath: string[] = []) => {
+	async onOpen() {
+		currentToggle = (data: Folder, root: Folder, self: any = true, name = '', parentPath: string[] = []) => {
 			if (self && data !== root) {
 				data.isOpen = !data.isOpen;
 				this.renderTreeContainer(root);
@@ -292,47 +175,28 @@ class MyFolderItemView extends ItemView {
 		if (!this.plugin.topicTree) {
 			MDParser.resetTree();
 			await this.plugin.loadTree();
-			const toogleWrapper = (data:any, root:any, self:any, name:string, parentPath:string[]) => currentToggle(data, root, self, name, parentPath);
+			const toogleWrapper = (data: any, root: any, self: any, name: string, parentPath: string[]) =>
+				currentToggle(data, root, self, name, parentPath);
 			this.plugin.topicTree = MDParser.GenerateTopicTree(false, toogleWrapper);
 			this.plugin.topicTree.isOpen = true;
 		}
 
 		this.renderTreeContainer(this.plugin.topicTree);
-		
-	  //this.plugin.app.vault.postMessage({ type: "folder-toggle", folder: this.folder, isOpen: this.isOpen });
 	}
 
-	async printSearch(search:string, WindowRef : WorkspaceLeaf, parentPath: string[] = []) {
-		const MainOutput = DEFAULT_SETTINGS.OutputDir + DEFAULT_SETTINGS.OutputFileName;
-		const realMainDir = this.app.vault.adapter.basePath+ '/' + DEFAULT_SETTINGS.OutputDir;
-		const realMainOutput = this.app.vault.adapter.basePath + '/' + MainOutput;
+	async printSearch(search: string, WindowRef: WorkspaceLeaf, parentPath: string[] = []) {
+		const MainOutput = this.plugin.settings.OutputDir + this.plugin.settings.OutputFileName;
+		const realMainDir = this.app.vault.adapter.basePath + '/' + this.plugin.settings.OutputDir;
 		const file = await this.app.vault.getFileByPath(MainOutput);
-		let markdownView = this.app.workspace.getActiveViewOfType(MarkdownView);
-
-
-		if (markdownView) {
-			WindowRef.setViewState({type: "markdown", active : true});
-			new Notice(new MarkdownView(WindowRef).getViewType());
-		}
-
-		markdownView = this.app.workspace.getActiveViewOfType(MarkdownView);
-
-		if (markdownView) {
-			//Work.getCursor();
-
-		}
 
 		if (file) {
 			WindowRef.openFile(file);
-
 		}
-
-		//this.app.workspace.openPopoutLeaf();
-		new Notice("should open");
 
 		if (!search.includes('#')) {
 			let display;
-			const cityContext = this.plugin.scopedSearch && parentPath.find(p => CITIES.some(c => c.toLowerCase() === p.toLowerCase()));
+			const cityContext = this.plugin.scopedSearch &&
+				parentPath.find(p => CITIES.some(c => c.toLowerCase() === p.toLowerCase()));
 			if (cityContext) {
 				let subTree: any = MDParser.getTree();
 				for (const parent of parentPath) {
@@ -343,13 +207,12 @@ class MyFolderItemView extends ItemView {
 				display = MDParser.getOrganizedTopics(search, true);
 			}
 			const print = MDParser.convertOrganizedTopicToMD(display);
-			writeAnswer(realMainDir,DEFAULT_SETTINGS.OutputFileName,print);
-		}else{
-			const ss = search.replace('#','');
-			console.log(ss);
+			writeAnswer(realMainDir, this.plugin.settings.OutputFileName, print);
+		} else {
+			const ss = search.replace('#', '');
 			const display = MDParser.getOrganizedTags(ss);
 			const print = MDParser.convertOrganizedTopicToMD(display);
-			writeAnswer(realMainDir,DEFAULT_SETTINGS.OutputFileName,print);
+			writeAnswer(realMainDir, this.plugin.settings.OutputFileName, print);
 		}
 	}
 
@@ -357,339 +220,82 @@ class MyFolderItemView extends ItemView {
 		this.root?.unmount();
 		this.root = null as any;
 	}
-	
-	
-
-	addChild<T extends Component>(child: T): T {
-		this.children.push(child as unknown as ItemView); // Cast child to ItemView
-		return child;
-  }
-
-  }
-  
-  // Respond to messages from the main view to update the dropdown state
-// //   addCachedData({
-// // 	type: "folder-toggle",
-// // 	handler: (data: { folder: TFolder; isOpen: boolean }) => {
-// // 	  // Find the corresponding ItemView and update its state
-// // 	  // ... (implementation to find and update the ItemView)
-// // 	},
-// //   });
+}
 
 export class ExampleView extends ItemView {
-	root : Root;
-	
+	root: Root;
+
 	constructor(leaf: WorkspaceLeaf) {
-	  super(leaf);
-	  
+		super(leaf);
 	}
-  
+
 	getViewType() {
-
-	  return VIEW_TYPE_EXAMPLE;
+		return VIEW_TYPE_EXAMPLE;
 	}
-  
+
 	getDisplayText() {
-	  return "Meeting Composer";
+		return "Meeting Composer";
 	}
-	
-	async printSearch(search:string, WindowRef : WorkspaceLeaf) {
-		const MainOutput = DEFAULT_SETTINGS.OutputDir + DEFAULT_SETTINGS.OutputFileName;
-		const realMainDir = this.app.vault.adapter.basePath+ '/' + DEFAULT_SETTINGS.OutputDir;
-		const realMainOutput = this.app.vault.adapter.basePath + '/' + MainOutput;
-		const file = await this.app.vault.getFileByPath(MainOutput);
-		let markdownView = this.app.workspace.getActiveViewOfType(MarkdownView);
-		
 
-		if (markdownView) {
-			WindowRef.setViewState({type: "markdown", active : false, pinned: false});
-			new Notice(new MarkdownView(WindowRef).getViewType());
-		}
-		
-		markdownView = this.app.workspace.getActiveViewOfType(MarkdownView);
-		
-		if (markdownView) {
-			//Work.getCursor();
-			
-		}
-		
+	async printSearch(search: string, WindowRef: WorkspaceLeaf) {
+		const MainOutput = DEFAULT_SETTINGS.OutputDir + DEFAULT_SETTINGS.OutputFileName;
+		const realMainDir = this.app.vault.adapter.basePath + '/' + DEFAULT_SETTINGS.OutputDir;
+		const file = await this.app.vault.getFileByPath(MainOutput);
+
 		if (file) {
-			// WindowRef.getViewState();
 			WindowRef.openFile(file);
-			
 		}
-		
-		//this.app.workspace.openPopoutLeaf();
-		new Notice("should open m8 m8 ");	
 
 		if (!search.includes('#')) {
-			const display = MDParser.getOrganizedTopics(search,true);
+			const display = MDParser.getOrganizedTopics(search, true);
 			const print = MDParser.convertOrganizedTopicToMD(display);
-			writeAnswer(realMainDir,DEFAULT_SETTINGS.OutputFileName,print);
-		}else{
-			const ss = search.replace('#','');
-			console.log(ss);
+			writeAnswer(realMainDir, DEFAULT_SETTINGS.OutputFileName, print);
+		} else {
+			const ss = search.replace('#', '');
 			const display = MDParser.getOrganizedTags(ss);
 			const print = MDParser.convertOrganizedTopicToMD(display);
-			writeAnswer(realMainDir,DEFAULT_SETTINGS.OutputFileName,print);
+			writeAnswer(realMainDir, DEFAULT_SETTINGS.OutputFileName, print);
 		}
 	}
 
 	async onOpen() {
-		const MainDir = 'Meeting_Composer_Search/';
-		const MainOutputName = 'output.md';
-		const MainOutput = MainDir + MainOutputName;
-		// const realMainDir = this.app.vault.adapter.basePath+ '/' + MainDir;
-		// const realMainOutput = this.app.vault.adapter.basePath + '/' + MainOutput;
+		const MainOutput = DEFAULT_SETTINGS.OutputDir + DEFAULT_SETTINGS.OutputFileName;
+		const vault = this.app.vault;
 
-	  const container = this.containerEl.children[1];
-	  const {contentEl} = this;
-	  container.empty();
-	  container.createEl("h4", { text: "Meetting Composer" });
-      let search : string = "";
-	  
-	  const SearchArea = new Setting(contentEl).setName("Search").addText(item => {
-	    item.onChange(string =>{
-			
-			search = string;
-			
-			// // // const file = await this.app.vault.getFileByPath(MainOutput);
-			// // // //Work = this.app.workspace.getLeaf("tab");
+		const container = this.containerEl.children[1];
+		const { contentEl } = this;
+		container.empty();
+		container.createEl("h4", { text: "Meeting Composer" });
+		let search: string = "";
 
-			// if (!OutputWindow || OutputWindow.getViewState().type == 'empty') {
-			// 	OutputWindow = this.app.workspace.getLeaf("tab");
-				
-				
-				
-			// 	//this.app.workspace.getMostRecentLeaf();
-			// 	OutputWindow.getContainer().on('quit',()=>{
-			// 		console.log('Is really really closed');
-			// 	});
-				
-			// }
-
-			
-
-			// if(OutputWindow.getRoot().getContainer().win.closed){
-			// 	console.log('Is really really closed');
-			// }
-			
-
-			// this.printSearch(search, OutputWindow);
-			
-			
-		
-		});
-		
-		new Notice(item.getValue())
-	  }).addButton(item =>{
-		item.setButtonText("search");
-	    
-
-		
-		item.onClick(async ()=>{
-			// // const file = await this.app.vault.getFileByPath(MainOutput);
-			// // //Work = this.app.workspace.getLeaf("tab");
-
-			if (!OutputWindow || await OutputWindow.getViewState().type == 'empty') {
-				OutputWindow = this.app.workspace.getLeaf("tab");
-				
-				
-				//this.app.workspace.getMostRecentLeaf();
-				OutputWindow.getContainer().on('quit',()=>{
-					console.log('Is really really closed');
+		new Setting(contentEl)
+			.setName("Search")
+			.addText(item => {
+				item.onChange(string => { search = string; });
+			})
+			.addButton(item => {
+				item.setButtonText("Search");
+				item.onClick(async () => {
+					if (!OutputWindow || OutputWindow.getViewState().type == 'empty') {
+						OutputWindow = this.app.workspace.getLeaf("tab");
+					}
+					this.printSearch(search, OutputWindow);
 				});
-				
-			}
+			});
 
-			
+		if (!vault.getFolderByPath(DEFAULT_SETTINGS.OutputDir)) {
+			await vault.createFolder(DEFAULT_SETTINGS.OutputDir);
+		}
 
-			if(OutputWindow.getRoot().getContainer().win.closed){
-				console.log('Is really really closed');
-			}
-            
-
-			this.printSearch(search, OutputWindow);
-			
-			
-		})
-		
-	  });
-	  const vault = this.app.vault;
-	  
-
-	  console.log(MainOutput);
-	  
-	  if (!vault.getFolderByPath(MainDir)) {
-		vault.createFolder(MainDir);
-	  } 
-
-	  const folder = vault.getFolderByPath(MainDir);
-
-	  if (!vault.getFileByPath(MainOutput)) {
-		vault.create(MainOutput, "");
-	  }
-
-
-	  const file = vault.getFileByPath(MainOutput);
-	  console.log(file);
-	  
-	//   if (file) {
-	// 	console.log(realMainDir);
-	//   }
-	  
-	  const inner : string = `<!DOCTYPE html>
-	  <html>
-	  <head>
-	  <meta name="viewport" content="width=device-width, initial-scale=1">
-	  <style>
-	  ul, #myUL {
-		list-style-type: none;
-	  }
-	  
-	  #myUL {
-		margin: 0;
-		padding: 0;
-	  }
-	  
-	  .caret {
-		cursor: pointer;
-		-webkit-user-select: none; /* Safari 3.1+ */
-		-moz-user-select: none; /* Firefox 2+ */
-		-ms-user-select: none; /* IE 10+ */
-		user-select: none;
-	  }
-	  
-	  .caret::before {
-		content: "\\25B6";
-		color: black;
-		display: inline-block;
-		margin-right: 6px;
-	  }
-	  
-	  .caret-down::before {
-		-ms-transform: rotate(90deg); /* IE 9 */
-		-webkit-transform: rotate(90deg); /* Safari */'
-		transform: rotate(90deg);  
-	  }
-	  
-	  .nested {
-		display: none;
-	  }
-	  
-	  .active {
-		display: block;
-	  }
-	  </style>
-	  </head>
-	  <body>
-	  
-	  <h2>Tree View</h2>
-	  <p>A tree view represents a hierarchical view of information, where each item can have a number of subitems.</p>
-	  <p>Click on the arrow(s) to open or close the tree branches.</p>
-	  
-	  <ul id="myUL">
-		<li><span class="caret">Beverages</span>
-		  <ul class="nested">
-			<li>Water</li>
-			<li>Coffee</li>
-			<li><span class="caret">Tea</span>
-			  <ul class="nested">
-				<li>Black Tea</li>
-				<li>White Tea</li>
-				<li><span class="caret">Green Tea</span>
-				  <ul class="nested">
-					<li>Sencha</li>
-					<li>Gyokuro</li>
-					<li>Matcha</li>
-					<li>Pi Lo Chun</li>
-				  </ul>
-				</li>
-			  </ul>
-			</li>  
-		  </ul>
-		</li>
-	  </ul>
-	  
-	  <script>
-	  var toggler = document.getElementsByClassName("caret");
-	  var i;
-	  
-	  for (i = 0; i < toggler.length; i++) {
-		toggler[i].addEventListener("click", function() {
-		  this.parentElement.querySelector(".nested").classList.toggle("active");
-		  this.classList.toggle("caret-down");
-		});
-	  }
-	  </script>
-	  
-	  </body>
-	  </html>
-	  `
-	  
-	  const div = container.createEl("li", "Name",(Root) => {
-		//Root.appendChild();
-	  });
-	  
-	  const bb = new Setting(div).addButton((bbb)=>{
-		bbb.setButtonText("name");
-	  });
-
-	  new Setting(div).addColorPicker(()=>{
-
-	  });
-	  
-	  new Setting(div).setHeading().setName("File");
-
-	  div.onClickEvent((event)=>{
-		console.log("here it is");
-		console.log(event);
-		console.log("here it was");
-
-	  });
-	  //container.createEl('textarea', {text : print, attr :{width : '100%'}, }).setCssStyles({width : "100%", height : "70vh"});
-
-	  
-	  
-	}
-  
-	async onClose() {
-	  // Nothing to clean up.
-	}
-  }
-  
-
-class EditorTab implements PluginValue {
-	constructor(view : EditorView) {
-		
-	}
-	
-	update(update: ViewUpdate) {
-	// ...
+		if (!vault.getFileByPath(MainOutput)) {
+			await vault.create(MainOutput, "");
+		}
 	}
 
-	destroy() {
-	// ...
-	}
+	async onClose() {}
 }
 
-class SampleModal extends Modal {
-	constructor(app: App) {
-		super(app);
-	}
-
-	onOpen() {
-		const {contentEl} = this;
-		contentEl.setText('Woah!');
-	}
-
-	onClose() {
-		const {contentEl} = this;
-		contentEl.empty();
-	}
-}
-
-class SampleSettingTab extends PluginSettingTab {
+class MeetingComposerSettingTab extends PluginSettingTab {
 	plugin: MyPlugin;
 
 	constructor(app: App, plugin: MyPlugin) {
@@ -698,55 +304,51 @@ class SampleSettingTab extends PluginSettingTab {
 	}
 
 	display(): void {
-		const {containerEl} = this;
-
+		const { containerEl } = this;
 		containerEl.empty();
 
 		new Setting(containerEl)
-			.setName('Meenutes Directory')
-			.setDesc('Where are the meenutes store relative to the vault')
+			.setName('Minutes directory')
+			.setDesc('Folder containing meeting minutes files, relative to the vault root')
 			.addText(text => text
-				.setPlaceholder('Use the Relarive Pah')
+				.setPlaceholder('Atas')
 				.setValue(this.plugin.settings.MeenutesDir)
 				.onChange(async (value) => {
 					this.plugin.settings.MeenutesDir = value;
 					await this.plugin.saveSettings();
 				}));
 
-				new Setting(containerEl)
-				.setName('Meenutes Output File Name')
-				.setDesc('Output File Name the print the search results')
-				.addText(text => text
-					.setPlaceholder('Use the Relarive Pah')
-					.setValue(this.plugin.settings.OutputFileName)
-					.onChange(async (value) => {
-						this.plugin.settings.OutputFileName = value;
-						await this.plugin.saveSettings();
-					}));
+		new Setting(containerEl)
+			.setName('Output file name')
+			.setDesc('Name of the file where search results are written')
+			.addText(text => text
+				.setPlaceholder('output.md')
+				.setValue(this.plugin.settings.OutputFileName)
+				.onChange(async (value) => {
+					this.plugin.settings.OutputFileName = value;
+					await this.plugin.saveSettings();
+				}));
 
-				new Setting(containerEl)
-				.setName('Meenutes Output Directory Name')
-				.setDesc('Output Directory Name the print the search results')
-				.addText(text => text
-					.setPlaceholder('Use the Relarive Pah')
-					.setValue(this.plugin.settings.OutputDir)
-					.onChange(async (value) => {
-						this.plugin.settings.OutputFileName = value;
-						await this.plugin.saveSettings();
-					}));
+		new Setting(containerEl)
+			.setName('Output directory')
+			.setDesc('Folder where search results are written, relative to the vault root')
+			.addText(text => text
+				.setPlaceholder('Meeting_Composer_Search/')
+				.setValue(this.plugin.settings.OutputDir)
+				.onChange(async (value) => {
+					this.plugin.settings.OutputDir = value;
+					await this.plugin.saveSettings();
+				}));
 
-		new Setting(containerEl).setName('Reload the Files').addButton((item)=>{
-			item.onClick(()=>{
-				this.plugin.reloadTree();
-				this.plugin.activateFileView();
+		new Setting(containerEl)
+			.setName('Reload minutes')
+			.setDesc('Re-scan the minutes folder and rebuild the topic tree')
+			.addButton(item => {
+				item.setButtonText("Reload");
+				item.onClick(() => {
+					this.plugin.reloadTree();
+					this.plugin.activateFileView();
+				});
 			});
-			item.setButtonText("Reload");
-		});
 	}
-
 }
-
-
-
-
-
