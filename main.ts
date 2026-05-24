@@ -165,7 +165,10 @@ class MyFolderItemView extends ItemView {
 			() => {
 				this.plugin.scopedSearch = !this.plugin.scopedSearch;
 				this.renderTreeContainer(TopicTree);
-			}
+			},
+			MDParser.priorityBeforeCities,
+			MDParser.cities,
+			MDParser.priorityAfterCities,
 		));
 	}
 

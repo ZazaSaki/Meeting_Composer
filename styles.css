@@ -1,3 +1,32 @@
+.mc-tree-toolbar {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 8px;
+}
+
+.mc-tree-columns {
+    display: flex;
+    gap: 8px;
+    align-items: flex-start;
+}
+
+.mc-tree-col {
+    flex: 1;
+    min-width: 0;
+    overflow-x: hidden;
+}
+
+.mc-tree-col-header {
+    font-size: 0.75em;
+    font-weight: 600;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 4px;
+    padding-bottom: 4px;
+    border-bottom: 1px solid var(--background-modifier-border);
+}
+
 .mc-priority-lists {
     display: flex;
     gap: 12px;

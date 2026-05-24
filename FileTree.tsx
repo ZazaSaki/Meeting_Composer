@@ -8,14 +8,47 @@ interface Folder {
   path?: string[];
 }
 
-export function FileTreeRoot(data: Folder, onRefresh: () => void, scopedSearch: boolean = false, onToggleScope: () => void = () => {}) {
+export function FileTreeRoot(
+  data: Folder,
+  onRefresh: () => void,
+  scopedSearch: boolean = false,
+  onToggleScope: () => void = () => {},
+  priorityBeforeCities: string[] = [],
+  cities: string[] = [],
+  priorityAfterCities: string[] = [],
+) {
+  const children = data.children || [];
+
+  const categorize = (child: Folder): 'org' | 'sector' | 'important' | 'other' => {
+    const lower = child.name.toLowerCase();
+    if (priorityBeforeCities.some(t => t.toLowerCase() === lower)) return 'org';
+    if (cities.some(c => lower.includes(c.toLowerCase()))) return 'sector';
+    if (priorityAfterCities.some(t => t.toLowerCase() === lower)) return 'important';
+    return 'other';
+  };
+
+  const orgs      = children.filter(c => categorize(c) === 'org');
+  const sectors   = children.filter(c => categorize(c) === 'sector');
+  const important = children.filter(c => categorize(c) === 'important' || categorize(c) === 'other');
+
+  const Column = ({ label, items }: { label: string; items: Folder[] }) => (
+    <div className="mc-tree-col">
+      <div className="mc-tree-col-header">{label}</div>
+      {items.map((child, i) => <div key={i}>{FileTree(child, 0, data)}</div>)}
+    </div>
+  );
+
   return (
     <div>
-      <button onClick={onRefresh} style={{ marginBottom: '6px' }}>⟳ Refresh</button>
-      <button onClick={onToggleScope} style={{ marginBottom: '6px', marginLeft: '4px' }}>
-        {scopedSearch ? '📍 Scoped' : '🌐 Global'}
-      </button>
-      {FileTree(data, 0, data)}
+      <div className="mc-tree-toolbar">
+        <button onClick={onRefresh}>⟳ Refresh</button>
+        <button onClick={onToggleScope}>{scopedSearch ? '📍 Scoped' : '🌐 Global'}</button>
+      </div>
+      <div className="mc-tree-columns">
+        <Column label="Organizations" items={orgs} />
+        <Column label="Sectors"       items={sectors} />
+        <Column label="Important Topics" items={important} />
+      </div>
     </div>
   );
 }
