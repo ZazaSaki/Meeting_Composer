@@ -23,6 +23,7 @@ interface MyPluginSettings {
 	autoReload: boolean;
 	autoCardIds: boolean;
 	processedRecallCloses: string[];
+	recallClosedBy: string[];
 }
 
 const DEFAULT_SETTINGS: MyPluginSettings = {
@@ -36,6 +37,7 @@ const DEFAULT_SETTINGS: MyPluginSettings = {
 	autoReload: true,
 	autoCardIds: true,
 	processedRecallCloses: [],
+	recallClosedBy: [],
 }
 
 interface Folder {
@@ -122,11 +124,13 @@ export default class MyPlugin extends Plugin {
 			outputDir: this.settings.OutputDir,
 			autoCardIds: this.settings.autoCardIds,
 			processedRecallCloses: this.settings.processedRecallCloses,
+			recallClosedBy: this.settings.recallClosedBy,
 			priorityBefore: this.settings.priorityBeforeCities,
 			cities: this.settings.cities,
 			priorityAfter: this.settings.priorityAfterCities,
-		}), async (keys) => {
-			this.settings.processedRecallCloses = keys;
+		}), async ({ processed, closedBy }) => {
+			this.settings.processedRecallCloses = processed;
+			this.settings.recallClosedBy = closedBy;
 			await this.saveSettings();
 		});
 		this.v2.load();

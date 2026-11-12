@@ -1,11 +1,12 @@
 // Auto-appends ^card-xxxxxx to trigger lines once the cursor leaves them (spec §2.2, review fix #17)
-// and keeps the title line its own Markdown block (review fix #1).
+// and keeps the title line its own Markdown block (review fix #1). When #open-card / #closed-card is
+// erased from a card line, the id is taken off again (unless recalls in other notes link to it).
 //
 // The change is dispatched to CodeMirror with addToHistory=false so Ctrl+Z goes straight to the
 // user's own edits instead of fighting the listener (undo would otherwise remove the id, the
 // listener would add it back, and so on).
 
-import { Editor, MarkdownView, Plugin, TFile, editorInfoField } from "obsidian";
+import { Editor, MarkdownView, Notice, Plugin, TFile, editorInfoField } from "obsidian";
 import { EditorView } from "@codemirror/view";
 import { Transaction } from "@codemirror/state";
 import { assignMissingIds } from "../core/autoId";
@@ -50,7 +51,9 @@ export class AutoIdListener {
 	run(editor: Editor, file: TFile, cursorLine: number | null): void {
 		if (!this.enabled() || !this.store.inScope(file.path)) return;
 		const before = editor.getValue();
-		const result = assignMissingIds(before, cursorLine, this.store.allIds());
+		const result = assignMissingIds(before, cursorLine, this.store.allIds(), undefined, {
+			stripOrphans: { keepId: id => this.store.hasRecallsElsewhere(id, file.path) },
+		});
 		if (result.edits.length === 0) return;
 
 		// eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -74,6 +77,9 @@ export class AutoIdListener {
 			});
 		}
 		this.store.indexNow(file, result.text);
+		if (result.removed.length) {
+			new Notice(result.removed.length === 1 ? `Card removed (^${result.removed[0]} taken off the line)` : `${result.removed.length} cards removed`);
+		}
 	}
 
 	destroy(): void {

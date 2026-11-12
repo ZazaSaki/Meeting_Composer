@@ -38,6 +38,7 @@ Initial scope: verify optical sensor quote from vendor.
 - Lifecycle tags: `#open-card` / `#open-ticket` (open), `#closed-card` / `#closed-ticket` (closed). A bare `#closed` is ignored.
 - The line (without tags and id) is the **title**; other tags (`#calling`, `#urgent`, …) are operational tags.
 - When the cursor leaves that line, a random id (`^card-xxxxxx`) is appended. If prose follows directly, a blank line is inserted so the id stays a real Obsidian block (otherwise `[[note#^card-…]]` links don't resolve). The id insertion is not in the undo history.
+- Erasing the lifecycle tag undoes the card: once the cursor leaves the line the `^card-…` id is removed too (kept when recalls in other notes link to it, so re-adding `#open-card` restores the card and its history).
 - The **description** runs until the next heading, `---`, or recall line.
 - Headings are a generic path (H1 › H2 › H3): they can be cities, organizations, people — whatever you use.
 
@@ -50,7 +51,7 @@ From the **Meeting cards** sidebar, *Insert recall* writes this at the cursor:
 - Vendor sent revised quote at €4,150.
 ```
 
-The recall is always written under the card's own heading path: missing headings above the cursor are added first (card under `# Aveiro › ## University of Aveiro`, cursor only under `# Aveiro` → `## University of Aveiro` is inserted before the recall). The timestamp is fixed at insertion; the lines below are collected into the card's history. Adding `#closed-card` at the end of a recall line closes the origin card (once — re-opening it by hand is respected).
+The recall is always written under the card's own heading path: missing headings above the cursor are added first (card under `# Aveiro › ## University of Aveiro`, cursor only under `# Aveiro` → `## University of Aveiro` is inserted before the recall). The timestamp is fixed at insertion; the lines below are collected into the card's history. Adding `#closed-card` at the end of a recall line closes the origin card (once — re-opening it by hand is respected). Erasing that `#closed-card` again re-opens the card, unless another recall that closed it still carries the tag.
 
 ### Meeting cards sidebar
 

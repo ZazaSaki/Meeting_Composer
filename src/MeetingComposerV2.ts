@@ -25,6 +25,7 @@ export interface V2Settings {
 	outputDir: string;
 	autoCardIds: boolean;
 	processedRecallCloses: string[];
+	recallClosedBy: string[];
 	priorityBefore: string[];
 	cities: string[];
 	priorityAfter: string[];
@@ -43,7 +44,7 @@ export class MeetingComposerV2 implements V2Host {
 	constructor(
 		private plugin: Plugin,
 		private settings: () => V2Settings,
-		private saveProcessedRecallCloses: (keys: string[]) => Promise<void>,
+		private saveRecallCloseState: (state: { processed: string[]; closedBy: string[] }) => Promise<void>,
 	) {
 		const app = plugin.app;
 		this.store = new VaultCardStore(app, () => ({
@@ -54,9 +55,21 @@ export class MeetingComposerV2 implements V2Host {
 		this.autoId = new AutoIdListener(plugin, this.store, () => this.settings().autoCardIds);
 		this.closer = new RemoteCloser(this.store, this.mutator, {
 			get: () => new Set(this.settings().processedRecallCloses),
-			add: async keys => {
-				const merged = Array.from(new Set([...this.settings().processedRecallCloses, ...keys]));
-				await this.saveProcessedRecallCloses(merged);
+			closedBy: () => new Set(this.settings().recallClosedBy),
+			add: async (keys, closingKeys) => {
+				const st = this.settings();
+				await this.saveRecallCloseState({
+					processed: Array.from(new Set([...st.processedRecallCloses, ...keys])),
+					closedBy: Array.from(new Set([...st.recallClosedBy, ...closingKeys])),
+				});
+			},
+			release: async keys => {
+				const st = this.settings();
+				const drop = new Set(keys);
+				await this.saveRecallCloseState({
+					processed: st.processedRecallCloses.filter(k => !drop.has(k)),
+					closedBy: st.recallClosedBy.filter(k => !drop.has(k)),
+				});
 			},
 		});
 	}

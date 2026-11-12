@@ -143,6 +143,14 @@ export class VaultCardStore extends Events {
 		return out;
 	}
 
+	/** True when a recall in another indexed note links to this id (whether or not the card still exists). */
+	hasRecallsElsewhere(id: string, exceptPath: string): boolean {
+		for (const [path, f] of this.files) {
+			if (path !== exceptPath && f.parsed.recalls.some(r => r.cardId === id)) return true;
+		}
+		return false;
+	}
+
 	getParsed(path: string): IndexedFile | undefined {
 		return this.files.get(path);
 	}

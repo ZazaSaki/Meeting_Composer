@@ -25367,6 +25367,14 @@ var VaultCardStore = class extends import_obsidian.Events {
     this.files.forEach((f) => out.push(...f.parsed.paths));
     return out;
   }
+  /** True when a recall in another indexed note links to this id (whether or not the card still exists). */
+  hasRecallsElsewhere(id, exceptPath) {
+    for (const [path, f] of this.files) {
+      if (path !== exceptPath && f.parsed.recalls.some((r) => r.cardId === id))
+        return true;
+    }
+    return false;
+  }
   getParsed(path) {
     return this.files.get(path);
   }
@@ -25676,7 +25684,8 @@ function newCardId(existing, rand = Math.random) {
 }
 
 // src/core/autoId.ts
-function assignMissingIds(text, cursorLine, existing, rand) {
+var ORPHAN_ID_RE = /(^|[ \t]+)\^(card-[A-Za-z0-9][A-Za-z0-9-]*)[ \t]*$/;
+function assignMissingIds(text, cursorLine, existing, rand, opts = {}) {
   const eol = text.includes("\r\n") ? "\r\n" : "\n";
   const lines = text.split(/\r?\n/);
   const taken = new Set(existing);
@@ -25704,12 +25713,37 @@ function assignMissingIds(text, cursorLine, existing, rand) {
     if (insert)
       edits.push({ line: c.titleLine, fromCh, toCh: line.length, insert });
   }
+  const removed = [];
+  if (opts.stripOrphans) {
+    const info = classifyLines(lines);
+    const linkedHere = /* @__PURE__ */ new Set();
+    for (const l of lines) {
+      const r = matchRecall(l);
+      if (r)
+        linkedHere.add(r.cardId);
+    }
+    for (let i = 0; i < lines.length; i++) {
+      if (i === cursorLine || info[i].kind !== "text")
+        continue;
+      const m = lines[i].match(ORPHAN_ID_RE);
+      if (!m || m.index === void 0)
+        continue;
+      const id = m[2];
+      if (lifecycleOf(findTags(lines[i]).map((t) => t.tag)) !== null)
+        continue;
+      if (linkedHere.has(id) || opts.stripOrphans.keepId(id))
+        continue;
+      removed.push(id);
+      edits.push({ line: i, fromCh: m.index, toCh: m.index + m[0].length, insert: "" });
+    }
+  }
+  edits.sort((a, b) => a.line - b.line);
   const out = [...lines];
   for (const e of edits) {
     const l = out[e.line];
     out[e.line] = l.slice(0, e.fromCh) + e.insert + l.slice(e.toCh);
   }
-  return { text: out.join(eol), assigned, edits };
+  return { text: out.join(eol), assigned, removed, edits };
 }
 
 // src/sync/AutoIdListener.ts
@@ -25755,7 +25789,9 @@ var AutoIdListener = class {
     if (!this.enabled() || !this.store.inScope(file.path))
       return;
     const before = editor.getValue();
-    const result = assignMissingIds(before, cursorLine, this.store.allIds());
+    const result = assignMissingIds(before, cursorLine, this.store.allIds(), void 0, {
+      stripOrphans: { keepId: (id) => this.store.hasRecallsElsewhere(id, file.path) }
+    });
     if (result.edits.length === 0)
       return;
     const cm = editor.cm;
@@ -25778,6 +25814,9 @@ var AutoIdListener = class {
       });
     }
     this.store.indexNow(file, result.text);
+    if (result.removed.length) {
+      new import_obsidian3.Notice(result.removed.length === 1 ? `Card removed (^${result.removed[0]} taken off the line)` : `${result.removed.length} cards removed`);
+    }
   }
   destroy() {
     if (this.timer)
@@ -25795,22 +25834,42 @@ function recallKey(cardId, sourcePath, timestamp, line) {
 function planRemoteCloses(cards, processed) {
   const toClose = [];
   const newKeys = [];
+  const closingKeys = [];
   for (const card of cards) {
-    let close = false;
+    const fresh = [];
     for (const r of card.recalls) {
       if (!r.closes)
         continue;
       const key = recallKey(card.id, r.sourceFilePath, r.timestamp, r.anchorLine);
       if (processed.has(key))
         continue;
-      newKeys.push(key);
-      if (card.status === "open")
-        close = true;
+      fresh.push(key);
     }
-    if (close)
+    newKeys.push(...fresh);
+    if (fresh.length && card.status === "open") {
       toClose.push(card);
+      closingKeys.push(...fresh);
+    }
   }
-  return { toClose, newKeys };
+  return { toClose, newKeys, closingKeys };
+}
+function planRemoteReopens(cards, closedBy) {
+  const toReopen = [];
+  const releasedKeys = [];
+  if (closedBy.size === 0)
+    return { toReopen, releasedKeys };
+  for (const card of cards) {
+    const released = card.recalls.filter((r) => !r.closes).map((r) => recallKey(card.id, r.sourceFilePath, r.timestamp, r.anchorLine)).filter((k) => closedBy.has(k));
+    if (released.length === 0)
+      continue;
+    releasedKeys.push(...released);
+    const stillClosedByOther = card.recalls.some(
+      (r) => r.closes && closedBy.has(recallKey(card.id, r.sourceFilePath, r.timestamp, r.anchorLine))
+    );
+    if (card.status === "closed" && !stillClosedByOther)
+      toReopen.push(card);
+  }
+  return { toReopen, releasedKeys };
 }
 
 // src/sync/RemoteCloser.ts
@@ -25832,10 +25891,19 @@ var RemoteCloser = class {
     }
     this.running = true;
     try {
+      const reopen = planRemoteReopens(this.store.getCards(), this.keys.closedBy());
+      if (reopen.releasedKeys.length) {
+        await this.keys.release(reopen.releasedKeys);
+        for (const card of reopen.toReopen) {
+          if (await this.mutator.setStatus(card, "open")) {
+            new import_obsidian4.Notice(`Re-opened "${card.title}": #closed-card was removed from its recall`);
+          }
+        }
+      }
       const plan = planRemoteCloses(this.store.getCards(), this.keys.get());
       if (plan.newKeys.length === 0)
         return;
-      await this.keys.add(plan.newKeys);
+      await this.keys.add(plan.newKeys, plan.closingKeys);
       for (const card of plan.toClose) {
         if (await this.mutator.setStatus(card, "closed")) {
           new import_obsidian4.Notice(`Closed "${card.title}" from a recall`);
@@ -27011,6 +27079,8 @@ function cardHelpMarkdown(minutesDir) {
     "",
     "To re-open it, change it back to `#open-card`. A plain `#closed` does **not** count.",
     "",
+    "**Remove a card:** erase `#open-card` / `#closed-card` from the title line. When your cursor leaves the line, the `^card-\u2026` id is taken off too and the card disappears. (If recalls in other notes link to it, the id is kept, so writing `#open-card` again brings the card back with its history.)",
+    "",
     "## 4. Follow up in a later meeting (recall)",
     "In the new meeting note, put your cursor where you want the follow-up. Open the **Meeting cards** sidebar (ribbon icon), go to **Context cards** and click **Insert recall** on the card. Or use the command **Insert recall for a card\u2026**. This inserts:",
     "",
@@ -27022,7 +27092,7 @@ function cardHelpMarkdown(minutesDir) {
     "- The recall is always written under the **same headings as the card**. If a heading is missing above your cursor, it is added for you. Example: the card is under `# Aveiro \u203A ## University of Aveiro` and your cursor is only under `# Aveiro`, so `## University of Aveiro` is inserted before the recall.",
     "- Write your follow-up notes on the lines **below** it. They become part of the card's history.",
     "- The `%%recall:\u2026%%` part is hidden in reading view. Keep it: it marks the line as a recall.",
-    "- To **close the card from here**, add `#closed-card` at the end of the recall line. The original card is closed once. If you re-open it by hand later, it stays open.",
+    "- To **close the card from here**, add `#closed-card` at the end of the recall line. The original card is closed once. If you re-open it by hand later, it stays open. Erase that `#closed-card` again and the card re-opens.",
     "",
     "## 5. See your cards",
     "- **Meeting cards sidebar** (ribbon icon or command *Open meeting cards sidebar*):",
@@ -27037,7 +27107,8 @@ function cardHelpMarkdown(minutesDir) {
     "| Tag a card | Add tags on the title line: `#calling #urgent` |",
     "| Close a card | `#open-card` \u2192 `#closed-card` |",
     "| Follow up later | Sidebar \u203A Context cards \u203A **Insert recall**, then write below the link |",
-    "| Close from a follow-up | Add `#closed-card` at the end of the recall line |",
+    "| Close from a follow-up | Add `#closed-card` at the end of the recall line (erase it to re-open) |",
+    "| Remove a card | Erase its `#open-card` / `#closed-card` (the id goes when the cursor leaves the line) |",
     "| Fix old notes | Command *Assign missing card ids & fix card blocks in minutes folder* |",
     "| Not seeing a card? | It must be in the minutes folder, on the first non-empty line under a `#`/`##`/`###` heading, with `#open-card` exactly |"
   ].join("\n");
@@ -27109,10 +27180,10 @@ function planRecallInsert(doc, cursorLine, cardPath, recallLine) {
 
 // src/MeetingComposerV2.ts
 var MeetingComposerV2 = class {
-  constructor(plugin, settings, saveProcessedRecallCloses) {
+  constructor(plugin, settings, saveRecallCloseState) {
     this.plugin = plugin;
     this.settings = settings;
-    this.saveProcessedRecallCloses = saveProcessedRecallCloses;
+    this.saveRecallCloseState = saveRecallCloseState;
     this.cursorEvents = new import_obsidian10.Events();
     this.cursorSlug = "";
     this.cursorTimer = null;
@@ -27126,9 +27197,21 @@ var MeetingComposerV2 = class {
     this.autoId = new AutoIdListener(plugin, this.store, () => this.settings().autoCardIds);
     this.closer = new RemoteCloser(this.store, this.mutator, {
       get: () => new Set(this.settings().processedRecallCloses),
-      add: async (keys) => {
-        const merged = Array.from(/* @__PURE__ */ new Set([...this.settings().processedRecallCloses, ...keys]));
-        await this.saveProcessedRecallCloses(merged);
+      closedBy: () => new Set(this.settings().recallClosedBy),
+      add: async (keys, closingKeys) => {
+        const st = this.settings();
+        await this.saveRecallCloseState({
+          processed: Array.from(/* @__PURE__ */ new Set([...st.processedRecallCloses, ...keys])),
+          closedBy: Array.from(/* @__PURE__ */ new Set([...st.recallClosedBy, ...closingKeys]))
+        });
+      },
+      release: async (keys) => {
+        const st = this.settings();
+        const drop = new Set(keys);
+        await this.saveRecallCloseState({
+          processed: st.processedRecallCloses.filter((k) => !drop.has(k)),
+          closedBy: st.recallClosedBy.filter((k) => !drop.has(k))
+        });
       }
     });
   }
@@ -27379,7 +27462,8 @@ var DEFAULT_SETTINGS = {
   autoComplete: true,
   autoReload: true,
   autoCardIds: true,
-  processedRecallCloses: []
+  processedRecallCloses: [],
+  recallClosedBy: []
 };
 var TreeView = null;
 var currentToggle = () => {
@@ -27454,11 +27538,13 @@ var MyPlugin = class extends import_obsidian11.Plugin {
       outputDir: this.settings.OutputDir,
       autoCardIds: this.settings.autoCardIds,
       processedRecallCloses: this.settings.processedRecallCloses,
+      recallClosedBy: this.settings.recallClosedBy,
       priorityBefore: this.settings.priorityBeforeCities,
       cities: this.settings.cities,
       priorityAfter: this.settings.priorityAfterCities
-    }), async (keys) => {
-      this.settings.processedRecallCloses = keys;
+    }), async ({ processed, closedBy }) => {
+      this.settings.processedRecallCloses = processed;
+      this.settings.recallClosedBy = closedBy;
       await this.saveSettings();
     });
     this.v2.load();
