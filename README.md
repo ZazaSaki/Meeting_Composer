@@ -61,7 +61,14 @@ The recall is always written under the card's own heading path: missing headings
 
 ### Meeting cards sidebar
 
-Ribbon icon **Open meeting cards**. Tab 1 is the organization tree with open-card counts (the heading under your cursor is highlighted). Tab 2 lists the cards for the selected branch or the heading under your cursor, with Open/Closed/All, search and *Insert recall*.
+Ribbon icon **Open meeting cards**. One panel, top to bottom:
+
+- **Search box** — filters the organization tree by branch name (matches highlighted, parents opened) and the card list by title, text, tag or heading; `#tag` filters the cards only. **Enter** selects the first matching branch, **Esc** clears. Buttons: re-index, collapse all, card syntax help.
+- **Organization tree** — native collapsible tree with open-card counts. The arrow only expands/collapses; clicking a branch name shows its cards below. The heading under your editor cursor is marked with a dot. Keyboard: ↑/↓ to move, ←/→ to collapse/expand, Enter to select, Space to toggle.
+- **Divider** — drag it (or focus it and use ↑/↓) to resize the tree; double-click resets.
+- **Cards** — the cards for the selected branch, or for the heading under your cursor while **Follow cursor** (◎) is on, with Open/Closed/All and *Insert recall*. × goes back to all minutes.
+
+Expanded branches, the selected branch, the status filter, follow mode and the tree height are remembered.
 
 ### `.orgboard` boards
 

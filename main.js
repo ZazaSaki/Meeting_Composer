@@ -1101,7 +1101,7 @@ var require_react_development = __commonJS({
           var dispatcher = resolveDispatcher();
           return dispatcher.useReducer(reducer, initialArg, init);
         }
-        function useRef2(initialValue) {
+        function useRef3(initialValue) {
           var dispatcher = resolveDispatcher();
           return dispatcher.useRef(initialValue);
         }
@@ -1894,7 +1894,7 @@ var require_react_development = __commonJS({
         exports.useLayoutEffect = useLayoutEffect;
         exports.useMemo = useMemo3;
         exports.useReducer = useReducer;
-        exports.useRef = useRef2;
+        exports.useRef = useRef3;
         exports.useState = useState5;
         exports.useSyncExternalStore = useSyncExternalStore;
         exports.useTransition = useTransition;
@@ -2442,7 +2442,7 @@ var require_react_dom_development = __commonJS({
         var HostPortal = 4;
         var HostComponent = 5;
         var HostText = 6;
-        var Fragment = 7;
+        var Fragment2 = 7;
         var Mode = 8;
         var ContextConsumer = 9;
         var ContextProvider = 10;
@@ -3598,7 +3598,7 @@ var require_react_dom_development = __commonJS({
               return "DehydratedFragment";
             case ForwardRef:
               return getWrappedName$1(type, type.render, "ForwardRef");
-            case Fragment:
+            case Fragment2:
               return "Fragment";
             case HostComponent:
               return type;
@@ -13269,7 +13269,7 @@ var require_react_dom_development = __commonJS({
             }
           }
           function updateFragment2(returnFiber, current2, fragment, lanes, key) {
-            if (current2 === null || current2.tag !== Fragment) {
+            if (current2 === null || current2.tag !== Fragment2) {
               var created = createFiberFromFragment(fragment, returnFiber.mode, lanes, key);
               created.return = returnFiber;
               return created;
@@ -13672,7 +13672,7 @@ var require_react_dom_development = __commonJS({
               if (child.key === key) {
                 var elementType = element.type;
                 if (elementType === REACT_FRAGMENT_TYPE) {
-                  if (child.tag === Fragment) {
+                  if (child.tag === Fragment2) {
                     deleteRemainingChildren(returnFiber, child.sibling);
                     var existing = useFiber(child, element.props.children);
                     existing.return = returnFiber;
@@ -17847,7 +17847,7 @@ var require_react_dom_development = __commonJS({
               var _resolvedProps2 = workInProgress2.elementType === type ? _unresolvedProps2 : resolveDefaultProps(type, _unresolvedProps2);
               return updateForwardRef(current2, workInProgress2, type, _resolvedProps2, renderLanes2);
             }
-            case Fragment:
+            case Fragment2:
               return updateFragment(current2, workInProgress2, renderLanes2);
             case Mode:
               return updateMode(current2, workInProgress2, renderLanes2);
@@ -18120,7 +18120,7 @@ var require_react_dom_development = __commonJS({
             case SimpleMemoComponent:
             case FunctionComponent:
             case ForwardRef:
-            case Fragment:
+            case Fragment2:
             case Mode:
             case Profiler:
             case ContextConsumer:
@@ -22379,7 +22379,7 @@ var require_react_dom_development = __commonJS({
           return fiber;
         }
         function createFiberFromFragment(elements, mode, lanes, key) {
-          var fiber = createFiber(Fragment, elements, key, mode);
+          var fiber = createFiber(Fragment2, elements, key, mode);
           fiber.lanes = lanes;
           return fiber;
         }
@@ -25903,6 +25903,39 @@ function inScope(cardSlug, scopeSlug) {
   return scopeSlug === "" || cardSlug === scopeSlug || cardSlug.startsWith(scopeSlug + "/");
 }
 
+// src/core/treeFilter.ts
+function filterByName(nodes, query, key) {
+  const q = query.trim().toLowerCase();
+  const open = /* @__PURE__ */ new Set();
+  let matches2 = 0;
+  if (!q)
+    return { nodes, open, matches: 0 };
+  const walk = (list) => {
+    const out = [];
+    for (const node of list) {
+      const self = node.name.toLowerCase().includes(q);
+      const kids = walk(node.children);
+      if (self)
+        matches2++;
+      if (kids.length > 0)
+        open.add(key(node));
+      if (self)
+        out.push(kids.length > 0 ? { ...node, children: mergeChildren(node.children, kids, key) } : node);
+      else if (kids.length > 0)
+        out.push({ ...node, children: kids });
+    }
+    return out;
+  };
+  return { nodes: walk(nodes), open, matches: matches2 };
+}
+function mergeChildren(all, filtered, key) {
+  const byKey = new Map(filtered.map((n) => [key(n), n]));
+  return all.map((n) => {
+    var _a;
+    return (_a = byKey.get(key(n))) != null ? _a : n;
+  });
+}
+
 // src/views/components.tsx
 var import_react = __toESM(require_react());
 var import_obsidian5 = require("obsidian");
@@ -26025,11 +26058,15 @@ function DuplicateBanner({ host }) {
 // src/views/CardsSidebarView.tsx
 var import_jsx_runtime2 = __toESM(require_jsx_runtime());
 var VIEW_TYPE_CARDS = "meeting-composer-cards";
+var DEFAULT_TREE_HEIGHT = 260;
+var MIN_TREE_HEIGHT = 60;
 var CardsSidebarView = class extends import_obsidian6.ItemView {
   constructor(leaf, host) {
     super(leaf);
     this.host = host;
     this.root = null;
+    this.ui = {};
+    this.mountKey = 0;
   }
   getViewType() {
     return VIEW_TYPE_CARDS;
@@ -26040,30 +26077,82 @@ var CardsSidebarView = class extends import_obsidian6.ItemView {
   getIcon() {
     return "kanban-square";
   }
+  getState() {
+    return { ...super.getState(), ...this.ui };
+  }
+  async setState(state, result) {
+    const next = { ...this.ui };
+    if (Array.isArray(state == null ? void 0 : state.expanded))
+      next.expanded = state.expanded.filter((s) => typeof s === "string");
+    if (typeof (state == null ? void 0 : state.treeHeight) === "number" && state.treeHeight > 0)
+      next.treeHeight = state.treeHeight;
+    if ((state == null ? void 0 : state.status) === "open" || (state == null ? void 0 : state.status) === "closed" || (state == null ? void 0 : state.status) === "all")
+      next.status = state.status;
+    if (typeof (state == null ? void 0 : state.follow) === "boolean")
+      next.follow = state.follow;
+    if (typeof (state == null ? void 0 : state.scope) === "string")
+      next.scope = state.scope;
+    this.ui = next;
+    this.mountKey++;
+    this.renderApp();
+    await super.setState(state, result);
+  }
   async onOpen() {
-    const container = this.containerEl.children[1];
+    const container = this.contentEl;
     container.empty();
     container.addClass("mc2-sidebar");
     this.root = (0, import_client.createRoot)(container);
-    this.root.render(/* @__PURE__ */ (0, import_jsx_runtime2.jsx)(SidebarApp, { host: this.host, component: this }));
+    this.renderApp();
   }
   async onClose() {
     var _a;
     (_a = this.root) == null ? void 0 : _a.unmount();
     this.root = null;
   }
+  renderApp() {
+    var _a;
+    (_a = this.root) == null ? void 0 : _a.render(
+      /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(
+        SidebarApp,
+        {
+          host: this.host,
+          component: this,
+          initial: this.ui,
+          persist: (patch) => {
+            this.ui = { ...this.ui, ...patch };
+            this.app.workspace.requestSaveLayout();
+          }
+        },
+        this.mountKey
+      )
+    );
+  }
 };
-function SidebarApp({ host, component }) {
+function SidebarApp({
+  host,
+  component,
+  initial,
+  persist
+}) {
+  var _a, _b, _c, _d;
   const version = useStoreVersion(host.store);
-  const [tab, setTab] = (0, import_react2.useState)("tree");
-  const [manualScope, setManualScope] = (0, import_react2.useState)("");
-  const [follow, setFollow] = (0, import_react2.useState)(true);
+  const [manualScope, setManualScope] = (0, import_react2.useState)((_a = initial.scope) != null ? _a : "");
+  const [follow, setFollow] = (0, import_react2.useState)((_b = initial.follow) != null ? _b : true);
   const [cursorSlug, setCursorSlug] = (0, import_react2.useState)(host.currentCursorScope());
-  const [expanded, setExpanded] = (0, import_react2.useState)(/* @__PURE__ */ new Set());
-  const [status, setStatus2] = (0, import_react2.useState)("open");
+  const [expanded, setExpanded] = (0, import_react2.useState)(() => {
+    var _a2;
+    return new Set((_a2 = initial.expanded) != null ? _a2 : []);
+  });
+  const [status, setStatus2] = (0, import_react2.useState)((_c = initial.status) != null ? _c : "open");
   const [query, setQuery] = (0, import_react2.useState)("");
   const [openCard, setOpenCard] = (0, import_react2.useState)(null);
+  const [treeHeight, setTreeHeight] = (0, import_react2.useState)((_d = initial.treeHeight) != null ? _d : DEFAULT_TREE_HEIGHT);
+  const [closedInSearch, setClosedInSearch] = (0, import_react2.useState)(/* @__PURE__ */ new Set());
+  const treeRef = (0, import_react2.useRef)(null);
+  const cardsRef = (0, import_react2.useRef)(null);
+  const searchRef = (0, import_react2.useRef)(null);
   (0, import_react2.useEffect)(() => host.onCursorScope(setCursorSlug), [host]);
+  (0, import_react2.useEffect)(() => setClosedInSearch(/* @__PURE__ */ new Set()), [query]);
   (0, import_react2.useEffect)(() => {
     if (!cursorSlug)
       return;
@@ -26072,48 +26161,155 @@ function SidebarApp({ host, component }) {
       const parts = cursorSlug.split("/");
       for (let i = 1; i < parts.length; i++)
         next.add(parts.slice(0, i).join("/"));
-      return next;
+      return next.size === prev.size ? prev : next;
     });
   }, [cursorSlug]);
+  (0, import_react2.useEffect)(() => persist({ expanded: [...expanded], status, follow, scope: manualScope, treeHeight }), [
+    expanded,
+    status,
+    follow,
+    manualScope,
+    treeHeight
+  ]);
   const scope = follow ? cursorSlug : manualScope;
+  const q = query.trim().toLowerCase();
+  const tagSearch = q.startsWith("#");
   const tree = (0, import_react2.useMemo)(
     () => buildTree(host.store.getAllPaths(), host.store.getCards(), (a, b) => host.compareTopics(a, b)),
     [version]
   );
+  const filtered = (0, import_react2.useMemo)(() => q && !tagSearch ? filterByName(tree.children, q, (n) => n.slug) : null, [tree, q, tagSearch]);
+  const roots = filtered ? filtered.nodes : tree.children;
+  const isOpen = (slug) => expanded.has(slug) || !!filtered && filtered.open.has(slug) && !closedInSearch.has(slug);
   const scopeNode = (0, import_react2.useMemo)(() => findNode(tree, scope), [tree, scope]);
-  const cards = (0, import_react2.useMemo)(() => {
-    const q = query.trim().toLowerCase();
-    return host.store.getCards().filter((c) => inScope(c.hierarchy.slug, scope)).filter((c) => status === "all" || c.status === status).filter((c) => !q || matches(c, q)).sort((a, b) => {
-      var _a, _b;
-      return ((_a = b.lastUpdated) != null ? _a : "").localeCompare((_b = a.lastUpdated) != null ? _b : "");
-    });
-  }, [version, scope, status, query]);
+  const cards = (0, import_react2.useMemo)(
+    () => host.store.getCards().filter((c) => inScope(c.hierarchy.slug, scope)).filter((c) => status === "all" || c.status === status).filter((c) => !q || matches(c, q)).sort((a, b) => {
+      var _a2, _b2;
+      return ((_a2 = b.lastUpdated) != null ? _a2 : "").localeCompare((_b2 = a.lastUpdated) != null ? _b2 : "");
+    }),
+    [version, scope, status, q]
+  );
+  (0, import_react2.useEffect)(() => {
+    var _a2;
+    if (!scope)
+      return;
+    const el = (_a2 = treeRef.current) == null ? void 0 : _a2.querySelector(`.mc2-org-row[data-slug="${cssEscape(scope)}"]`);
+    el == null ? void 0 : el.scrollIntoView({ block: "nearest" });
+  }, [scope, version]);
   const pick = (n) => {
+    var _a2;
     setManualScope(n.slug);
     setFollow(false);
-    setTab("cards");
+    setOpenCard(null);
+    (_a2 = cardsRef.current) == null ? void 0 : _a2.scrollTo({ top: 0 });
   };
-  const toggle = (slug) => setExpanded((prev) => {
-    const next = new Set(prev);
-    if (next.has(slug))
-      next.delete(slug);
-    else
-      next.add(slug);
-    return next;
-  });
+  const toggle = (slug, open) => {
+    const next = open != null ? open : !isOpen(slug);
+    setExpanded((prev) => {
+      const s = new Set(prev);
+      if (next)
+        s.add(slug);
+      else
+        s.delete(slug);
+      return s;
+    });
+    setClosedInSearch((prev) => {
+      const s = new Set(prev);
+      if (next)
+        s.delete(slug);
+      else
+        s.add(slug);
+      return s;
+    });
+  };
+  const collapseAll = () => {
+    setExpanded(/* @__PURE__ */ new Set());
+    if (filtered)
+      setClosedInSearch(new Set(filtered.open));
+  };
+  const onSearchKey = (e) => {
+    var _a2, _b2;
+    if (e.key === "Escape" && query) {
+      e.preventDefault();
+      setQuery("");
+    } else if (e.key === "Enter" && filtered) {
+      const first = firstMatch(filtered.nodes, q);
+      if (first)
+        pick(first);
+    } else if (e.key === "ArrowDown") {
+      e.preventDefault();
+      (_b2 = (_a2 = treeRef.current) == null ? void 0 : _a2.querySelector(".mc2-org-row")) == null ? void 0 : _b2.focus();
+    }
+  };
+  const onTreeKey = (e) => {
+    var _a2, _b2, _c2, _d2, _e, _f, _g, _h, _i, _j;
+    const row = e.target.closest(".mc2-org-row");
+    const slug = row == null ? void 0 : row.dataset.slug;
+    if (!row || slug === void 0)
+      return;
+    const node = findNode(tree, slug);
+    if (!node)
+      return;
+    const hasKids = node.children.length > 0;
+    const open = hasKids && isOpen(slug);
+    switch (e.key) {
+      case "Enter":
+        pick(node);
+        break;
+      case " ":
+        if (hasKids)
+          toggle(slug);
+        break;
+      case "ArrowRight":
+        if (hasKids && !open)
+          toggle(slug, true);
+        else if (open)
+          focusRow((_b2 = (_a2 = row.parentElement) == null ? void 0 : _a2.querySelector(":scope > .tree-item-children .mc2-org-row")) != null ? _b2 : null);
+        break;
+      case "ArrowLeft":
+        if (open)
+          toggle(slug, false);
+        else
+          focusRow((_f = (_e = (_d2 = (_c2 = row.parentElement) == null ? void 0 : _c2.parentElement) == null ? void 0 : _d2.closest(".tree-item")) == null ? void 0 : _e.querySelector(":scope > .mc2-org-row")) != null ? _f : null);
+        break;
+      case "ArrowDown":
+      case "ArrowUp": {
+        const rows = Array.from((_h = (_g = treeRef.current) == null ? void 0 : _g.querySelectorAll(".mc2-org-row")) != null ? _h : []);
+        const i = rows.indexOf(row);
+        if (e.key === "ArrowUp" && i === 0)
+          (_i = searchRef.current) == null ? void 0 : _i.focus();
+        else
+          focusRow((_j = rows[i + (e.key === "ArrowDown" ? 1 : -1)]) != null ? _j : null);
+        break;
+      }
+      default:
+        return;
+    }
+    e.preventDefault();
+  };
   const openInScope = cards.filter((c) => c.status === "open").length;
+  const scopeLabel = scopeNode && scopeNode.slug ? scopeNode.segments.map((s) => s.text) : [];
   return /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "mc2-sidebar-app", children: [
-    /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "mc2-tabs", role: "tablist", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("button", { role: "tab", "aria-selected": tab === "tree", className: tab === "tree" ? "is-active" : "", onClick: () => setTab("tree"), children: "Organization tree" }),
-      /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("button", { role: "tab", "aria-selected": tab === "cards", className: tab === "cards" ? "is-active" : "", onClick: () => setTab("cards"), children: [
-        "Context cards (",
-        openInScope,
-        ")"
-      ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("button", { className: "mc2-help-btn", "aria-label": "How to write cards", title: "How to write cards", onClick: () => host.showHelp(), children: "?" })
+    /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "mc2-side-header", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { className: "search-input-container mc2-side-search", children: /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(
+        "input",
+        {
+          ref: searchRef,
+          type: "search",
+          placeholder: "Search branches, cards, #tags\u2026",
+          "aria-label": "Search branches, cards and #tags",
+          spellCheck: false,
+          value: query,
+          onChange: (e) => setQuery(e.target.value),
+          onKeyDown: onSearchKey
+        }
+      ) }),
+      /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(IconButton, { icon: "rotate-cw", label: "Re-index meeting cards", onClick: () => void host.store.reindexAll() }),
+      /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(IconButton, { icon: "chevrons-down-up", label: "Collapse all", onClick: collapseAll }),
+      /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(IconButton, { icon: "help-circle", label: "How to write cards", onClick: () => host.showHelp() })
     ] }),
     /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(DuplicateBanner, { host }),
-    tab === "tree" ? /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "mc2-tree", children: [
+    /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "mc2-org-tree", ref: treeRef, role: "tree", style: { height: treeHeight }, onKeyDown: onTreeKey, children: [
       tree.children.length === 0 && /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "mc2-muted mc2-empty", children: [
         "No headings found in the minutes folder yet.",
         " ",
@@ -26122,39 +26318,55 @@ function SidebarApp({ host, component }) {
           host.showHelp();
         }, children: "How to write cards" })
       ] }),
-      tree.children.map((n) => /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(TreeRow, { node: n, depth: 0, expanded, toggle, pick, cursorSlug }, n.slug))
-    ] }) : /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "mc2-feed", children: [
+      tagSearch && tree.children.length > 0 && /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { className: "mc2-muted mc2-org-hint", children: "Tag search filters the cards below." }),
+      filtered && roots.length === 0 && /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "mc2-muted mc2-empty", children: [
+        "No branches match \u201C",
+        query.trim(),
+        "\u201D."
+      ] }),
+      roots.map((n) => /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(
+        OrgRow,
+        {
+          node: n,
+          isOpen,
+          toggle,
+          pick,
+          scope,
+          cursorSlug,
+          highlight: filtered ? q : ""
+        },
+        n.slug
+      ))
+    ] }),
+    /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(Divider, { height: treeHeight, setHeight: setTreeHeight }),
+    /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "mc2-feed", ref: cardsRef, children: [
       /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "mc2-scope", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { className: "mc2-muted", children: "Scope:" }),
-        " ",
-        scopeNode && scopeNode.slug ? scopeNode.segments.map((s) => s.text).join(" \u2192 ") : "All minutes",
+        /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { className: "mc2-scope-path", title: scopeLabel.join(" \u203A ") || "All minutes", children: scopeLabel.length === 0 ? /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { className: "mc2-scope-current", children: "All minutes" }) : scopeLabel.map((s, i) => /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)(import_react2.default.Fragment, { children: [
+          i > 0 && /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { className: "mc2-scope-sep", children: "\u203A" }),
+          /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { className: i === scopeLabel.length - 1 ? "mc2-scope-current" : "mc2-muted", children: s })
+        ] }, i)) }),
         /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("span", { className: "mc2-scope-actions", children: [
           /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(
-            "button",
+            IconButton,
             {
-              className: follow ? "is-active" : "",
-              onClick: () => setFollow(!follow),
-              title: "Follow the heading under the editor cursor",
-              children: "\u{1F4CD} Follow cursor"
+              icon: "locate-fixed",
+              label: follow ? "Following the heading under the editor cursor (click to stop)" : "Follow the heading under the editor cursor",
+              active: follow,
+              onClick: () => setFollow(!follow)
             }
           ),
-          !follow && manualScope && /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("button", { onClick: () => setManualScope(""), children: "All" })
+          !follow && manualScope && /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(IconButton, { icon: "x", label: "Show all minutes", onClick: () => setManualScope("") })
         ] })
       ] }),
       /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "mc2-filters", children: [
         /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { className: "mc2-segmented", children: ["open", "closed", "all"].map((s) => /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("button", { className: status === s ? "is-active" : "", onClick: () => setStatus2(s), children: s[0].toUpperCase() + s.slice(1) }, s)) }),
-        /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(
-          "input",
-          {
-            type: "search",
-            placeholder: "Search title, #tag, text\u2026",
-            value: query,
-            onChange: (e) => setQuery(e.target.value)
-          }
-        )
+        /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("span", { className: "mc2-muted mc2-feed-count", children: [
+          plural(cards.length, "card"),
+          status !== "open" ? ` \xB7 ${openInScope} open` : ""
+        ] })
       ] }),
       cards.length === 0 && /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "mc2-muted mc2-empty", children: [
-        "No cards in this scope.",
+        q ? "No cards match the search in this scope." : "No cards in this scope.",
         " ",
         /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("a", { href: "#", onClick: (e) => {
           e.preventDefault();
@@ -26172,35 +26384,159 @@ function SidebarApp({ host, component }) {
     ] })
   ] });
 }
-function TreeRow(props) {
-  const { node, depth, expanded, toggle, pick, cursorSlug } = props;
-  const isOpen = expanded.has(node.slug);
+function OrgRow(props) {
+  const { node, isOpen, toggle, pick, scope, cursorSlug, highlight } = props;
   const hasChildren = node.children.length > 0;
-  const active = cursorSlug === node.slug;
-  const onPath = !active && cursorSlug.startsWith(node.slug + "/");
-  return /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "mc2-tree-node", children: [
+  const open = hasChildren && isOpen(node.slug);
+  const active = scope !== "" && scope === node.slug;
+  const onPath = !active && scope !== "" && scope.startsWith(node.slug + "/");
+  const atCursor = cursorSlug === node.slug;
+  const cls = [
+    "tree-item-self is-clickable mc2-org-row",
+    hasChildren ? "mod-collapsible" : "",
+    active ? "is-active" : "",
+    onPath ? "is-on-path" : "",
+    atCursor ? "is-cursor" : ""
+  ].join(" ");
+  return /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "tree-item mc2-org-item", children: [
     /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)(
       "div",
       {
-        className: `mc2-tree-row ${active ? "is-active" : ""} ${onPath ? "is-on-path" : ""}`,
-        style: { paddingLeft: 4 + depth * 14 },
+        className: cls,
+        "data-slug": node.slug,
+        role: "treeitem",
+        tabIndex: 0,
+        "aria-expanded": hasChildren ? open : void 0,
+        "aria-selected": active,
+        onClick: () => pick(node),
+        title: atCursor ? "Heading under the editor cursor" : void 0,
         children: [
-          /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(
-            "span",
+          hasChildren ? /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(
+            Icon,
             {
-              className: "mc2-tree-chevron",
-              onClick: () => hasChildren && toggle(node.slug),
-              "aria-label": hasChildren ? isOpen ? "Collapse" : "Expand" : void 0,
-              children: hasChildren ? isOpen ? "\u25BC" : "\u25B6" : "\u2022"
+              name: "right-triangle",
+              className: `tree-item-icon collapse-icon mc2-org-chevron ${open ? "" : "is-collapsed"}`,
+              label: open ? "Collapse" : "Expand",
+              onClick: (e) => {
+                e.stopPropagation();
+                toggle(node.slug);
+              }
             }
-          ),
-          /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { className: "mc2-tree-name", onClick: () => pick(node), title: "Show cards for this branch", children: node.name }),
-          /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { className: `mc2-badge ${node.openCount ? "" : "is-zero"}`, title: `${plural(node.openCount, "open card")}`, children: node.openCount })
+          ) : /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { className: "tree-item-icon mc2-org-chevron is-leaf" }),
+          /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { className: "tree-item-inner mc2-org-label", children: /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(Highlighted, { text: node.name, query: highlight }) }),
+          /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { className: "tree-item-flair-outer", children: /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { className: `tree-item-flair mc2-org-count ${node.openCount ? "" : "is-zero"}`, title: plural(node.openCount, "open card"), children: node.openCount }) })
         ]
       }
     ),
-    isOpen && node.children.map((c) => /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(TreeRow, { ...props, node: c, depth: depth + 1 }, c.slug))
+    open && /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { className: "tree-item-children mc2-org-children", role: "group", children: node.children.map((c) => /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(OrgRow, { ...props, node: c }, c.slug)) })
   ] });
+}
+function Divider({ height, setHeight }) {
+  const drag = (0, import_react2.useRef)(null);
+  const maxFor = (el) => {
+    var _a;
+    const app = el.closest(".mc2-sidebar-app");
+    return Math.max(MIN_TREE_HEIGHT, ((_a = app == null ? void 0 : app.clientHeight) != null ? _a : 600) - 140);
+  };
+  const clamp = (h, max) => Math.round(Math.min(Math.max(h, MIN_TREE_HEIGHT), max));
+  return /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(
+    "div",
+    {
+      className: "mc2-divider",
+      role: "separator",
+      "aria-orientation": "horizontal",
+      "aria-label": "Resize organization tree",
+      tabIndex: 0,
+      onPointerDown: (e) => {
+        const el = e.currentTarget;
+        el.setPointerCapture(e.pointerId);
+        drag.current = { y: e.clientY, h: height, max: maxFor(el) };
+        el.addClass("is-dragging");
+      },
+      onPointerMove: (e) => {
+        const d = drag.current;
+        if (d)
+          setHeight(clamp(d.h + e.clientY - d.y, d.max));
+      },
+      onPointerUp: (e) => {
+        drag.current = null;
+        e.currentTarget.releasePointerCapture(e.pointerId);
+        e.currentTarget.removeClass("is-dragging");
+      },
+      onDoubleClick: () => setHeight(DEFAULT_TREE_HEIGHT),
+      onKeyDown: (e) => {
+        if (e.key !== "ArrowUp" && e.key !== "ArrowDown")
+          return;
+        e.preventDefault();
+        setHeight(clamp(height + (e.key === "ArrowDown" ? 24 : -24), maxFor(e.currentTarget)));
+      }
+    }
+  );
+}
+function Icon({
+  name,
+  className,
+  label,
+  onClick
+}) {
+  const ref = (0, import_react2.useRef)(null);
+  (0, import_react2.useEffect)(() => {
+    const el = ref.current;
+    if (!el)
+      return;
+    el.empty();
+    (0, import_obsidian6.setIcon)(el, name);
+  }, [name]);
+  return /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { ref, className, "aria-label": label, onClick });
+}
+function IconButton({ icon, label, onClick, active }) {
+  return /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(
+    "div",
+    {
+      className: `clickable-icon mc2-icon-btn ${active ? "is-active" : ""}`,
+      role: "button",
+      tabIndex: 0,
+      "aria-label": label,
+      "aria-pressed": active,
+      onClick,
+      onKeyDown: (e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          onClick();
+        }
+      },
+      children: /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(Icon, { name: icon, className: "mc2-icon" })
+    }
+  );
+}
+function Highlighted({ text, query }) {
+  const i = query ? text.toLowerCase().indexOf(query) : -1;
+  if (i < 0)
+    return /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(import_jsx_runtime2.Fragment, { children: text });
+  return /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)(import_jsx_runtime2.Fragment, { children: [
+    text.slice(0, i),
+    /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { className: "mc2-org-match", children: text.slice(i, i + query.length) }),
+    text.slice(i + query.length)
+  ] });
+}
+function focusRow(el) {
+  if (!el)
+    return;
+  el.focus();
+  el.scrollIntoView({ block: "nearest" });
+}
+function firstMatch(nodes, q) {
+  for (const n of nodes) {
+    if (n.name.toLowerCase().includes(q))
+      return n;
+    const f = firstMatch(n.children, q);
+    if (f)
+      return f;
+  }
+  return null;
+}
+function cssEscape(s) {
+  return typeof CSS !== "undefined" && CSS.escape ? CSS.escape(s) : s.replace(/["\\]/g, "\\$&");
 }
 function findNode(root, slug) {
   if (root.slug === slug)
@@ -27868,35 +28204,7 @@ function groupRoots(roots, lists) {
   return out;
 }
 function filterTree(nodes, query) {
-  const q = query.trim().toLowerCase();
-  const open = /* @__PURE__ */ new Set();
-  let matches2 = 0;
-  if (!q)
-    return { nodes, open, matches: 0 };
-  const walk = (list) => {
-    const out = [];
-    for (const node of list) {
-      const self = node.name.toLowerCase().includes(q);
-      const kids = walk(node.children);
-      if (self)
-        matches2++;
-      if (kids.length > 0)
-        open.add(pathKey(node.path, node.name));
-      if (self)
-        out.push(kids.length > 0 ? { ...node, children: mergeChildren(node.children, kids) } : node);
-      else if (kids.length > 0)
-        out.push({ ...node, children: kids });
-    }
-    return out;
-  };
-  return { nodes: walk(nodes), open, matches: matches2 };
-}
-function mergeChildren(all, filtered) {
-  const byName = new Map(filtered.map((n) => [n.name, n]));
-  return all.map((n) => {
-    var _a;
-    return (_a = byName.get(n.name)) != null ? _a : n;
-  });
+  return filterByName(nodes, query, (n) => pathKey(n.path, n.name));
 }
 function resolveTopicName(text, names) {
   var _a;
