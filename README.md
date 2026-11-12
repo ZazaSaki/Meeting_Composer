@@ -50,7 +50,7 @@ From the **Meeting cards** sidebar, *Insert recall* writes this at the cursor:
 - Vendor sent revised quote at €4,150.
 ```
 
-The timestamp is fixed at insertion; the lines below are collected into the card's history. Adding `#closed-card` at the end of a recall line closes the origin card (once — re-opening it by hand is respected).
+The recall is always written under the card's own heading path: missing headings above the cursor are added first (card under `# Aveiro › ## University of Aveiro`, cursor only under `# Aveiro` → `## University of Aveiro` is inserted before the recall). The timestamp is fixed at insertion; the lines below are collected into the card's history. Adding `#closed-card` at the end of a recall line closes the origin card (once — re-opening it by hand is respected).
 
 ### Meeting cards sidebar
 

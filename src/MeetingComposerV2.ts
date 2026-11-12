@@ -15,6 +15,7 @@ import { V2Host } from "./views/host";
 import { CardNode } from "./types";
 import { hierarchyAt } from "./core/cardParser";
 import { assignMissingIds } from "./core/autoId";
+import { planRecallInsert } from "./core/recallInsert";
 import { newCardId } from "./core/ids";
 import { formatTimestamp } from "./core/syntax";
 import { DEFAULT_BOARD, serializeBoard } from "./core/boardFile";
@@ -214,16 +215,12 @@ export class MeetingComposerV2 implements V2Host {
 		const alias = card.title.replace(/[[\]|]/g, " ").replace(/\s+/g, " ").trim();
 		const recall = `[[${linktext}#^${card.id}|${alias}]] %%recall:${formatTimestamp(new Date())}%%`;
 
+		// Write the recall under the card's own heading path, adding missing headings (e.g. "## b").
 		const editor = view.editor;
-		const cur = editor.getCursor();
-		const lineText = editor.getLine(cur.line);
-		if (lineText.trim() === "") {
-			editor.replaceRange(recall + "\n", { line: cur.line, ch: 0 }, { line: cur.line, ch: lineText.length });
-			editor.setCursor({ line: cur.line + 1, ch: 0 });
-		} else {
-			editor.replaceRange("\n" + recall + "\n", { line: cur.line, ch: lineText.length });
-			editor.setCursor({ line: cur.line + 2, ch: 0 });
-		}
+		const plan = planRecallInsert(editor.getValue(), editor.getCursor().line, card.hierarchy, recall);
+		editor.replaceRange(plan.text, plan.from, plan.to);
+		editor.setCursor(plan.cursor);
+		if (plan.addedHeadings.length) new Notice(`Added missing heading${plan.addedHeadings.length > 1 ? "s" : ""}: ${plan.addedHeadings.join(" › ")}`);
 		this.app.workspace.setActiveLeaf(view.leaf, { focus: true });
 		editor.focus();
 	}

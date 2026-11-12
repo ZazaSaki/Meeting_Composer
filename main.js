@@ -27019,6 +27019,7 @@ function cardHelpMarkdown(minutesDir) {
     "Vendor sent a new quote: \u20AC4,150.",
     FENCE,
     "",
+    "- The recall is always written under the **same headings as the card**. If a heading is missing above your cursor, it is added for you. Example: the card is under `# Aveiro \u203A ## University of Aveiro` and your cursor is only under `# Aveiro`, so `## University of Aveiro` is inserted before the recall.",
     "- Write your follow-up notes on the lines **below** it. They become part of the card's history.",
     "- The `%%recall:\u2026%%` part is hidden in reading view. Keep it: it marks the line as a recall.",
     "- To **close the card from here**, add `#closed-card` at the end of the recall line. The original card is closed once. If you re-open it by hand later, it stays open.",
@@ -27062,6 +27063,49 @@ var CardHelpModal = class extends import_obsidian9.Modal {
     this.contentEl.empty();
   }
 };
+
+// src/core/recallInsert.ts
+function missingHeadings(here, target) {
+  let k = 0;
+  while (k < here.length && k < target.length && slugify(here[k].text) === slugify(target[k].text))
+    k++;
+  if (k === target.length)
+    return [];
+  const out = [];
+  const floor = k > 0 ? here[k - 1].level + 1 : 1;
+  const ceil = k < here.length ? here[k].level : 6;
+  let level = Math.min(Math.max(target[k].level, floor), ceil);
+  out.push({ level, text: target[k].text });
+  for (let j = k + 1; j < target.length; j++) {
+    level = Math.min(Math.max(target[j].level, level + 1), 6);
+    out.push({ level, text: target[j].text });
+  }
+  return out;
+}
+function planRecallInsert(doc, cursorLine, cardPath, recallLine) {
+  const lines = doc.split(/\r?\n/);
+  const line = Math.min(Math.max(cursorLine, 0), lines.length - 1);
+  const lineText = lines[line];
+  const here = hierarchyAt(doc, line).segments;
+  const added = missingHeadings(here, cardPath.segments).map((h) => "#".repeat(h.level) + " " + h.text);
+  const block = [...added, recallLine];
+  if (lineText.trim() === "") {
+    return {
+      from: { line, ch: 0 },
+      to: { line, ch: lineText.length },
+      text: block.join("\n") + "\n",
+      cursor: { line: line + block.length, ch: 0 },
+      addedHeadings: added
+    };
+  }
+  return {
+    from: { line, ch: lineText.length },
+    to: { line, ch: lineText.length },
+    text: "\n" + block.join("\n") + "\n",
+    cursor: { line: line + 1 + block.length, ch: 0 },
+    addedHeadings: added
+  };
+}
 
 // src/MeetingComposerV2.ts
 var MeetingComposerV2 = class {
@@ -27232,15 +27276,11 @@ var MeetingComposerV2 = class {
     const alias = card.title.replace(/[[\]|]/g, " ").replace(/\s+/g, " ").trim();
     const recall = `[[${linktext}#^${card.id}|${alias}]] %%recall:${formatTimestamp(new Date())}%%`;
     const editor = view.editor;
-    const cur = editor.getCursor();
-    const lineText = editor.getLine(cur.line);
-    if (lineText.trim() === "") {
-      editor.replaceRange(recall + "\n", { line: cur.line, ch: 0 }, { line: cur.line, ch: lineText.length });
-      editor.setCursor({ line: cur.line + 1, ch: 0 });
-    } else {
-      editor.replaceRange("\n" + recall + "\n", { line: cur.line, ch: lineText.length });
-      editor.setCursor({ line: cur.line + 2, ch: 0 });
-    }
+    const plan = planRecallInsert(editor.getValue(), editor.getCursor().line, card.hierarchy, recall);
+    editor.replaceRange(plan.text, plan.from, plan.to);
+    editor.setCursor(plan.cursor);
+    if (plan.addedHeadings.length)
+      new import_obsidian10.Notice(`Added missing heading${plan.addedHeadings.length > 1 ? "s" : ""}: ${plan.addedHeadings.join(" \u203A ")}`);
     this.app.workspace.setActiveLeaf(view.leaf, { focus: true });
     editor.focus();
   }

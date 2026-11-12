@@ -52,6 +52,7 @@ export function cardHelpMarkdown(minutesDir: string): string {
 		"Vendor sent a new quote: €4,150.",
 		FENCE,
 		"",
+		"- The recall is always written under the **same headings as the card**. If a heading is missing above your cursor, it is added for you. Example: the card is under `# Aveiro › ## University of Aveiro` and your cursor is only under `# Aveiro`, so `## University of Aveiro` is inserted before the recall.",
 		"- Write your follow-up notes on the lines **below** it. They become part of the card's history.",
 		"- The `%%recall:…%%` part is hidden in reading view. Keep it: it marks the line as a recall.",
 		"- To **close the card from here**, add `#closed-card` at the end of the recall line. The original card is closed once. If you re-open it by hand later, it stays open.",
