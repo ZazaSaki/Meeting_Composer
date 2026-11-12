@@ -1,11 +1,14 @@
 {
 	"name": "meeting-composer",
-	"version": "1.0.0",
+	"version": "2.0.0",
 	"description": "Scan meeting minutes and navigate topics across all files from a sidebar topic tree",
 	"main": "main.js",
 	"scripts": {
 		"dev": "node esbuild.config.mjs",
-		"build": "tsc -noEmit -skipLibCheck && node esbuild.config.mjs production",
+		"build": "npm run typecheck && node esbuild.config.mjs production",
+		"typecheck": "tsc -p tsconfig.v2.json --noEmit",
+		"typecheck:all": "tsc -noEmit -skipLibCheck",
+		"test": "vitest run",
 		"version": "node version-bump.mjs && git add manifest.json versions.json"
 	},
 	"keywords": [],
@@ -21,7 +24,8 @@
 		"esbuild": "0.17.3",
 		"obsidian": "latest",
 		"tslib": "2.4.0",
-		"typescript": "4.7.4"
+		"typescript": "4.7.4",
+		"vitest": "^1.6.0"
 	},
 	"dependencies": {
 		"codemirror": "^6.0.1",

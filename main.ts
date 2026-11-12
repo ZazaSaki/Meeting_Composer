@@ -3,6 +3,7 @@ import { MarkdownParser, DEFAULT_PRIORITY_BEFORE_CITIES, DEFAULT_PRIORITY_AFTER_
 import { createRoot, Root } from 'react-dom/client';
 import { FileTreeRoot } from './FileTree';
 import { writeAnswer } from 'DataMeenutes/FileReader';
+import { MeetingComposerV2 } from './src/MeetingComposerV2';
 
 const MDParser = new MarkdownParser();
 let OutputWindow: WorkspaceLeaf | null = null;
@@ -19,6 +20,8 @@ interface MyPluginSettings {
 	priorityAfterCities: string[];
 	autoComplete: boolean;
 	autoReload: boolean;
+	autoCardIds: boolean;
+	processedRecallCloses: string[];
 }
 
 const DEFAULT_SETTINGS: MyPluginSettings = {
@@ -30,6 +33,8 @@ const DEFAULT_SETTINGS: MyPluginSettings = {
 	priorityAfterCities: [...DEFAULT_PRIORITY_AFTER_CITIES],
 	autoComplete: true,
 	autoReload: true,
+	autoCardIds: true,
+	processedRecallCloses: [],
 }
 
 interface Folder {
@@ -47,6 +52,8 @@ export default class MyPlugin extends Plugin {
 	topicTree: any = null;
 	scopedSearch: boolean = false;
 	private reloadDebounce: ReturnType<typeof setTimeout> | null = null;
+	private reindexDebounce: ReturnType<typeof setTimeout> | null = null;
+	v2: MeetingComposerV2;
 
 	createTreeView(leaf: WorkspaceLeaf): ItemView {
 		const view = new MyFolderItemView(leaf, this);
@@ -107,9 +114,32 @@ export default class MyPlugin extends Plugin {
 			if (this.reloadDebounce) clearTimeout(this.reloadDebounce);
 			this.reloadDebounce = setTimeout(() => this.reloadTree(), 1000);
 		}));
+
+		// v2: cards, recalls, companion sidebar and .orgboard boards (additive)
+		this.v2 = new MeetingComposerV2(this, () => ({
+			minutesDir: this.settings.MeenutesDir,
+			outputDir: this.settings.OutputDir,
+			autoCardIds: this.settings.autoCardIds,
+			processedRecallCloses: this.settings.processedRecallCloses,
+			priorityBefore: this.settings.priorityBeforeCities,
+			cities: this.settings.cities,
+			priorityAfter: this.settings.priorityAfterCities,
+		}), async (keys) => {
+			this.settings.processedRecallCloses = keys;
+			await this.saveSettings();
+		});
+		this.v2.load();
 	}
 
-	onunload() {}
+	/** Re-index v2 cards after the minutes/output folder setting changes. */
+	scheduleCardReindex() {
+		if (this.reindexDebounce) clearTimeout(this.reindexDebounce);
+		this.reindexDebounce = setTimeout(() => this.v2?.store.reindexAll(), 800);
+	}
+
+	onunload() {
+		this.v2?.unload();
+	}
 
 	async loadSettings() {
 		this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData());
@@ -410,6 +440,7 @@ class MeetingComposerSettingTab extends PluginSettingTab {
 				.onChange(async (value) => {
 					this.plugin.settings.MeenutesDir = value;
 					await this.plugin.saveSettings();
+					this.plugin.scheduleCardReindex();
 				}));
 
 		new Setting(containerEl)
@@ -432,6 +463,7 @@ class MeetingComposerSettingTab extends PluginSettingTab {
 				.onChange(async (value) => {
 					this.plugin.settings.OutputDir = value;
 					await this.plugin.saveSettings();
+					this.plugin.scheduleCardReindex();
 				}));
 
 		new Setting(containerEl)
@@ -451,6 +483,16 @@ class MeetingComposerSettingTab extends PluginSettingTab {
 				.setValue(this.plugin.settings.autoReload)
 				.onChange(async (value) => {
 					this.plugin.settings.autoReload = value;
+					await this.plugin.saveSettings();
+				}));
+
+		new Setting(containerEl)
+			.setName('Auto-assign card ids')
+			.setDesc('Append a ^card-id when a line with #open-card / #open-ticket is written right under a heading (applied when the cursor leaves the line)')
+			.addToggle(toggle => toggle
+				.setValue(this.plugin.settings.autoCardIds)
+				.onChange(async (value) => {
+					this.plugin.settings.autoCardIds = value;
 					await this.plugin.saveSettings();
 				}));
 

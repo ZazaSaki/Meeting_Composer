@@ -1,8 +1,8 @@
 {
 	"id": "meeting-composer",
 	"name": "Meeting Composer",
-	"version": "1.0.0",
-	"minAppVersion": "0.15.0",
+	"version": "2.0.0",
+	"minAppVersion": "1.4.10",
 	"description": "Scan meeting minutes and navigate topics across all files. A sidebar topic tree lets you click any topic to compile all related content into a single output note.",
 	"author": "ZazaSaki",
 	"authorUrl": "https://github.com/ZazaSaki",

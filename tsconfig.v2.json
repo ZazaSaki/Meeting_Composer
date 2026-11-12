@@ -1,0 +1,18 @@
+{
+	"compilerOptions": {
+		"jsx": "react-jsx",
+		"baseUrl": ".",
+		"module": "ESNext",
+		"target": "ES2018",
+		"moduleResolution": "node",
+		"importHelpers": true,
+		"isolatedModules": true,
+		"allowSyntheticDefaultImports": true,
+		"strict": true,
+		"noImplicitAny": true,
+		"strictNullChecks": true,
+		"skipLibCheck": true,
+		"lib": ["DOM", "ES2018", "ES2019.Array", "ES2019.Object"]
+	},
+	"include": ["src/**/*.ts", "src/**/*.tsx"]
+}

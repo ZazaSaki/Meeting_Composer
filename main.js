@@ -1093,7 +1093,7 @@ var require_react_development = __commonJS({
           }
           return dispatcher.useContext(Context);
         }
-        function useState(initialState) {
+        function useState5(initialState) {
           var dispatcher = resolveDispatcher();
           return dispatcher.useState(initialState);
         }
@@ -1101,11 +1101,11 @@ var require_react_development = __commonJS({
           var dispatcher = resolveDispatcher();
           return dispatcher.useReducer(reducer, initialArg, init);
         }
-        function useRef(initialValue) {
+        function useRef2(initialValue) {
           var dispatcher = resolveDispatcher();
           return dispatcher.useRef(initialValue);
         }
-        function useEffect(create, deps) {
+        function useEffect4(create, deps) {
           var dispatcher = resolveDispatcher();
           return dispatcher.useEffect(create, deps);
         }
@@ -1121,7 +1121,7 @@ var require_react_development = __commonJS({
           var dispatcher = resolveDispatcher();
           return dispatcher.useCallback(callback, deps);
         }
-        function useMemo(create, deps) {
+        function useMemo3(create, deps) {
           var dispatcher = resolveDispatcher();
           return dispatcher.useMemo(create, deps);
         }
@@ -1887,15 +1887,15 @@ var require_react_development = __commonJS({
         exports.useContext = useContext;
         exports.useDebugValue = useDebugValue;
         exports.useDeferredValue = useDeferredValue;
-        exports.useEffect = useEffect;
+        exports.useEffect = useEffect4;
         exports.useId = useId;
         exports.useImperativeHandle = useImperativeHandle;
         exports.useInsertionEffect = useInsertionEffect;
         exports.useLayoutEffect = useLayoutEffect;
-        exports.useMemo = useMemo;
+        exports.useMemo = useMemo3;
         exports.useReducer = useReducer;
-        exports.useRef = useRef;
-        exports.useState = useState;
+        exports.useRef = useRef2;
+        exports.useState = useState5;
         exports.useSyncExternalStore = useSyncExternalStore;
         exports.useTransition = useTransition;
         exports.version = ReactVersion;
@@ -2391,9 +2391,9 @@ var require_react_dom_development = __commonJS({
         if (typeof __REACT_DEVTOOLS_GLOBAL_HOOK__ !== "undefined" && typeof __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStart === "function") {
           __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStart(new Error());
         }
-        var React = require_react();
+        var React5 = require_react();
         var Scheduler = require_scheduler();
-        var ReactSharedInternals = React.__SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED;
+        var ReactSharedInternals = React5.__SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED;
         var suppressWarning = false;
         function setSuppressWarning(newSuppressWarning) {
           {
@@ -3998,7 +3998,7 @@ var require_react_dom_development = __commonJS({
           {
             if (props.value == null) {
               if (typeof props.children === "object" && props.children !== null) {
-                React.Children.forEach(props.children, function(child) {
+                React5.Children.forEach(props.children, function(child) {
                   if (child == null) {
                     return;
                   }
@@ -12445,7 +12445,7 @@ var require_react_dom_development = __commonJS({
           }
         }
         var fakeInternalInstance = {};
-        var emptyRefsObject = new React.Component().refs;
+        var emptyRefsObject = new React5.Component().refs;
         var didWarnAboutStateAssignmentForComponent;
         var didWarnAboutUninitializedState;
         var didWarnAboutGetSnapshotBeforeUpdateWithoutDidUpdate;
@@ -23047,7 +23047,7 @@ var require_react_dom_development = __commonJS({
             unmarkContainerAsRoot(container);
           }
         };
-        function createRoot2(container, options2) {
+        function createRoot4(container, options2) {
           if (!isValidContainer(container)) {
             throw new Error("createRoot(...): Target container is not a DOM element.");
           }
@@ -23418,7 +23418,7 @@ var require_react_dom_development = __commonJS({
               error('You are importing createRoot from "react-dom" which is not supported. You should instead import it from "react-dom/client".');
             }
           }
-          return createRoot2(container, options2);
+          return createRoot4(container, options2);
         }
         function hydrateRoot$1(container, initialChildren, options2) {
           {
@@ -23523,7 +23523,7 @@ var require_react_jsx_runtime_development = __commonJS({
     if (true) {
       (function() {
         "use strict";
-        var React = require_react();
+        var React5 = require_react();
         var REACT_ELEMENT_TYPE = Symbol.for("react.element");
         var REACT_PORTAL_TYPE = Symbol.for("react.portal");
         var REACT_FRAGMENT_TYPE = Symbol.for("react.fragment");
@@ -23549,7 +23549,7 @@ var require_react_jsx_runtime_development = __commonJS({
           }
           return null;
         }
-        var ReactSharedInternals = React.__SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED;
+        var ReactSharedInternals = React5.__SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED;
         function error(format) {
           {
             {
@@ -24384,11 +24384,11 @@ var require_react_jsx_runtime_development = __commonJS({
             return jsxWithValidation(type, props, key, false);
           }
         }
-        var jsx2 = jsxWithValidationDynamic;
-        var jsxs2 = jsxWithValidationStatic;
+        var jsx6 = jsxWithValidationDynamic;
+        var jsxs6 = jsxWithValidationStatic;
         exports.Fragment = REACT_FRAGMENT_TYPE;
-        exports.jsx = jsx2;
-        exports.jsxs = jsxs2;
+        exports.jsx = jsx6;
+        exports.jsxs = jsxs6;
       })();
     }
   }
@@ -24415,7 +24415,7 @@ __export(main_exports, {
   default: () => MyPlugin
 });
 module.exports = __toCommonJS(main_exports);
-var import_obsidian = require("obsidian");
+var import_obsidian10 = require("obsidian");
 
 // DataMeenutes/FileReader.ts
 var fs = __toESM(require("fs"));
@@ -24812,7 +24812,7 @@ var MarkdownParser = class {
 };
 
 // main.ts
-var import_client = __toESM(require_client());
+var import_client3 = __toESM(require_client());
 
 // FileTree.tsx
 var import_jsx_runtime = __toESM(require_jsx_runtime());
@@ -24884,6 +24884,2333 @@ function FileTree(data, id = 0, root = null) {
   ] }) });
 }
 
+// src/MeetingComposerV2.ts
+var import_obsidian9 = require("obsidian");
+var import_view2 = require("@codemirror/view");
+
+// src/store/VaultCardStore.ts
+var import_obsidian = require("obsidian");
+
+// src/core/syntax.ts
+var OPEN_TAGS = ["#open-card", "#open-ticket"];
+var CLOSED_TAGS = ["#closed-card", "#closed-ticket"];
+var LIFECYCLE_TAGS = [...OPEN_TAGS, ...CLOSED_TAGS];
+var HEADING_RE = /^(#{1,6})[ \t]+(.*)$/;
+var HR_RE = /^ {0,3}(?:(?:-[ \t]*){3,}|(?:\*[ \t]*){3,}|(?:_[ \t]*){3,})$/;
+var FENCE_RE = /^ {0,3}(`{3,}|~{3,})/;
+var BLOCK_ID_RE = /(^|\s)\^(card-[A-Za-z0-9][A-Za-z0-9-]*)(?=\s|$)/;
+var LIST_PREFIX_RE = /^(\s*(?:[-*+]|\d+[.)])\s+(?:\[[^\]]\]\s+)?)/;
+var RECALL_LINK_RE = /\[\[([^\]|#]*)#\^(card-[A-Za-z0-9][A-Za-z0-9-]*)(?:\|[^\]]*)?\]\]/;
+var RECALL_STAMP_RE = /%%\s*recall:\s*([^%]*?)\s*%%/;
+var STAMP_VALUE_RE = /^(\d{4}-\d{2}-\d{2})[ T](\d{2}:\d{2})$/;
+var TAG_RE = /(^|\s)(#[\p{L}\p{N}_/-]+)/gu;
+function maskNonTagSpans(line) {
+  const blank = (m) => " ".repeat(m.length);
+  return line.replace(/`[^`]*`/g, blank).replace(/%%.*?%%/g, blank).replace(/\[\[[^\]]*\]\]/g, blank).replace(/\[[^\]]*\]\([^)]*\)/g, blank).replace(/\bhttps?:\/\/\S+/g, blank);
+}
+function findTags(line) {
+  const masked = maskNonTagSpans(line);
+  const out = [];
+  TAG_RE.lastIndex = 0;
+  let m;
+  while ((m = TAG_RE.exec(masked)) !== null) {
+    const raw = m[2];
+    if (!/[^\d#]/.test(raw))
+      continue;
+    const start = m.index + m[1].length;
+    out.push({ tag: raw.toLowerCase(), raw, start, end: start + raw.length });
+  }
+  return out;
+}
+function normalizeTag(tag) {
+  const t = tag.trim().toLowerCase();
+  return t.startsWith("#") ? t : "#" + t;
+}
+function isHeading(line) {
+  return HEADING_RE.test(line);
+}
+function parseHeading(line) {
+  const m = line.match(HEADING_RE);
+  if (!m)
+    return null;
+  let text = m[2].replace(/[ \t]+#+[ \t]*$/, "");
+  for (const t of findTags(text).reverse()) {
+    text = text.slice(0, t.start) + text.slice(t.end);
+  }
+  text = text.replace(/\s+/g, " ").trim();
+  if (!text)
+    return null;
+  return { level: m[1].length, text };
+}
+function isHr(line) {
+  return HR_RE.test(line);
+}
+function fenceMarker(line) {
+  const m = line.match(FENCE_RE);
+  return m ? m[1] : null;
+}
+function findBlockId(line) {
+  const m = line.match(BLOCK_ID_RE);
+  return m ? m[2] : null;
+}
+function listPrefix(line) {
+  const m = line.match(LIST_PREFIX_RE);
+  return m ? m[1] : "";
+}
+function matchRecall(line) {
+  const link = line.match(RECALL_LINK_RE);
+  if (!link)
+    return null;
+  const stamp = line.match(RECALL_STAMP_RE);
+  if (!stamp)
+    return null;
+  const sm = stamp[1].match(STAMP_VALUE_RE);
+  return {
+    linkPath: link[1],
+    cardId: link[2],
+    timestamp: sm ? `${sm[1]} ${sm[2]}` : null
+  };
+}
+function isRecallLine(line) {
+  return matchRecall(line) !== null;
+}
+function lifecycleOf(tags) {
+  if (tags.some((t) => CLOSED_TAGS.includes(t)))
+    return "closed";
+  if (tags.some((t) => OPEN_TAGS.includes(t)))
+    return "open";
+  return null;
+}
+function isCardTriggerLine(line) {
+  if (isHeading(line) || isRecallLine(line))
+    return false;
+  return lifecycleOf(findTags(line).map((t) => t.tag)) !== null;
+}
+function extractTitle(line) {
+  let body = line.slice(listPrefix(line).length);
+  const id = body.match(BLOCK_ID_RE);
+  if (id && id.index !== void 0) {
+    const s = id.index + id[1].length;
+    body = body.slice(0, s) + body.slice(s + 1 + id[2].length);
+  }
+  for (const t of findTags(body).reverse()) {
+    body = body.slice(0, t.start) + body.slice(t.end);
+  }
+  return body.replace(/\s+/g, " ").trim();
+}
+function slugify(text) {
+  return text.normalize("NFD").replace(/\p{M}/gu, "").toLowerCase().replace(/[^\p{L}\p{N}]+/gu, "-").replace(/^-+|-+$/g, "");
+}
+function dateFromFileName(name) {
+  const iso = name.match(/(\d{4})[-_.](\d{2})[-_.](\d{2})/);
+  if (iso)
+    return `${iso[1]}-${iso[2]}-${iso[3]}`;
+  const eu = name.match(/(\d{2})[-_.](\d{2})[-_.](\d{4})/);
+  if (eu)
+    return `${eu[3]}-${eu[2]}-${eu[1]}`;
+  return null;
+}
+var pad = (n) => String(n).padStart(2, "0");
+function formatTimestamp(d) {
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
+}
+function formatDate(d) {
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+}
+
+// src/core/cardParser.ts
+function classifyLines(lines) {
+  const info = new Array(lines.length);
+  let i = 0;
+  if (lines.length > 0 && lines[0].trim() === "---") {
+    let j = 1;
+    while (j < lines.length && lines[j].trim() !== "---" && lines[j].trim() !== "...")
+      j++;
+    if (j < lines.length) {
+      for (let k = 0; k <= j; k++)
+        info[k] = { kind: "opaque" };
+      i = j + 1;
+    }
+  }
+  let fence = null;
+  for (; i < lines.length; i++) {
+    const line = lines[i];
+    const marker = fenceMarker(line);
+    if (fence) {
+      info[i] = { kind: "opaque" };
+      if (marker && marker[0] === fence[0] && marker.length >= fence.length && line.trim() === marker)
+        fence = null;
+      continue;
+    }
+    if (marker) {
+      fence = marker;
+      info[i] = { kind: "opaque" };
+      continue;
+    }
+    if (line.trim() === "") {
+      info[i] = { kind: "blank" };
+      continue;
+    }
+    const h = parseHeading(line);
+    if (h) {
+      info[i] = { kind: "heading", heading: h };
+      continue;
+    }
+    if (isHr(line)) {
+      info[i] = { kind: "hr" };
+      continue;
+    }
+    if (matchRecall(line)) {
+      info[i] = { kind: "recall" };
+      continue;
+    }
+    info[i] = { kind: "text" };
+  }
+  return info;
+}
+function makeHierarchy(segments) {
+  return {
+    segments: segments.map((s) => ({ ...s })),
+    slug: segments.map((s) => slugify(s.text)).join("/")
+  };
+}
+function isBoundary(k) {
+  return k === "heading" || k === "hr" || k === "recall";
+}
+function bodyRange(info, from) {
+  let k = from + 1;
+  let last = from;
+  while (k < info.length && !isBoundary(info[k].kind)) {
+    if (info[k].kind !== "blank")
+      last = k;
+    k++;
+  }
+  return { end: last, boundary: k };
+}
+function parseFile(text, path) {
+  var _a;
+  const lines = text.split(/\r?\n/);
+  const info = classifyLines(lines);
+  const cards = [];
+  const recalls = [];
+  const paths = [];
+  const stack = [];
+  for (let i = 0; i < lines.length; i++) {
+    const li = info[i];
+    if (li.kind === "heading" && li.heading) {
+      const { level, text: htext } = li.heading;
+      if (level > 3)
+        continue;
+      while (stack.length && stack[stack.length - 1].level >= level)
+        stack.pop();
+      stack.push({ level, text: htext });
+      paths.push(makeHierarchy(stack));
+      let j = i + 1;
+      while (j < lines.length && info[j].kind === "blank")
+        j++;
+      if (j < lines.length && info[j].kind === "text" && isCardTriggerLine(lines[j])) {
+        const tags = findTags(lines[j]).map((t) => t.tag);
+        const { end } = bodyRange(info, j);
+        cards.push({
+          id: findBlockId(lines[j]),
+          title: extractTitle(lines[j]),
+          status: (_a = lifecycleOf(tags)) != null ? _a : "open",
+          tags: unique(tags.filter((t) => !LIFECYCLE_TAGS.includes(t))),
+          hierarchy: makeHierarchy(stack),
+          headingLine: i,
+          headingLevel: level,
+          titleLine: j,
+          endLine: end,
+          description: trimLeadingBlank(lines.slice(j + 1, end + 1)).join("\n")
+        });
+      }
+      continue;
+    }
+    if (li.kind === "recall") {
+      const m = matchRecall(lines[i]);
+      if (!m)
+        continue;
+      const { end } = bodyRange(info, i);
+      const tags = findTags(lines[i]).map((t) => t.tag);
+      recalls.push({
+        cardId: m.cardId,
+        linkPath: m.linkPath,
+        timestamp: m.timestamp,
+        closes: tags.some((t) => CLOSED_TAGS.includes(t)),
+        line: i,
+        endLine: end,
+        content: trimLeadingBlank(lines.slice(i + 1, end + 1)).join("\n"),
+        hierarchy: makeHierarchy(stack)
+      });
+    }
+  }
+  return { path, cards, recalls, paths };
+}
+function hierarchyAt(text, line) {
+  const lines = text.split(/\r?\n/);
+  const info = classifyLines(lines.slice(0, line + 1));
+  const stack = [];
+  for (const li of info) {
+    const h = li.kind === "heading" ? li.heading : void 0;
+    if (!h || h.level > 3)
+      continue;
+    while (stack.length && stack[stack.length - 1].level >= h.level)
+      stack.pop();
+    stack.push({ level: h.level, text: h.text });
+  }
+  return makeHierarchy(stack);
+}
+function locateCard(text, id) {
+  var _a;
+  return (_a = parseFile(text, "").cards.find((c) => c.id === id)) != null ? _a : null;
+}
+function trimLeadingBlank(xs) {
+  let k = 0;
+  while (k < xs.length && xs[k].trim() === "")
+    k++;
+  return xs.slice(k);
+}
+function unique(xs) {
+  return Array.from(new Set(xs));
+}
+
+// src/core/cardIndex.ts
+function buildCardIndex(files, resolveLink = () => null) {
+  const ordered = [...files].sort((a, b) => {
+    var _a, _b;
+    const da = (_a = a.openedAt) != null ? _a : "9999";
+    const db = (_b = b.openedAt) != null ? _b : "9999";
+    return da !== db ? da < db ? -1 : 1 : a.parsed.path.localeCompare(b.parsed.path);
+  });
+  const cards = /* @__PURE__ */ new Map();
+  const duplicates = [];
+  const unassigned = [];
+  const allIds = /* @__PURE__ */ new Set();
+  const byFileAndId = /* @__PURE__ */ new Map();
+  for (const f of ordered) {
+    for (const c of f.parsed.cards) {
+      if (!c.id) {
+        unassigned.push({ filePath: f.parsed.path, titleLine: c.titleLine, title: c.title });
+        continue;
+      }
+      const node = {
+        ...c,
+        id: c.id,
+        filePath: f.parsed.path,
+        openedAt: f.openedAt,
+        recalls: [],
+        lastUpdated: f.openedAt
+      };
+      allIds.add(c.id);
+      byFileAndId.set(f.parsed.path + "\0" + c.id, node);
+      const existing = cards.get(c.id);
+      if (existing) {
+        node.duplicateOf = existing.filePath;
+        duplicates.push(node);
+      } else {
+        cards.set(c.id, node);
+      }
+    }
+  }
+  for (const f of files) {
+    for (const r of f.parsed.recalls) {
+      const target = resolveLink(r.linkPath, f.parsed.path);
+      const node = target && byFileAndId.get(target + "\0" + r.cardId) || cards.get(r.cardId);
+      if (!node)
+        continue;
+      const entry = {
+        timestamp: r.timestamp,
+        sourceFilePath: f.parsed.path,
+        anchorLine: r.line,
+        endLine: r.endLine,
+        content: r.content,
+        closes: r.closes
+      };
+      node.recalls.push(entry);
+    }
+  }
+  const all = [...cards.values(), ...duplicates];
+  for (const node of all) {
+    node.recalls.sort((a, b) => {
+      var _a, _b;
+      return ((_a = a.timestamp) != null ? _a : "").localeCompare((_b = b.timestamp) != null ? _b : "") || a.anchorLine - b.anchorLine;
+    });
+    const last = node.recalls.map((r) => r.timestamp).filter((t) => !!t).pop();
+    node.lastUpdated = last != null ? last : node.openedAt;
+  }
+  return { cards, duplicates, unassigned, allIds };
+}
+
+// src/store/VaultCardStore.ts
+var DEBOUNCE_MS = 250;
+var VaultCardStore = class extends import_obsidian.Events {
+  constructor(app, getScope) {
+    super();
+    this.app = app;
+    this.getScope = getScope;
+    this.files = /* @__PURE__ */ new Map();
+    this.index = buildCardIndex([]);
+    this.timers = /* @__PURE__ */ new Map();
+    this.rebuildTimer = null;
+    this.ready = false;
+  }
+  inScope(path) {
+    if (!path.endsWith(".md"))
+      return false;
+    const { minutesDir, outputDir } = this.getScope();
+    const dir = minutesDir.replace(/\/+$/, "");
+    const out = outputDir.replace(/\/+$/, "");
+    if (out && (path === out || path.startsWith(out + "/")))
+      return false;
+    return dir === "" || path.startsWith(dir + "/");
+  }
+  /** Full scan. Call once on layout ready and whenever the minutes folder setting changes. */
+  async reindexAll() {
+    this.files.clear();
+    const mdFiles = this.app.vault.getMarkdownFiles().filter((f) => this.inScope(f.path));
+    await Promise.all(mdFiles.map(async (f) => this.indexText(f, await this.app.vault.cachedRead(f))));
+    this.rebuild();
+    this.ready = true;
+  }
+  /** Wire vault / metadata events. `register` is Plugin.registerEvent. */
+  attach(register) {
+    register(this.app.metadataCache.on("changed", (file, data) => {
+      if (this.inScope(file.path))
+        this.schedule(file, data);
+    }));
+    register(this.app.vault.on("delete", (f) => {
+      if (this.files.delete(f.path))
+        this.scheduleRebuild();
+    }));
+    register(this.app.vault.on("rename", (f, oldPath) => {
+      const had = this.files.delete(oldPath);
+      if (f instanceof import_obsidian.TFile && this.inScope(f.path)) {
+        this.app.vault.cachedRead(f).then((t) => {
+          this.indexText(f, t);
+          this.scheduleRebuild();
+        });
+      } else if (had)
+        this.scheduleRebuild();
+    }));
+    register(this.app.vault.on("create", (f) => {
+      if (f instanceof import_obsidian.TFile && this.inScope(f.path)) {
+        this.app.vault.cachedRead(f).then((t) => this.schedule(f, t));
+      }
+    }));
+  }
+  /** Live re-index from an open editor (before Obsidian saves the file). Text is read when the timer fires. */
+  scheduleFromEditor(file, getText) {
+    if (this.inScope(file.path))
+      this.schedule(file, getText);
+  }
+  schedule(file, data) {
+    const prev = this.timers.get(file.path);
+    if (prev)
+      window.clearTimeout(prev);
+    this.timers.set(file.path, window.setTimeout(() => {
+      this.timers.delete(file.path);
+      this.indexText(file, typeof data === "string" ? data : data());
+      this.rebuild();
+    }, DEBOUNCE_MS));
+  }
+  scheduleRebuild() {
+    if (this.rebuildTimer)
+      window.clearTimeout(this.rebuildTimer);
+    this.rebuildTimer = window.setTimeout(() => {
+      this.rebuildTimer = null;
+      this.rebuild();
+    }, DEBOUNCE_MS);
+  }
+  /** Index a file immediately (used by mutators so the UI updates without waiting for the cache). */
+  indexNow(file, text) {
+    this.indexText(file, text);
+    this.rebuild();
+  }
+  indexText(file, text) {
+    var _a;
+    this.files.set(file.path, {
+      parsed: parseFile(text, file.path),
+      openedAt: (_a = dateFromFileName(file.basename)) != null ? _a : formatDate(new Date(file.stat.ctime))
+    });
+  }
+  rebuild() {
+    const resolve = (linkPath, source) => {
+      var _a, _b;
+      return (_b = (_a = this.app.metadataCache.getFirstLinkpathDest(linkPath, source)) == null ? void 0 : _a.path) != null ? _b : null;
+    };
+    this.index = buildCardIndex([...this.files.values()], resolve);
+    this.trigger("updated");
+  }
+  destroy() {
+    this.timers.forEach((t) => window.clearTimeout(t));
+    if (this.rebuildTimer)
+      window.clearTimeout(this.rebuildTimer);
+  }
+  // ---------- queries ----------
+  getCards() {
+    return [...this.index.cards.values()];
+  }
+  getCard(id) {
+    return this.index.cards.get(id);
+  }
+  getDuplicates() {
+    return this.index.duplicates;
+  }
+  allIds() {
+    return this.index.allIds;
+  }
+  getUnassigned() {
+    return this.index.unassigned;
+  }
+  getAllPaths() {
+    const out = [];
+    this.files.forEach((f) => out.push(...f.parsed.paths));
+    return out;
+  }
+  getParsed(path) {
+    return this.files.get(path);
+  }
+};
+
+// src/sync/MarkdownMutator.ts
+var import_obsidian2 = require("obsidian");
+
+// src/core/diff.ts
+function minimalChange(a, b) {
+  if (a === b)
+    return null;
+  let start = 0;
+  const max = Math.min(a.length, b.length);
+  while (start < max && a.charCodeAt(start) === b.charCodeAt(start))
+    start++;
+  let endA = a.length;
+  let endB = b.length;
+  while (endA > start && endB > start && a.charCodeAt(endA - 1) === b.charCodeAt(endB - 1)) {
+    endA--;
+    endB--;
+  }
+  return { start, end: endA, insert: b.slice(start, endB) };
+}
+
+// src/core/mutations.ts
+var CardNotFoundError = class extends Error {
+  constructor(id) {
+    super(`Card ^${id} not found`);
+  }
+};
+var OPEN_TO_CLOSED = { "#open-card": "#closed-card", "#open-ticket": "#closed-ticket" };
+var CLOSED_TO_OPEN = { "#closed-card": "#open-card", "#closed-ticket": "#open-ticket" };
+function eolOf(text) {
+  return text.includes("\r\n") ? "\r\n" : "\n";
+}
+function setLifecycleOnLine(line, status) {
+  const map = status === "closed" ? OPEN_TO_CLOSED : CLOSED_TO_OPEN;
+  let out = line;
+  for (const t of findTags(line).reverse()) {
+    const repl = map[t.tag];
+    if (repl)
+      out = out.slice(0, t.start) + repl + out.slice(t.end);
+  }
+  return out;
+}
+function addTagToLine(line, tag) {
+  const t = normalizeTag(tag);
+  if (findTags(line).some((m2) => m2.tag === t))
+    return line;
+  const m = line.match(/(\s)\^(card-[A-Za-z0-9][A-Za-z0-9-]*)\s*$/);
+  if (m && m.index !== void 0) {
+    return line.slice(0, m.index).replace(/\s+$/, "") + " " + t + " ^" + m[2];
+  }
+  return line.replace(/\s+$/, "") + " " + t;
+}
+function removeTagFromLine(line, tag) {
+  const t = normalizeTag(tag);
+  let out = line;
+  for (const m of findTags(line).reverse()) {
+    if (m.tag !== t)
+      continue;
+    let start = m.start;
+    while (start > 0 && /[ \t]/.test(out[start - 1]))
+      start--;
+    out = out.slice(0, start) + (start > 0 && m.end < out.length ? " " : "") + out.slice(m.end).replace(/^[ \t]+/, "");
+  }
+  return out;
+}
+function setTitleOnLine(line, title) {
+  const prefix = listPrefix(line);
+  const tags = findTags(line).map((t) => t.raw);
+  const id = findBlockId(line);
+  const clean = title.replace(/[\r\n]+/g, " ").trim();
+  return [prefix + clean, ...tags, ...id ? ["^" + id] : []].join(" ").replace(/\s+$/, "");
+}
+function needsSeparator(line) {
+  if (line === void 0 || line.trim() === "")
+    return false;
+  if (listPrefix(line))
+    return false;
+  if (/^\s{0,3}>/.test(line))
+    return false;
+  if (fenceMarker(line) || isHeading(line))
+    return false;
+  return true;
+}
+function withCard(text, id, fn) {
+  const card = locateCard(text, id);
+  if (!card)
+    throw new CardNotFoundError(id);
+  const eol = eolOf(text);
+  const lines = text.split(/\r?\n/);
+  fn(lines, card);
+  return lines.join(eol);
+}
+function onTitleLine(text, id, fn) {
+  return withCard(text, id, (lines, card) => {
+    lines[card.titleLine] = fn(lines[card.titleLine]);
+  });
+}
+function setStatus(text, id, status) {
+  return onTitleLine(text, id, (l) => setLifecycleOnLine(l, status));
+}
+function addTag(text, id, tag) {
+  return onTitleLine(text, id, (l) => addTagToLine(l, tag));
+}
+function removeTag(text, id, tag) {
+  return onTitleLine(text, id, (l) => removeTagFromLine(l, tag));
+}
+function setTitle(text, id, title) {
+  return onTitleLine(text, id, (l) => setTitleOnLine(l, title));
+}
+function setDescription(text, id, description) {
+  return withCard(text, id, (lines, card) => {
+    const body = description.replace(/\r\n/g, "\n").replace(/\s+$/, "");
+    const newLines = body === "" ? [] : body.split("\n");
+    if (needsSeparator(newLines[0]))
+      newLines.unshift("");
+    const removeCount = card.endLine - card.titleLine;
+    lines.splice(card.titleLine + 1, removeCount, ...newLines);
+  });
+}
+function findSection(lines, segments) {
+  const info = classifyLines(lines);
+  const want = makeHierarchy(segments).slug;
+  const stack = [];
+  let found = null;
+  for (let i = 0; i < lines.length; i++) {
+    const h = info[i].kind === "heading" ? info[i].heading : void 0;
+    if (!h || h.level > 3)
+      continue;
+    if (found && found.end === -1 && h.level <= found.level)
+      found.end = i - 1;
+    while (stack.length && stack[stack.length - 1].level >= h.level)
+      stack.pop();
+    stack.push({ level: h.level, text: h.text });
+    if (makeHierarchy(stack).slug === want)
+      found = { headingLine: i, level: h.level, end: -1 };
+  }
+  if (found && found.end === -1)
+    found.end = lines.length - 1;
+  return found;
+}
+function insertAtSectionEnd(lines, end, block) {
+  let at = end;
+  while (at >= 0 && lines[at].trim() === "")
+    at--;
+  const insert = [...block];
+  if (at >= 0 && !isHeading(lines[at]))
+    insert.unshift("");
+  if (at + 1 < lines.length && lines[at + 1].trim() !== "")
+    insert.push("");
+  lines.splice(at + 1, 0, ...insert);
+}
+function headingLine(seg) {
+  return "#".repeat(seg.level) + " " + seg.text;
+}
+function moveCardToHeading(text, id, target) {
+  if (target.length === 0)
+    return text;
+  const card = locateCard(text, id);
+  if (!card)
+    throw new CardNotFoundError(id);
+  const targetSlug = makeHierarchy(target).slug;
+  const own = card.hierarchy.slug;
+  if (own === targetSlug || own.startsWith(targetSlug + "/"))
+    return text;
+  const eol = eolOf(text);
+  const lines = text.split(/\r?\n/);
+  const info = classifyLines(lines);
+  const { boundary } = bodyRange(info, card.titleLine);
+  const next = info[boundary];
+  const dedicated = boundary >= lines.length || next.kind === "heading" && !!next.heading && next.heading.level <= card.headingLevel;
+  const targetLevel = target[target.length - 1].level;
+  const keepOwnHeading = card.headingLevel > targetLevel;
+  const cardLines = lines.slice(card.titleLine, card.endLine + 1);
+  const block = keepOwnHeading ? [lines[card.headingLine], ...cardLines] : cardLines;
+  const cutStart = dedicated ? card.headingLine : card.titleLine;
+  const cutEnd = dedicated ? boundary - 1 : card.endLine;
+  lines.splice(cutStart, cutEnd - cutStart + 1);
+  if (cutStart > 0 && cutStart < lines.length && lines[cutStart - 1].trim() === "" && lines[cutStart].trim() === "") {
+    lines.splice(cutStart, 1);
+  }
+  let depth = target.length;
+  let section = null;
+  while (depth > 0 && !(section = findSection(lines, target.slice(0, depth))))
+    depth--;
+  const missing = target.slice(depth).map(headingLine);
+  let prefix;
+  if (depth === target.length) {
+    prefix = keepOwnHeading ? [] : [headingLine(target[target.length - 1])];
+  } else {
+    prefix = missing;
+  }
+  const full = [...prefix, ...block];
+  if (section)
+    insertAtSectionEnd(lines, section.end, full);
+  else
+    insertAtSectionEnd(lines, lines.length - 1, full);
+  return lines.join(eol);
+}
+function segmentsForSlug(slug, known, lastTitle) {
+  const parts = slug.split("/").filter(Boolean);
+  for (const segs of known) {
+    if (segs.length >= parts.length && segs.slice(0, parts.length).every((s, i) => slugify(s.text) === parts[i])) {
+      return segs.slice(0, parts.length).map((s) => ({ ...s }));
+    }
+  }
+  return parts.map((p, i) => ({
+    level: i + 1,
+    text: i === parts.length - 1 && lastTitle ? lastTitle : p.replace(/-/g, " ").replace(/\b\w/g, (c) => c.toUpperCase())
+  }));
+}
+
+// src/sync/MarkdownMutator.ts
+var MarkdownMutator = class {
+  constructor(app, store) {
+    this.app = app;
+    this.store = store;
+  }
+  openView(path) {
+    var _a;
+    for (const leaf of this.app.workspace.getLeavesOfType("markdown")) {
+      const v = leaf.view;
+      if (v instanceof import_obsidian2.MarkdownView && ((_a = v.file) == null ? void 0 : _a.path) === path)
+        return v;
+    }
+    return null;
+  }
+  /** Returns true when the file changed. */
+  async apply(filePath, fn) {
+    const file = this.app.vault.getAbstractFileByPath(filePath);
+    if (!(file instanceof import_obsidian2.TFile)) {
+      new import_obsidian2.Notice(`Meeting Composer: file not found: ${filePath}`);
+      return false;
+    }
+    try {
+      const view = this.openView(filePath);
+      if (view) {
+        const editor = view.editor;
+        const before = editor.getValue();
+        const after = fn(before);
+        const change = minimalChange(before, after);
+        if (!change)
+          return false;
+        editor.replaceRange(change.insert, editor.offsetToPos(change.start), editor.offsetToPos(change.end));
+        this.store.indexNow(file, after);
+        return true;
+      }
+      let changed = false;
+      const result = await this.app.vault.process(file, (data) => {
+        const next = fn(data);
+        changed = next !== data;
+        return next;
+      });
+      if (changed)
+        this.store.indexNow(file, result);
+      return changed;
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : String(e);
+      new import_obsidian2.Notice(`Meeting Composer: ${msg}`);
+      console.error("Meeting Composer mutation failed", e);
+      return false;
+    }
+  }
+  setStatus(card, status) {
+    return this.apply(card.filePath, (t) => setStatus(t, card.id, status));
+  }
+  addTag(card, tag) {
+    return this.apply(card.filePath, (t) => addTag(t, card.id, tag));
+  }
+  removeTag(card, tag) {
+    return this.apply(card.filePath, (t) => removeTag(t, card.id, tag));
+  }
+  setTitle(card, title) {
+    return this.apply(card.filePath, (t) => setTitle(t, card.id, title));
+  }
+  setDescription(card, description) {
+    return this.apply(card.filePath, (t) => setDescription(t, card.id, description));
+  }
+  moveToHeading(card, target) {
+    return this.apply(card.filePath, (t) => moveCardToHeading(t, card.id, target));
+  }
+  /** Several transforms on one file in a single write. */
+  applyAll(card, fns) {
+    return this.apply(card.filePath, (t) => fns.reduce((acc, f) => f(acc), t));
+  }
+};
+
+// src/sync/AutoIdListener.ts
+var import_obsidian3 = require("obsidian");
+var import_view = require("@codemirror/view");
+var import_state = require("@codemirror/state");
+
+// src/core/ids.ts
+var ALPHABET = "0123456789abcdefghijklmnopqrstuvwxyz";
+function newCardId(existing, rand = Math.random) {
+  for (let attempt = 0; attempt < 1e3; attempt++) {
+    let s = "card-";
+    for (let i = 0; i < 6; i++)
+      s += ALPHABET[Math.floor(rand() * ALPHABET.length)];
+    if (!existing.has(s))
+      return s;
+  }
+  throw new Error("Could not generate a unique card id");
+}
+
+// src/core/autoId.ts
+function assignMissingIds(text, cursorLine, existing, rand) {
+  const eol = text.includes("\r\n") ? "\r\n" : "\n";
+  const lines = text.split(/\r?\n/);
+  const taken = new Set(existing);
+  const assigned = [];
+  const edits = [];
+  const cards = parseFile(text, "").cards;
+  for (const c of cards)
+    if (c.id)
+      taken.add(c.id);
+  for (const c of cards) {
+    if (c.titleLine === cursorLine)
+      continue;
+    const line = lines[c.titleLine];
+    let insert = "";
+    let fromCh = line.length;
+    if (!c.id) {
+      const id = newCardId(taken, rand);
+      taken.add(id);
+      assigned.push(id);
+      fromCh = line.replace(/\s+$/, "").length;
+      insert = " ^" + id;
+    }
+    if (cursorLine !== c.titleLine + 1 && needsSeparator(lines[c.titleLine + 1]))
+      insert += eol;
+    if (insert)
+      edits.push({ line: c.titleLine, fromCh, toCh: line.length, insert });
+  }
+  const out = [...lines];
+  for (const e of edits) {
+    const l = out[e.line];
+    out[e.line] = l.slice(0, e.fromCh) + e.insert + l.slice(e.toCh);
+  }
+  return { text: out.join(eol), assigned, edits };
+}
+
+// src/sync/AutoIdListener.ts
+var DELAY_MS = 400;
+var AutoIdListener = class {
+  constructor(plugin, store, enabled) {
+    this.plugin = plugin;
+    this.store = store;
+    this.enabled = enabled;
+    this.timer = null;
+  }
+  register() {
+    const { app } = this.plugin;
+    this.plugin.registerEvent(app.workspace.on("editor-change", (editor, info) => {
+      if (info.file)
+        this.schedule(editor, info.file);
+    }));
+    this.plugin.registerEditorExtension(import_view.EditorView.updateListener.of((update) => {
+      if (!update.selectionSet || update.docChanged)
+        return;
+      const info = update.state.field(import_obsidian3.editorInfoField, false);
+      if ((info == null ? void 0 : info.editor) && info.file)
+        this.schedule(info.editor, info.file);
+    }));
+    this.plugin.registerEvent(app.workspace.on("active-leaf-change", () => {
+      for (const leaf of app.workspace.getLeavesOfType("markdown")) {
+        const v = leaf.view;
+        if (v instanceof import_obsidian3.MarkdownView && v.file && leaf !== app.workspace.getMostRecentLeaf()) {
+          this.run(v.editor, v.file, null);
+        }
+      }
+    }));
+  }
+  schedule(editor, file) {
+    if (this.timer)
+      window.clearTimeout(this.timer);
+    this.timer = window.setTimeout(() => {
+      this.timer = null;
+      this.run(editor, file, editor.getCursor().line);
+    }, DELAY_MS);
+  }
+  run(editor, file, cursorLine) {
+    if (!this.enabled() || !this.store.inScope(file.path))
+      return;
+    const before = editor.getValue();
+    const result = assignMissingIds(before, cursorLine, this.store.allIds());
+    if (result.edits.length === 0)
+      return;
+    const cm = editor.cm;
+    if (cm && typeof cm.dispatch === "function") {
+      const doc = cm.state.doc;
+      cm.dispatch({
+        changes: result.edits.map((e) => {
+          const line = doc.line(e.line + 1);
+          return { from: line.from + e.fromCh, to: line.from + e.toCh, insert: e.insert };
+        }),
+        annotations: import_state.Transaction.addToHistory.of(false)
+      });
+    } else {
+      editor.transaction({
+        changes: result.edits.map((e) => ({
+          from: { line: e.line, ch: e.fromCh },
+          to: { line: e.line, ch: e.toCh },
+          text: e.insert
+        }))
+      });
+    }
+    this.store.indexNow(file, result.text);
+  }
+  destroy() {
+    if (this.timer)
+      window.clearTimeout(this.timer);
+  }
+};
+
+// src/sync/RemoteCloser.ts
+var import_obsidian4 = require("obsidian");
+
+// src/core/remoteClose.ts
+function recallKey(cardId, sourcePath, timestamp, line) {
+  return `${cardId}|${sourcePath}|${timestamp != null ? timestamp : "line:" + line}`;
+}
+function planRemoteCloses(cards, processed) {
+  const toClose = [];
+  const newKeys = [];
+  for (const card of cards) {
+    let close = false;
+    for (const r of card.recalls) {
+      if (!r.closes)
+        continue;
+      const key = recallKey(card.id, r.sourceFilePath, r.timestamp, r.anchorLine);
+      if (processed.has(key))
+        continue;
+      newKeys.push(key);
+      if (card.status === "open")
+        close = true;
+    }
+    if (close)
+      toClose.push(card);
+  }
+  return { toClose, newKeys };
+}
+
+// src/sync/RemoteCloser.ts
+var RemoteCloser = class {
+  constructor(store, mutator, keys) {
+    this.store = store;
+    this.mutator = mutator;
+    this.keys = keys;
+    this.running = false;
+    this.again = false;
+  }
+  attach(register) {
+    register(this.store.on("updated", () => this.check()));
+  }
+  async check() {
+    if (this.running) {
+      this.again = true;
+      return;
+    }
+    this.running = true;
+    try {
+      const plan = planRemoteCloses(this.store.getCards(), this.keys.get());
+      if (plan.newKeys.length === 0)
+        return;
+      await this.keys.add(plan.newKeys);
+      for (const card of plan.toClose) {
+        if (await this.mutator.setStatus(card, "closed")) {
+          new import_obsidian4.Notice(`Closed "${card.title}" from a recall`);
+        }
+      }
+    } finally {
+      this.running = false;
+      if (this.again) {
+        this.again = false;
+        void this.check();
+      }
+    }
+  }
+};
+
+// src/views/CardsSidebarView.tsx
+var import_react2 = __toESM(require_react());
+var import_obsidian6 = require("obsidian");
+var import_client = __toESM(require_client());
+
+// src/core/tree.ts
+function buildTree(paths, cards, compare = (a, b) => a.localeCompare(b)) {
+  const root = { slug: "", name: "", level: 0, segments: [], children: [], openCount: 0, totalCount: 0 };
+  const bySlug = /* @__PURE__ */ new Map([["", root]]);
+  const ensure = (h) => {
+    const chain = [root];
+    let parent = root;
+    let slug = "";
+    h.segments.forEach((seg, i) => {
+      slug = slug ? slug + "/" + slugify(seg.text) : slugify(seg.text);
+      let node = bySlug.get(slug);
+      if (!node) {
+        node = {
+          slug,
+          name: seg.text,
+          level: seg.level,
+          segments: h.segments.slice(0, i + 1).map((s) => ({ ...s })),
+          children: [],
+          openCount: 0,
+          totalCount: 0
+        };
+        bySlug.set(slug, node);
+        parent.children.push(node);
+      }
+      chain.push(node);
+      parent = node;
+    });
+    return chain;
+  };
+  for (const p of paths)
+    ensure(p);
+  for (const c of cards) {
+    for (const n of ensure(c.hierarchy)) {
+      n.totalCount++;
+      if (c.status === "open")
+        n.openCount++;
+    }
+  }
+  const sort = (n) => {
+    n.children.sort((a, b) => compare(a.name, b.name));
+    n.children.forEach(sort);
+  };
+  sort(root);
+  return root;
+}
+function inScope(cardSlug, scopeSlug) {
+  return scopeSlug === "" || cardSlug === scopeSlug || cardSlug.startsWith(scopeSlug + "/");
+}
+
+// src/views/components.tsx
+var import_react = __toESM(require_react());
+var import_obsidian5 = require("obsidian");
+var import_jsx_runtime2 = __toESM(require_jsx_runtime());
+function useStoreVersion(store) {
+  const [v, setV] = (0, import_react.useState)(0);
+  (0, import_react.useEffect)(() => {
+    const ref = store.on("updated", () => setV((x) => x + 1));
+    return () => store.offref(ref);
+  }, [store]);
+  return v;
+}
+function HierarchyPill({ h }) {
+  if (h.segments.length === 0)
+    return null;
+  return /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { className: "mc2-pill", children: h.segments.map((s) => s.text).join(" \u2192 ") });
+}
+function TagChips({ tags, onRemove }) {
+  return /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { className: "mc2-tags", children: tags.map((t) => /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("span", { className: "mc2-tag", children: [
+    t,
+    onRemove && /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("button", { className: "mc2-tag-x", "aria-label": `Remove ${t}`, onClick: (e) => {
+      e.stopPropagation();
+      onRemove(t);
+    }, children: "\xD7" })
+  ] }, t)) });
+}
+function plural(n, word) {
+  return `${n} ${word}${n === 1 ? "" : "s"}`;
+}
+function CardFace({ card, compact }) {
+  return /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "mc2-card-face", children: [
+    /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "mc2-card-title", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { className: `mc2-status mc2-status-${card.status}`, "aria-label": card.status }),
+      card.title || /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("em", { children: "(untitled)" })
+    ] }),
+    !compact && /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(HierarchyPill, { h: card.hierarchy }),
+    /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "mc2-card-meta", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(TagChips, { tags: card.tags }),
+      /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("span", { className: "mc2-muted", children: [
+        plural(card.recalls.length, "recall"),
+        card.lastUpdated ? ` \xB7 ${card.lastUpdated}` : ""
+      ] })
+    ] })
+  ] });
+}
+function MarkdownBlock({ host, component, markdown, sourcePath }) {
+  const ref = (0, import_react.useRef)(null);
+  (0, import_react.useEffect)(() => {
+    const el = ref.current;
+    if (!el)
+      return;
+    el.empty();
+    if (markdown.trim())
+      void import_obsidian5.MarkdownRenderer.render(host.app, markdown, el, sourcePath, component);
+  }, [markdown, sourcePath]);
+  return /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { ref, className: "mc2-md" });
+}
+function baseName(path) {
+  var _a;
+  return (_a = path.split("/").pop()) != null ? _a : path;
+}
+function CardHistory({ host, component, card, hideDescription }) {
+  return /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "mc2-history", children: [
+    !hideDescription && /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("section", { children: [
+      /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "mc2-section-title", children: [
+        "Description",
+        card.openedAt ? ` (opened ${card.openedAt})` : ""
+      ] }),
+      card.description.trim() ? /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(MarkdownBlock, { host, component, markdown: card.description, sourcePath: card.filePath }) : /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { className: "mc2-muted", children: "No description" })
+    ] }),
+    /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("section", { children: [
+      /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { className: "mc2-section-title", children: "Recall history" }),
+      card.recalls.length === 0 && /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { className: "mc2-muted", children: "No recalls yet" }),
+      card.recalls.map((r) => {
+        var _a;
+        return /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "mc2-recall", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)(
+            "a",
+            {
+              className: "mc2-recall-head",
+              onClick: () => host.openLocation(r.sourceFilePath, r.anchorLine),
+              title: "Open in the meeting note",
+              children: [
+                "[",
+                (_a = r.timestamp) != null ? _a : "no timestamp",
+                "] \u2014 ",
+                baseName(r.sourceFilePath),
+                r.closes && /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { className: "mc2-tag", children: "#closed-card" })
+              ]
+            }
+          ),
+          /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(MarkdownBlock, { host, component, markdown: r.content, sourcePath: r.sourceFilePath })
+        ] }, r.sourceFilePath + ":" + r.anchorLine);
+      })
+    ] })
+  ] });
+}
+function DuplicateBanner({ host }) {
+  const dups = host.store.getDuplicates();
+  if (dups.length === 0)
+    return null;
+  return /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "mc2-warning", children: [
+    /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { children: [
+      "\u26A0 ",
+      plural(dups.length, "duplicate card id"),
+      " (copied card lines?)"
+    ] }),
+    dups.map((d) => /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "mc2-dup", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("a", { onClick: () => host.openCard(d), children: [
+        "^",
+        d.id,
+        " in ",
+        baseName(d.filePath)
+      ] }),
+      /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("button", { onClick: () => host.reissueId(d), children: "Re-issue id" })
+    ] }, d.filePath + d.titleLine))
+  ] });
+}
+
+// src/views/CardsSidebarView.tsx
+var import_jsx_runtime3 = __toESM(require_jsx_runtime());
+var VIEW_TYPE_CARDS = "meeting-composer-cards";
+var CardsSidebarView = class extends import_obsidian6.ItemView {
+  constructor(leaf, host) {
+    super(leaf);
+    this.host = host;
+    this.root = null;
+  }
+  getViewType() {
+    return VIEW_TYPE_CARDS;
+  }
+  getDisplayText() {
+    return "Meeting cards";
+  }
+  getIcon() {
+    return "kanban-square";
+  }
+  async onOpen() {
+    const container = this.containerEl.children[1];
+    container.empty();
+    container.addClass("mc2-sidebar");
+    this.root = (0, import_client.createRoot)(container);
+    this.root.render(/* @__PURE__ */ (0, import_jsx_runtime3.jsx)(SidebarApp, { host: this.host, component: this }));
+  }
+  async onClose() {
+    var _a;
+    (_a = this.root) == null ? void 0 : _a.unmount();
+    this.root = null;
+  }
+};
+function SidebarApp({ host, component }) {
+  const version = useStoreVersion(host.store);
+  const [tab, setTab] = (0, import_react2.useState)("tree");
+  const [manualScope, setManualScope] = (0, import_react2.useState)("");
+  const [follow, setFollow] = (0, import_react2.useState)(true);
+  const [cursorSlug, setCursorSlug] = (0, import_react2.useState)(host.currentCursorScope());
+  const [expanded, setExpanded] = (0, import_react2.useState)(/* @__PURE__ */ new Set());
+  const [status, setStatus2] = (0, import_react2.useState)("open");
+  const [query, setQuery] = (0, import_react2.useState)("");
+  const [openCard, setOpenCard] = (0, import_react2.useState)(null);
+  (0, import_react2.useEffect)(() => host.onCursorScope(setCursorSlug), [host]);
+  (0, import_react2.useEffect)(() => {
+    if (!cursorSlug)
+      return;
+    setExpanded((prev) => {
+      const next = new Set(prev);
+      const parts = cursorSlug.split("/");
+      for (let i = 1; i < parts.length; i++)
+        next.add(parts.slice(0, i).join("/"));
+      return next;
+    });
+  }, [cursorSlug]);
+  const scope = follow ? cursorSlug : manualScope;
+  const tree = (0, import_react2.useMemo)(
+    () => buildTree(host.store.getAllPaths(), host.store.getCards(), (a, b) => host.compareTopics(a, b)),
+    [version]
+  );
+  const scopeNode = (0, import_react2.useMemo)(() => findNode(tree, scope), [tree, scope]);
+  const cards = (0, import_react2.useMemo)(() => {
+    const q = query.trim().toLowerCase();
+    return host.store.getCards().filter((c) => inScope(c.hierarchy.slug, scope)).filter((c) => status === "all" || c.status === status).filter((c) => !q || matches(c, q)).sort((a, b) => {
+      var _a, _b;
+      return ((_a = b.lastUpdated) != null ? _a : "").localeCompare((_b = a.lastUpdated) != null ? _b : "");
+    });
+  }, [version, scope, status, query]);
+  const pick = (n) => {
+    setManualScope(n.slug);
+    setFollow(false);
+    setTab("cards");
+  };
+  const toggle = (slug) => setExpanded((prev) => {
+    const next = new Set(prev);
+    if (next.has(slug))
+      next.delete(slug);
+    else
+      next.add(slug);
+    return next;
+  });
+  const openInScope = cards.filter((c) => c.status === "open").length;
+  return /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "mc2-sidebar-app", children: [
+    /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "mc2-tabs", role: "tablist", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("button", { role: "tab", "aria-selected": tab === "tree", className: tab === "tree" ? "is-active" : "", onClick: () => setTab("tree"), children: "Organization tree" }),
+      /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("button", { role: "tab", "aria-selected": tab === "cards", className: tab === "cards" ? "is-active" : "", onClick: () => setTab("cards"), children: [
+        "Context cards (",
+        openInScope,
+        ")"
+      ] })
+    ] }),
+    /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(DuplicateBanner, { host }),
+    tab === "tree" ? /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "mc2-tree", children: [
+      tree.children.length === 0 && /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("div", { className: "mc2-muted mc2-empty", children: "No headings found in the minutes folder yet." }),
+      tree.children.map((n) => /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(TreeRow, { node: n, depth: 0, expanded, toggle, pick, cursorSlug }, n.slug))
+    ] }) : /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "mc2-feed", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "mc2-scope", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: "mc2-muted", children: "Scope:" }),
+        " ",
+        scopeNode && scopeNode.slug ? scopeNode.segments.map((s) => s.text).join(" \u2192 ") : "All minutes",
+        /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("span", { className: "mc2-scope-actions", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(
+            "button",
+            {
+              className: follow ? "is-active" : "",
+              onClick: () => setFollow(!follow),
+              title: "Follow the heading under the editor cursor",
+              children: "\u{1F4CD} Follow cursor"
+            }
+          ),
+          !follow && manualScope && /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("button", { onClick: () => setManualScope(""), children: "All" })
+        ] })
+      ] }),
+      /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "mc2-filters", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("div", { className: "mc2-segmented", children: ["open", "closed", "all"].map((s) => /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("button", { className: status === s ? "is-active" : "", onClick: () => setStatus2(s), children: s[0].toUpperCase() + s.slice(1) }, s)) }),
+        /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(
+          "input",
+          {
+            type: "search",
+            placeholder: "Search title, #tag, text\u2026",
+            value: query,
+            onChange: (e) => setQuery(e.target.value)
+          }
+        )
+      ] }),
+      cards.length === 0 && /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("div", { className: "mc2-muted mc2-empty", children: "No cards in this scope." }),
+      cards.map((c) => /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: `mc2-card ${openCard === c.id ? "is-expanded" : ""}`, children: [
+        /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("div", { className: "mc2-card-click", onClick: () => setOpenCard(openCard === c.id ? null : c.id), children: /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(CardFace, { card: c }) }),
+        /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "mc2-card-actions", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("button", { className: "mod-cta", onClick: () => host.insertRecall(c), children: "Insert recall" }),
+          /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("button", { onClick: () => host.openCard(c), children: "Open" })
+        ] }),
+        openCard === c.id && /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(CardHistory, { host, component, card: c })
+      ] }, c.id))
+    ] })
+  ] });
+}
+function TreeRow(props) {
+  const { node, depth, expanded, toggle, pick, cursorSlug } = props;
+  const isOpen = expanded.has(node.slug);
+  const hasChildren = node.children.length > 0;
+  const active = cursorSlug === node.slug;
+  const onPath = !active && cursorSlug.startsWith(node.slug + "/");
+  return /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "mc2-tree-node", children: [
+    /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)(
+      "div",
+      {
+        className: `mc2-tree-row ${active ? "is-active" : ""} ${onPath ? "is-on-path" : ""}`,
+        style: { paddingLeft: 4 + depth * 14 },
+        children: [
+          /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(
+            "span",
+            {
+              className: "mc2-tree-chevron",
+              onClick: () => hasChildren && toggle(node.slug),
+              "aria-label": hasChildren ? isOpen ? "Collapse" : "Expand" : void 0,
+              children: hasChildren ? isOpen ? "\u25BC" : "\u25B6" : "\u2022"
+            }
+          ),
+          /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: "mc2-tree-name", onClick: () => pick(node), title: "Show cards for this branch", children: node.name }),
+          /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: `mc2-badge ${node.openCount ? "" : "is-zero"}`, title: `${plural(node.openCount, "open card")}`, children: node.openCount })
+        ]
+      }
+    ),
+    isOpen && node.children.map((c) => /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(TreeRow, { ...props, node: c, depth: depth + 1 }, c.slug))
+  ] });
+}
+function findNode(root, slug) {
+  if (root.slug === slug)
+    return root;
+  for (const c of root.children) {
+    if (slug === c.slug || slug.startsWith(c.slug + "/")) {
+      const f = findNode(c, slug);
+      if (f)
+        return f;
+    }
+  }
+  return null;
+}
+function matches(c, q) {
+  if (q.startsWith("#"))
+    return c.tags.some((t) => t.startsWith(q)) || q.length > 1 && `#${c.status}`.startsWith(q);
+  return c.title.toLowerCase().includes(q) || c.description.toLowerCase().includes(q) || c.tags.some((t) => t.includes(q)) || c.hierarchy.segments.some((s) => s.text.toLowerCase().includes(q));
+}
+
+// src/views/OrgBoardView.tsx
+var import_react4 = __toESM(require_react());
+var import_obsidian8 = require("obsidian");
+var import_client2 = __toESM(require_client());
+
+// src/core/boardEngine.ts
+function slugPath(v) {
+  return v.split("/").map(slugify).filter(Boolean).join("/");
+}
+function normalizeColumn(col, prefix) {
+  var _a;
+  if (col.ruleType === "tag") {
+    const v = normalizeTag(col.ruleValue);
+    if (OPEN_TAGS.includes(v))
+      return { ...col, ruleType: "status", ruleValue: "open" };
+    if (CLOSED_TAGS.includes(v))
+      return { ...col, ruleType: "status", ruleValue: "closed" };
+    return { ...col, ruleValue: v, requiredTags: (_a = col.requiredTags) == null ? void 0 : _a.map(normalizeTag) };
+  }
+  if (col.ruleType === "status")
+    return { ...col, ruleValue: col.ruleValue.toLowerCase() };
+  if (col.ruleType === "header") {
+    const raw = col.ruleValue.trim();
+    if (raw.startsWith("#")) {
+      const name = slugify(raw.replace(/^#+\s*/, ""));
+      const p = prefix ? slugPath(prefix) : "";
+      return { ...col, ruleValue: p ? `${p}/${name}` : name };
+    }
+    return { ...col, ruleValue: slugPath(raw) };
+  }
+  return col;
+}
+function columnTags(col) {
+  var _a;
+  const c = normalizeColumn(col);
+  const req = ((_a = c.requiredTags) != null ? _a : []).map(normalizeTag);
+  return c.ruleType === "tag" ? Array.from(/* @__PURE__ */ new Set([c.ruleValue, ...req])) : req;
+}
+function hasAll(card, tags) {
+  return tags.every((t) => card.tags.includes(t));
+}
+function cardsForPreset(cards, preset) {
+  var _a, _b, _c;
+  const f = (_a = preset.scopeFilter) != null ? _a : {};
+  const cols = preset.columns.map((c) => {
+    var _a2;
+    return normalizeColumn(c, (_a2 = preset.scopeFilter) == null ? void 0 : _a2.hierarchyPrefix);
+  });
+  const hasClosedCol = cols.some((c) => c.ruleType === "status" && c.ruleValue === "closed");
+  const include = ((_b = f.includeTags) != null ? _b : []).map(normalizeTag);
+  const exclude = ((_c = f.excludeTags) != null ? _c : []).map(normalizeTag);
+  const columnTagSet = new Set(cols.flatMap(columnTags));
+  return cards.filter((c) => {
+    if (f.hierarchyPrefix && !inScope(c.hierarchy.slug, slugPath(f.hierarchyPrefix)))
+      return false;
+    if (exclude.some((t) => c.tags.includes(t)))
+      return false;
+    if (include.length && !include.some((t) => c.tags.includes(t)) && !c.tags.some((t) => columnTagSet.has(t))) {
+      if (!(c.status === "closed" && hasClosedCol))
+        return false;
+    }
+    if (c.status === "closed" && f.showClosed === false && !hasClosedCol)
+      return false;
+    return true;
+  });
+}
+function assignColumn(card, preset) {
+  var _a, _b, _c, _d;
+  const cols = preset.columns.map((c) => {
+    var _a2;
+    return normalizeColumn(c, (_a2 = preset.scopeFilter) == null ? void 0 : _a2.hierarchyPrefix);
+  });
+  const statusCol = (s) => cols.find((c) => {
+    var _a2;
+    return c.ruleType === "status" && c.ruleValue === s && hasAll(card, ((_a2 = c.requiredTags) != null ? _a2 : []).map(normalizeTag));
+  });
+  if (card.status === "closed")
+    return (_b = (_a = statusCol("closed")) == null ? void 0 : _a.id) != null ? _b : null;
+  let best = null;
+  cols.forEach((c, index) => {
+    if (c.ruleType !== "tag")
+      return;
+    const tags = columnTags(c);
+    if (!hasAll(card, tags))
+      return;
+    const score = tags.length;
+    if (!best || score > best.score || score === best.score && index > best.index)
+      best = { id: c.id, score, index };
+  });
+  if (best)
+    return best.id;
+  let header = null;
+  for (const c of cols) {
+    if (c.ruleType !== "header")
+      continue;
+    if (inScope(card.hierarchy.slug, c.ruleValue) && (!header || c.ruleValue.length > header.len)) {
+      header = { id: c.id, len: c.ruleValue.length };
+    }
+  }
+  if (header)
+    return header.id;
+  return (_d = (_c = statusCol("open")) == null ? void 0 : _c.id) != null ? _d : null;
+}
+function applyOps(card, ops) {
+  let tags = [...card.tags];
+  let status = card.status;
+  for (const op of ops) {
+    if (op.kind === "addTag" && !tags.includes(op.tag))
+      tags.push(op.tag);
+    if (op.kind === "removeTag")
+      tags = tags.filter((t) => t !== op.tag);
+    if (op.kind === "setStatus")
+      status = op.status;
+  }
+  return { status, tags, hierarchy: card.hierarchy };
+}
+function planDrop(card, fromId, toId, preset) {
+  var _a, _b;
+  if (fromId === toId)
+    return [];
+  const cols = preset.columns.map((c) => {
+    var _a2;
+    return normalizeColumn(c, (_a2 = preset.scopeFilter) == null ? void 0 : _a2.hierarchyPrefix);
+  });
+  const to = cols.find((c) => c.id === toId);
+  if (!to)
+    return [];
+  const from = (_a = cols.find((c) => c.id === fromId)) != null ? _a : null;
+  if (to.ruleType === "header") {
+    const ops2 = [{ kind: "move", slug: to.ruleValue, title: to.title }];
+    if (card.status === "closed" && ((_b = preset.scopeFilter) == null ? void 0 : _b.showClosed) === false)
+      ops2.push({ kind: "setStatus", status: "open" });
+    return ops2;
+  }
+  if (to.ruleType === "status" && to.ruleValue === "closed") {
+    return [{ kind: "setStatus", status: "closed" }];
+  }
+  const ops = [];
+  if (card.status === "closed")
+    ops.push({ kind: "setStatus", status: "open" });
+  const toTags = columnTags(to);
+  if (from && from.ruleType === "tag") {
+    for (const t of columnTags(from))
+      if (!toTags.includes(t))
+        ops.push({ kind: "removeTag", tag: t });
+  }
+  for (const t of toTags)
+    if (!card.tags.includes(t))
+      ops.push({ kind: "addTag", tag: t });
+  for (let guard = 0; guard < cols.length; guard++) {
+    const now = assignColumn(applyOps(card, ops), preset);
+    if (now === toId || now === null)
+      break;
+    const blocking = cols.find((c) => c.id === now);
+    if (!blocking || blocking.ruleType !== "tag")
+      break;
+    const strip = columnTags(blocking).filter((t) => !toTags.includes(t));
+    if (strip.length === 0)
+      break;
+    for (const t of strip)
+      ops.push({ kind: "removeTag", tag: t });
+  }
+  return ops;
+}
+
+// src/core/boardFile.ts
+var DEFAULT_BOARD = {
+  version: 1,
+  activePresetId: "view-workflow",
+  presets: [
+    {
+      id: "view-workflow",
+      name: "Action Workflow",
+      layout: "kanban",
+      dropMode: "tag",
+      scopeFilter: { showClosed: true },
+      columns: [
+        { id: "col-open", title: "Open", ruleType: "status", ruleValue: "open" },
+        { id: "col-calling", title: "Calling Queue", ruleType: "tag", ruleValue: "#calling" },
+        { id: "col-waiting", title: "Waiting / Follow-Up", ruleType: "tag", ruleValue: "#waiting" },
+        { id: "col-closed", title: "Closed", ruleType: "status", ruleValue: "closed" }
+      ]
+    },
+    {
+      id: "view-calling-global",
+      name: "Global Calling Queue",
+      layout: "kanban",
+      dropMode: "tag",
+      // "#followup" cards stay visible: tag columns are always admitted by the scope filter
+      scopeFilter: { includeTags: ["#calling"], showClosed: false },
+      columns: [
+        { id: "col-call-todo", title: "To Call", ruleType: "tag", ruleValue: "#calling" },
+        { id: "col-call-followup", title: "Follow-Up Sent", ruleType: "tag", ruleValue: "#followup" },
+        { id: "col-call-done", title: "Completed", ruleType: "status", ruleValue: "closed" }
+      ]
+    },
+    {
+      id: "view-eisenhower",
+      name: "Priority Matrix",
+      layout: "matrix",
+      dropMode: "tag",
+      scopeFilter: { showClosed: false },
+      columns: [
+        { id: "q-do", title: "Do First", ruleType: "tag", ruleValue: "#urgent", requiredTags: ["#important"] },
+        { id: "q-schedule", title: "Schedule", ruleType: "tag", ruleValue: "#important" },
+        { id: "q-delegate", title: "Delegate", ruleType: "tag", ruleValue: "#urgent" },
+        { id: "q-backlog", title: "Backlog", ruleType: "status", ruleValue: "open" }
+      ]
+    }
+  ]
+};
+function isPreset(p) {
+  if (!p || typeof p !== "object")
+    return false;
+  const o = p;
+  return typeof o.id === "string" && typeof o.name === "string" && Array.isArray(o.columns);
+}
+function parseBoardFile(text) {
+  if (text.trim() === "")
+    return { ok: true, board: structuredCloneSafe(DEFAULT_BOARD) };
+  let data;
+  try {
+    data = JSON.parse(text);
+  } catch (e) {
+    return { ok: false, error: `Invalid JSON: ${e instanceof Error ? e.message : String(e)}` };
+  }
+  if (!data || typeof data !== "object")
+    return { ok: false, error: "Board file must be a JSON object" };
+  const o = data;
+  if (!Array.isArray(o.presets) || o.presets.length === 0)
+    return { ok: false, error: '"presets" must be a non-empty array' };
+  const bad = o.presets.findIndex((p) => !isPreset(p));
+  if (bad >= 0)
+    return { ok: false, error: `Preset #${bad + 1} needs "id", "name" and "columns"` };
+  const presets = o.presets.map((p) => ({
+    ...p,
+    layout: p.layout === "matrix" ? "matrix" : "kanban",
+    dropMode: p.dropMode === "header" ? "header" : "tag",
+    columns: p.columns.filter((c) => c && typeof c.id === "string" && typeof c.ruleValue === "string")
+  }));
+  const active = typeof o.activePresetId === "string" && presets.some((p) => p.id === o.activePresetId) ? o.activePresetId : presets[0].id;
+  return { ok: true, board: { version: typeof o.version === "number" ? o.version : 1, activePresetId: active, presets } };
+}
+function serializeBoard(board) {
+  return JSON.stringify(board, null, "	") + "\n";
+}
+function structuredCloneSafe(v) {
+  return JSON.parse(JSON.stringify(v));
+}
+
+// src/views/CardDrawer.tsx
+var import_react3 = __toESM(require_react());
+var import_jsx_runtime4 = __toESM(require_jsx_runtime());
+function CardDrawer({ host, component, card, onClose }) {
+  const [title, setTitle2] = (0, import_react3.useState)(card.title);
+  const [desc, setDesc] = (0, import_react3.useState)(card.description);
+  const [descDirty, setDescDirty] = (0, import_react3.useState)(false);
+  const [newTag, setNewTag] = (0, import_react3.useState)("");
+  (0, import_react3.useEffect)(() => setTitle2(card.title), [card.id, card.title]);
+  (0, import_react3.useEffect)(() => {
+    if (!descDirty)
+      setDesc(card.description);
+  }, [card.id, card.description]);
+  (0, import_react3.useEffect)(() => setDescDirty(false), [card.id]);
+  const commitTitle = () => {
+    const t = title.trim();
+    if (t && t !== card.title)
+      void host.mutator.setTitle(card, t);
+    else
+      setTitle2(card.title);
+  };
+  const saveDesc = async () => {
+    await host.mutator.setDescription(card, desc);
+    setDescDirty(false);
+  };
+  const addTag2 = () => {
+    const raw = newTag.trim();
+    if (!raw)
+      return;
+    const tag = normalizeTag(raw.replace(/\s+/g, "-"));
+    void host.mutator.addTag(card, tag);
+    setNewTag("");
+  };
+  return /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("aside", { className: "mc2-drawer", "aria-label": "Card details", children: [
+    /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("div", { className: "mc2-drawer-head", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(
+        "input",
+        {
+          className: "mc2-drawer-title",
+          value: title,
+          onChange: (e) => setTitle2(e.target.value),
+          onBlur: commitTitle,
+          onKeyDown: (e) => {
+            if (e.key === "Enter")
+              e.target.blur();
+            if (e.key === "Escape") {
+              setTitle2(card.title);
+              e.target.blur();
+            }
+          },
+          "aria-label": "Card title"
+        }
+      ),
+      /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("button", { className: "mc2-icon-btn", onClick: onClose, "aria-label": "Close drawer", children: "\u2715" })
+    ] }),
+    /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("div", { className: "mc2-drawer-sub", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(HierarchyPill, { h: card.hierarchy }),
+      /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("span", { className: "mc2-muted", children: [
+        "^",
+        card.id
+      ] })
+    ] }),
+    /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("div", { className: "mc2-drawer-row", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(
+        "button",
+        {
+          className: card.status === "open" ? "mod-cta" : "",
+          onClick: () => host.mutator.setStatus(card, card.status === "open" ? "closed" : "open"),
+          children: card.status === "open" ? "Close card" : "Re-open card"
+        }
+      ),
+      /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("button", { onClick: () => host.openCard(card), children: "Open in note" }),
+      /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("button", { onClick: () => host.insertRecall(card), children: "Insert recall" })
+    ] }),
+    /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("div", { className: "mc2-section-title", children: "Tags" }),
+    /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("div", { className: "mc2-drawer-row", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(TagChips, { tags: card.tags, onRemove: (t) => host.mutator.removeTag(card, t) }),
+      /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(
+        "input",
+        {
+          className: "mc2-tag-input",
+          placeholder: "#add-tag",
+          value: newTag,
+          onChange: (e) => setNewTag(e.target.value),
+          onKeyDown: (e) => e.key === "Enter" && addTag2()
+        }
+      )
+    ] }),
+    /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("div", { className: "mc2-section-title", children: [
+      "Description",
+      card.openedAt ? ` (opened ${card.openedAt})` : ""
+    ] }),
+    /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(
+      "textarea",
+      {
+        className: "mc2-drawer-desc",
+        value: desc,
+        rows: 8,
+        onChange: (e) => {
+          setDesc(e.target.value);
+          setDescDirty(true);
+        }
+      }
+    ),
+    descDirty && /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("div", { className: "mc2-drawer-row", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("button", { className: "mod-cta", onClick: saveDesc, children: "Save description" }),
+      /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(
+        "button",
+        {
+          onClick: () => {
+            setDesc(card.description);
+            setDescDirty(false);
+          },
+          children: "Discard"
+        }
+      )
+    ] }),
+    /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(CardHistory, { host, component, card, hideDescription: true })
+  ] });
+}
+
+// src/views/modals.ts
+var import_obsidian7 = require("obsidian");
+var PromptModal = class extends import_obsidian7.Modal {
+  constructor(app, title, placeholder, onSubmit) {
+    super(app);
+    this.title = title;
+    this.placeholder = placeholder;
+    this.onSubmit = onSubmit;
+    this.value = "";
+  }
+  onOpen() {
+    this.titleEl.setText(this.title);
+    const submit = () => {
+      if (this.value.trim())
+        this.onSubmit(this.value.trim());
+      this.close();
+    };
+    new import_obsidian7.Setting(this.contentEl).addText((t) => {
+      t.setPlaceholder(this.placeholder).onChange((v) => this.value = v);
+      t.inputEl.addEventListener("keydown", (e) => {
+        if (e.key === "Enter")
+          submit();
+      });
+      window.setTimeout(() => t.inputEl.focus(), 0);
+    });
+    new import_obsidian7.Setting(this.contentEl).addButton((b) => b.setButtonText("Add").setCta().onClick(submit));
+  }
+  onClose() {
+    this.contentEl.empty();
+  }
+};
+var JsonEditModal = class extends import_obsidian7.Modal {
+  constructor(app, initial, onSave) {
+    super(app);
+    this.initial = initial;
+    this.onSave = onSave;
+  }
+  onOpen() {
+    this.titleEl.setText("Edit board JSON");
+    const ta = this.contentEl.createEl("textarea", { cls: "mc2-json-editor" });
+    ta.value = this.initial;
+    ta.rows = 24;
+    const err = this.contentEl.createDiv({ cls: "mc2-error" });
+    new import_obsidian7.Setting(this.contentEl).addButton((b) => b.setButtonText("Cancel").onClick(() => this.close())).addButton(
+      (b) => b.setButtonText("Save").setCta().onClick(() => {
+        const problem = this.onSave(ta.value);
+        if (problem)
+          err.setText(problem);
+        else
+          this.close();
+      })
+    );
+  }
+  onClose() {
+    this.contentEl.empty();
+  }
+};
+var HeadingSuggestModal = class extends import_obsidian7.FuzzySuggestModal {
+  constructor(app, nodes, onPick) {
+    super(app);
+    this.nodes = nodes;
+    this.onPick = onPick;
+    this.setPlaceholder("Pick a heading for the new column\u2026");
+  }
+  getItems() {
+    return this.nodes;
+  }
+  getItemText(n) {
+    return n.segments.map((s) => s.text).join(" \u2192 ");
+  }
+  onChooseItem(n) {
+    this.onPick(n);
+  }
+};
+var CardSuggestModal = class extends import_obsidian7.FuzzySuggestModal {
+  constructor(app, cards, onPick) {
+    super(app);
+    this.cards = cards;
+    this.onPick = onPick;
+    this.setPlaceholder("Insert recall for card\u2026");
+  }
+  getItems() {
+    return this.cards;
+  }
+  getItemText(c) {
+    return [c.title, ...c.tags].join(" ") + " \u2014 " + c.hierarchy.segments.map((s) => s.text).join(" \u2192 ");
+  }
+  onChooseItem(c) {
+    this.onPick(c);
+  }
+};
+function flattenTree(root) {
+  const out = [];
+  const walk = (n) => {
+    if (n.slug)
+      out.push(n);
+    n.children.forEach(walk);
+  };
+  walk(root);
+  return out;
+}
+
+// src/views/OrgBoardView.tsx
+var import_jsx_runtime5 = __toESM(require_jsx_runtime());
+var VIEW_TYPE_ORG_BOARD = "meeting-composer-orgboard";
+var ORGBOARD_EXT = "orgboard";
+var DRAG_MIME = "application/x-meeting-composer-card";
+var OrgBoardView = class extends import_obsidian8.TextFileView {
+  constructor(leaf, host) {
+    super(leaf);
+    this.host = host;
+    this.root = null;
+    this.board = null;
+    this.error = null;
+    this.raw = "";
+    this.update = (board) => {
+      this.board = board;
+      this.raw = serializeBoard(board);
+      this.requestSave();
+      this.render();
+    };
+    this.editJson = () => {
+      new JsonEditModal(this.app, this.board ? serializeBoard(this.board) : this.raw, (text) => {
+        const r = parseBoardFile(text);
+        if (!r.ok)
+          return r.error;
+        this.error = null;
+        this.update(r.board);
+        return null;
+      }).open();
+    };
+  }
+  getViewType() {
+    return VIEW_TYPE_ORG_BOARD;
+  }
+  getIcon() {
+    return "layout-dashboard";
+  }
+  getDisplayText() {
+    var _a, _b;
+    return (_b = (_a = this.file) == null ? void 0 : _a.basename) != null ? _b : "Org board";
+  }
+  /** Invalid files are written back untouched. */
+  getViewData() {
+    return this.board && !this.error ? serializeBoard(this.board) : this.raw;
+  }
+  setViewData(data, clear) {
+    this.raw = data;
+    const r = parseBoardFile(data);
+    if (r.ok) {
+      this.board = r.board;
+      this.error = null;
+    } else {
+      this.board = null;
+      this.error = r.error;
+    }
+    this.render();
+  }
+  clear() {
+    this.board = null;
+    this.error = null;
+    this.raw = "";
+  }
+  async onOpen() {
+    this.contentEl.empty();
+    this.contentEl.addClass("mc2-board-view");
+    this.root = (0, import_client2.createRoot)(this.contentEl);
+    this.render();
+  }
+  async onClose() {
+    var _a;
+    (_a = this.root) == null ? void 0 : _a.unmount();
+    this.root = null;
+  }
+  render() {
+    if (!this.root)
+      return;
+    this.root.render(
+      /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(
+        BoardApp,
+        {
+          host: this.host,
+          view: this,
+          board: this.board,
+          error: this.error,
+          onChange: this.update,
+          onEditJson: this.editJson
+        }
+      )
+    );
+  }
+};
+function BoardApp({ host, view, board, error, onChange, onEditJson }) {
+  var _a;
+  const version = useStoreVersion(host.store);
+  const [selected, setSelected] = (0, import_react4.useState)(null);
+  const [query, setQuery] = (0, import_react4.useState)("");
+  const [dragOver, setDragOver] = (0, import_react4.useState)(null);
+  const preset = (_a = board == null ? void 0 : board.presets.find((p) => p.id === board.activePresetId)) != null ? _a : board == null ? void 0 : board.presets[0];
+  const columns = (0, import_react4.useMemo)(() => {
+    var _a2;
+    const out = /* @__PURE__ */ new Map();
+    if (!preset)
+      return out;
+    preset.columns.forEach((c) => out.set(c.id, []));
+    const q = query.trim().toLowerCase();
+    for (const c of cardsForPreset(host.store.getCards(), preset)) {
+      if (q && !matches(c, q))
+        continue;
+      const col = assignColumn(c, preset);
+      if (col)
+        (_a2 = out.get(col)) == null ? void 0 : _a2.push(c);
+    }
+    out.forEach((list) => list.sort((a, b) => {
+      var _a3, _b;
+      return ((_a3 = b.lastUpdated) != null ? _a3 : "").localeCompare((_b = a.lastUpdated) != null ? _b : "");
+    }));
+    return out;
+  }, [version, preset, query]);
+  if (error) {
+    return /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("div", { className: "mc2-board-error", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("h3", { children: "This board file could not be read" }),
+      /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("p", { className: "mc2-error", children: error }),
+      /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("p", { className: "mc2-muted", children: "The file is left untouched. Fix it in the JSON editor:" }),
+      /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("button", { className: "mod-cta", onClick: onEditJson, children: "Edit board JSON" })
+    ] });
+  }
+  if (!board || !preset)
+    return /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("div", { className: "mc2-muted mc2-empty", children: "Loading\u2026" });
+  const selectedCard = selected ? host.store.getCard(selected) : void 0;
+  const setPreset = (id) => onChange({ ...board, activePresetId: id });
+  const replacePreset = (p) => onChange({ ...board, presets: board.presets.map((x) => x.id === p.id ? p : x) });
+  const addColumn = () => {
+    if (preset.dropMode === "header") {
+      const tree = buildTree(host.store.getAllPaths(), host.store.getCards(), (a, b) => host.compareTopics(a, b));
+      new HeadingSuggestModal(host.app, flattenTree(tree), (n) => {
+        replacePreset({
+          ...preset,
+          columns: [...preset.columns, { id: "col-" + Date.now().toString(36), title: n.name, ruleType: "header", ruleValue: n.slug }]
+        });
+      }).open();
+    } else {
+      new PromptModal(host.app, "New tag column", "#tag (e.g. #waiting)", (v) => {
+        const tag = v.startsWith("#") ? v : "#" + v;
+        replacePreset({
+          ...preset,
+          columns: [...preset.columns, { id: "col-" + Date.now().toString(36), title: tag, ruleType: "tag", ruleValue: tag }]
+        });
+      }).open();
+    }
+  };
+  const removeColumn = (id) => replacePreset({ ...preset, columns: preset.columns.filter((c) => c.id !== id) });
+  const onDrop = async (toId, e) => {
+    e.preventDefault();
+    setDragOver(null);
+    let payload;
+    try {
+      payload = JSON.parse(e.dataTransfer.getData(DRAG_MIME));
+    } catch (e2) {
+      return;
+    }
+    const card = host.store.getCard(payload.id);
+    if (!card)
+      return;
+    const ops = planDrop(card, payload.from, toId, preset);
+    if (ops.length === 0)
+      return;
+    const known = host.store.getAllPaths().map((p) => p.segments);
+    await host.mutator.applyAll(card, ops.map((op) => opToFn(op, card.id, known)));
+  };
+  const cols = preset.columns.map((c) => {
+    var _a2;
+    return { raw: c, norm: normalizeColumn(c, (_a2 = preset.scopeFilter) == null ? void 0 : _a2.hierarchyPrefix) };
+  });
+  return /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("div", { className: `mc2-board ${selectedCard ? "has-drawer" : ""}`, children: [
+    /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("div", { className: "mc2-board-toolbar", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("div", { className: "mc2-presets", role: "tablist", children: board.presets.map((p) => /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(
+        "button",
+        {
+          role: "tab",
+          "aria-selected": p.id === preset.id,
+          className: p.id === preset.id ? "is-active" : "",
+          onClick: () => setPreset(p.id),
+          children: p.name
+        },
+        p.id
+      )) }),
+      /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("input", { type: "search", placeholder: "Filter cards\u2026", value: query, onChange: (e) => setQuery(e.target.value) }),
+      /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("button", { onClick: addColumn, title: "Add a column to this view", children: "\uFF0B Column" }),
+      /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("button", { onClick: onEditJson, title: "Edit the presets as JSON", children: "{ } JSON" })
+    ] }),
+    /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("div", { className: "mc2-board-body", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("div", { className: `mc2-columns mc2-layout-${preset.layout}`, children: [
+        cols.map(({ raw, norm }) => {
+          var _a2;
+          const list = (_a2 = columns.get(raw.id)) != null ? _a2 : [];
+          return /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)(
+            "section",
+            {
+              className: `mc2-column ${dragOver === raw.id ? "is-drag-over" : ""}`,
+              style: raw.color ? { borderTopColor: raw.color } : void 0,
+              onDragOver: (e) => {
+                if (!e.dataTransfer.types.includes(DRAG_MIME))
+                  return;
+                e.preventDefault();
+                e.dataTransfer.dropEffect = "move";
+                if (dragOver !== raw.id)
+                  setDragOver(raw.id);
+              },
+              onDragLeave: (e) => {
+                if (!e.currentTarget.contains(e.relatedTarget))
+                  setDragOver(null);
+              },
+              onDrop: (e) => onDrop(raw.id, e),
+              children: [
+                /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("header", { className: "mc2-column-head", children: [
+                  /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("span", { className: "mc2-column-title", children: raw.title }),
+                  /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("span", { className: "mc2-muted mc2-column-rule", children: ruleLabel(norm) }),
+                  /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("span", { className: "mc2-badge", children: list.length }),
+                  /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("button", { className: "mc2-icon-btn", "aria-label": `Remove column ${raw.title}`, onClick: () => removeColumn(raw.id), children: "\xD7" })
+                ] }),
+                /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("div", { className: "mc2-column-cards", children: [
+                  list.map((c) => /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(
+                    "div",
+                    {
+                      className: `mc2-card mc2-board-card ${selected === c.id ? "is-selected" : ""}`,
+                      draggable: true,
+                      onDragStart: (e) => {
+                        e.dataTransfer.setData(DRAG_MIME, JSON.stringify({ id: c.id, from: raw.id }));
+                        e.dataTransfer.effectAllowed = "move";
+                      },
+                      onClick: () => setSelected(selected === c.id ? null : c.id),
+                      children: /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(CardFace, { card: c })
+                    },
+                    c.id
+                  )),
+                  list.length === 0 && /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("div", { className: "mc2-muted mc2-drop-hint", children: "Drop cards here" })
+                ] })
+              ]
+            },
+            raw.id
+          );
+        }),
+        cols.length === 0 && /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("div", { className: "mc2-muted mc2-empty", children: "This view has no columns. Use \uFF0B Column." })
+      ] }),
+      selectedCard && /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(CardDrawer, { host, component: view, card: selectedCard, onClose: () => setSelected(null) })
+    ] })
+  ] });
+}
+function ruleLabel(c) {
+  var _a;
+  if (c.ruleType === "status")
+    return c.ruleValue === "closed" ? "#closed-card" : "#open-card";
+  if (c.ruleType === "tag")
+    return [c.ruleValue, ...(_a = c.requiredTags) != null ? _a : []].join(" + ");
+  return c.ruleValue;
+}
+function opToFn(op, id, known) {
+  switch (op.kind) {
+    case "addTag":
+      return (t) => addTag(t, id, op.tag);
+    case "removeTag":
+      return (t) => removeTag(t, id, op.tag);
+    case "setStatus":
+      return (t) => setStatus(t, id, op.status);
+    case "move": {
+      const segments = segmentsForSlug(op.slug, known, op.title);
+      if (segments.length === 0) {
+        new import_obsidian8.Notice("Meeting Composer: column has no heading path");
+        return (t) => t;
+      }
+      return (t) => moveCardToHeading(t, id, segments);
+    }
+  }
+}
+
+// src/MeetingComposerV2.ts
+var MeetingComposerV2 = class {
+  constructor(plugin, settings, saveProcessedRecallCloses) {
+    this.plugin = plugin;
+    this.settings = settings;
+    this.saveProcessedRecallCloses = saveProcessedRecallCloses;
+    this.cursorEvents = new import_obsidian9.Events();
+    this.cursorSlug = "";
+    this.cursorTimer = null;
+    this.lastMarkdown = null;
+    const app = plugin.app;
+    this.store = new VaultCardStore(app, () => ({
+      minutesDir: this.settings().minutesDir,
+      outputDir: this.settings().outputDir
+    }));
+    this.mutator = new MarkdownMutator(app, this.store);
+    this.autoId = new AutoIdListener(plugin, this.store, () => this.settings().autoCardIds);
+    this.closer = new RemoteCloser(this.store, this.mutator, {
+      get: () => new Set(this.settings().processedRecallCloses),
+      add: async (keys) => {
+        const merged = Array.from(/* @__PURE__ */ new Set([...this.settings().processedRecallCloses, ...keys]));
+        await this.saveProcessedRecallCloses(merged);
+      }
+    });
+  }
+  get app() {
+    return this.plugin.app;
+  }
+  load() {
+    const p = this.plugin;
+    const reg = (ref) => p.registerEvent(ref);
+    this.store.attach(reg);
+    this.autoId.register();
+    this.closer.attach(reg);
+    p.registerView(VIEW_TYPE_CARDS, (leaf) => new CardsSidebarView(leaf, this));
+    p.registerView(VIEW_TYPE_ORG_BOARD, (leaf) => new OrgBoardView(leaf, this));
+    try {
+      p.registerExtensions([ORGBOARD_EXT], VIEW_TYPE_ORG_BOARD);
+    } catch (e) {
+      console.error("Meeting Composer: could not register .orgboard", e);
+    }
+    p.addRibbonIcon("kanban-square", "Open meeting cards", () => this.activateSidebar());
+    p.addCommand({ id: "open-cards-sidebar", name: "Open meeting cards sidebar", callback: () => this.activateSidebar() });
+    p.addCommand({ id: "new-org-board", name: "Create new org board", callback: () => this.createBoard() });
+    p.addCommand({
+      id: "insert-recall",
+      name: "Insert recall for a card\u2026",
+      callback: () => {
+        const cards = this.store.getCards().filter((c) => c.status === "open");
+        new CardSuggestModal(this.app, cards, (c) => this.insertRecall(c)).open();
+      }
+    });
+    p.addCommand({ id: "assign-missing-ids", name: "Assign missing card ids & fix card blocks in minutes folder", callback: () => this.assignAllMissingIds() });
+    p.addCommand({ id: "reindex-cards", name: "Re-index meeting cards", callback: () => this.store.reindexAll() });
+    reg(this.app.workspace.on("file-menu", (menu, file) => {
+      const folder = file instanceof import_obsidian9.TFolder ? file : file.parent;
+      if (!folder)
+        return;
+      menu.addItem(
+        (item) => item.setTitle("New org board").setIcon("layout-dashboard").onClick(() => this.createBoard(folder.path))
+      );
+    }));
+    p.registerEditorExtension(import_view2.EditorView.updateListener.of((update) => {
+      if (!update.selectionSet && !update.docChanged)
+        return;
+      const info = update.state.field(import_obsidian9.editorInfoField, false);
+      const editor = info == null ? void 0 : info.editor;
+      if (!editor || !info.file)
+        return;
+      const file = info.file;
+      this.scheduleCursor(() => editor.getValue(), () => editor.getCursor().line, file);
+      if (update.docChanged)
+        this.store.scheduleFromEditor(file, () => editor.getValue());
+    }));
+    reg(this.app.workspace.on("active-leaf-change", (leaf) => {
+      const v = leaf == null ? void 0 : leaf.view;
+      if (v instanceof import_obsidian9.MarkdownView) {
+        this.lastMarkdown = v;
+        if (v.file)
+          this.scheduleCursor(() => v.editor.getValue(), () => v.editor.getCursor().line, v.file);
+      }
+    }));
+    this.app.workspace.onLayoutReady(() => void this.store.reindexAll());
+  }
+  unload() {
+    this.store.destroy();
+    this.autoId.destroy();
+    if (this.cursorTimer)
+      window.clearTimeout(this.cursorTimer);
+  }
+  // ---------- cursor scope ----------
+  scheduleCursor(text, line, file) {
+    if (this.cursorTimer)
+      window.clearTimeout(this.cursorTimer);
+    this.cursorTimer = window.setTimeout(() => {
+      this.cursorTimer = null;
+      const slug = this.store.inScope(file.path) ? hierarchyAt(text(), line()).slug : "";
+      if (slug !== this.cursorSlug) {
+        this.cursorSlug = slug;
+        this.cursorEvents.trigger("scope", slug);
+      }
+    }, 200);
+  }
+  onCursorScope(cb) {
+    const ref = this.cursorEvents.on("scope", cb);
+    return () => this.cursorEvents.offref(ref);
+  }
+  currentCursorScope() {
+    return this.cursorSlug;
+  }
+  // ---------- topic ordering (same rules as the v1 tree) ----------
+  compareTopics(a, b) {
+    const pa = this.priority(a);
+    const pb = this.priority(b);
+    return pa !== pb ? pa - pb : a.localeCompare(b);
+  }
+  priority(name) {
+    const s = this.settings();
+    const lower = name.toLowerCase();
+    const before = s.priorityBefore.findIndex((t) => t.toLowerCase() === lower);
+    if (before !== -1)
+      return before;
+    if (s.cities.some((c) => lower.includes(c.toLowerCase())))
+      return s.priorityBefore.length;
+    const after = s.priorityAfter.findIndex((t) => t.toLowerCase() === lower);
+    if (after !== -1)
+      return s.priorityBefore.length + 1 + after;
+    return Number.MAX_SAFE_INTEGER;
+  }
+  // ---------- actions ----------
+  async activateSidebar() {
+    const { workspace } = this.app;
+    const existing = workspace.getLeavesOfType(VIEW_TYPE_CARDS);
+    if (existing.length) {
+      workspace.revealLeaf(existing[0]);
+      return;
+    }
+    const leaf = workspace.getRightLeaf(false);
+    if (leaf) {
+      await leaf.setViewState({ type: VIEW_TYPE_CARDS, active: true });
+      workspace.revealLeaf(leaf);
+    }
+  }
+  targetEditorView() {
+    const active = this.app.workspace.getActiveViewOfType(import_obsidian9.MarkdownView);
+    if (active)
+      return active;
+    if (this.lastMarkdown && this.lastMarkdown.file && this.app.workspace.getLeavesOfType("markdown").some((l) => l.view === this.lastMarkdown)) {
+      return this.lastMarkdown;
+    }
+    return null;
+  }
+  insertRecall(card) {
+    const view = this.targetEditorView();
+    const origin = this.app.vault.getAbstractFileByPath(card.filePath);
+    if (!view || !view.file) {
+      new import_obsidian9.Notice("Open a meeting note first, then insert the recall.");
+      return;
+    }
+    if (!(origin instanceof import_obsidian9.TFile))
+      return;
+    const linktext = this.app.metadataCache.fileToLinktext(origin, view.file.path, true);
+    const alias = card.title.replace(/[[\]|]/g, " ").replace(/\s+/g, " ").trim();
+    const recall = `[[${linktext}#^${card.id}|${alias}]] %%recall:${formatTimestamp(new Date())}%%`;
+    const editor = view.editor;
+    const cur = editor.getCursor();
+    const lineText = editor.getLine(cur.line);
+    if (lineText.trim() === "") {
+      editor.replaceRange(recall + "\n", { line: cur.line, ch: 0 }, { line: cur.line, ch: lineText.length });
+      editor.setCursor({ line: cur.line + 1, ch: 0 });
+    } else {
+      editor.replaceRange("\n" + recall + "\n", { line: cur.line, ch: lineText.length });
+      editor.setCursor({ line: cur.line + 2, ch: 0 });
+    }
+    this.app.workspace.setActiveLeaf(view.leaf, { focus: true });
+    editor.focus();
+  }
+  async openCard(card) {
+    await this.openLocation(card.filePath, card.titleLine);
+  }
+  async openLocation(path, line) {
+    const file = this.app.vault.getAbstractFileByPath(path);
+    if (!(file instanceof import_obsidian9.TFile))
+      return;
+    const { workspace } = this.app;
+    let leaf = workspace.getLeavesOfType("markdown").find((l) => {
+      var _a;
+      return ((_a = l.view.file) == null ? void 0 : _a.path) === path;
+    });
+    if (!leaf) {
+      const recent = workspace.getMostRecentLeaf();
+      leaf = recent && recent.view instanceof import_obsidian9.MarkdownView ? recent : workspace.getLeaf("tab");
+      await leaf.openFile(file);
+    }
+    workspace.setActiveLeaf(leaf, { focus: true });
+    const v = leaf.view;
+    if (v instanceof import_obsidian9.MarkdownView) {
+      const pos = { line, ch: 0 };
+      v.editor.setCursor(pos);
+      v.editor.scrollIntoView({ from: pos, to: pos }, true);
+    }
+  }
+  async reissueId(card) {
+    const newId = newCardId(this.store.allIds());
+    await this.mutator.apply(card.filePath, (text) => {
+      var _a;
+      const eol = text.includes("\r\n") ? "\r\n" : "\n";
+      const lines = text.split(/\r?\n/);
+      const re = new RegExp(`(^|\\s)\\^${card.id}(?=\\s|$)`);
+      let idx = re.test((_a = lines[card.titleLine]) != null ? _a : "") ? card.titleLine : -1;
+      if (idx === -1) {
+        for (let i = lines.length - 1; i >= 0; i--)
+          if (re.test(lines[i])) {
+            idx = i;
+            break;
+          }
+      }
+      if (idx === -1)
+        return text;
+      lines[idx] = lines[idx].replace(re, `$1^${newId}`);
+      return lines.join(eol);
+    });
+    new import_obsidian9.Notice(`Card re-issued as ^${newId}`);
+  }
+  /** Assign missing ids AND separate prose from title lines (so ^ids are real blocks) in every minutes file. */
+  async assignAllMissingIds() {
+    var _a;
+    const files = this.app.vault.getMarkdownFiles().filter((f) => this.store.inScope(f.path));
+    let ids = 0;
+    let touched = 0;
+    for (const f of files) {
+      const parsed = (_a = this.store.getParsed(f.path)) == null ? void 0 : _a.parsed;
+      if (parsed && parsed.cards.length === 0)
+        continue;
+      const changed = await this.mutator.apply(f.path, (text) => {
+        const r = assignMissingIds(text, null, this.store.allIds());
+        ids += r.assigned.length;
+        return r.text;
+      });
+      if (changed)
+        touched++;
+    }
+    new import_obsidian9.Notice(touched ? `Assigned ${ids} card id(s), updated ${touched} note(s)` : "All cards already have ids and valid blocks");
+  }
+  async createBoard(folderPath) {
+    var _a, _b;
+    const folder = folderPath != null ? folderPath : this.app.fileManager.getNewFileParent((_b = (_a = this.app.workspace.getActiveFile()) == null ? void 0 : _a.path) != null ? _b : "").path;
+    const base = folder && folder !== "/" ? folder + "/" : "";
+    let name = "Operations";
+    let i = 1;
+    while (this.app.vault.getAbstractFileByPath((0, import_obsidian9.normalizePath)(`${base}${name}.${ORGBOARD_EXT}`)))
+      name = `Operations ${i++}`;
+    const file = await this.app.vault.create((0, import_obsidian9.normalizePath)(`${base}${name}.${ORGBOARD_EXT}`), serializeBoard(DEFAULT_BOARD));
+    await this.app.workspace.getLeaf("tab").openFile(file);
+  }
+};
+
 // main.ts
 var MDParser = new MarkdownParser();
 var OutputWindow = null;
@@ -24897,17 +27224,20 @@ var DEFAULT_SETTINGS = {
   cities: [...DEFAULT_CITIES],
   priorityAfterCities: [...DEFAULT_PRIORITY_AFTER_CITIES],
   autoComplete: true,
-  autoReload: true
+  autoReload: true,
+  autoCardIds: true,
+  processedRecallCloses: []
 };
 var TreeView = null;
 var currentToggle = () => {
 };
-var MyPlugin = class extends import_obsidian.Plugin {
+var MyPlugin = class extends import_obsidian10.Plugin {
   constructor() {
     super(...arguments);
     this.topicTree = null;
     this.scopedSearch = false;
     this.reloadDebounce = null;
+    this.reindexDebounce = null;
   }
   createTreeView(leaf) {
     const view = new MyFolderItemView(leaf, this);
@@ -24923,7 +27253,7 @@ var MyPlugin = class extends import_obsidian.Plugin {
     if (!folder)
       return;
     for (const child of folder.children) {
-      if (!(child instanceof import_obsidian.TFile) || !child.name.endsWith(".md"))
+      if (!(child instanceof import_obsidian10.TFile) || !child.name.endsWith(".md"))
         continue;
       const content = await this.app.vault.read(child);
       const name = child.name.replace(".md", "").trim();
@@ -24966,8 +27296,32 @@ var MyPlugin = class extends import_obsidian.Plugin {
         clearTimeout(this.reloadDebounce);
       this.reloadDebounce = setTimeout(() => this.reloadTree(), 1e3);
     }));
+    this.v2 = new MeetingComposerV2(this, () => ({
+      minutesDir: this.settings.MeenutesDir,
+      outputDir: this.settings.OutputDir,
+      autoCardIds: this.settings.autoCardIds,
+      processedRecallCloses: this.settings.processedRecallCloses,
+      priorityBefore: this.settings.priorityBeforeCities,
+      cities: this.settings.cities,
+      priorityAfter: this.settings.priorityAfterCities
+    }), async (keys) => {
+      this.settings.processedRecallCloses = keys;
+      await this.saveSettings();
+    });
+    this.v2.load();
+  }
+  /** Re-index v2 cards after the minutes/output folder setting changes. */
+  scheduleCardReindex() {
+    if (this.reindexDebounce)
+      clearTimeout(this.reindexDebounce);
+    this.reindexDebounce = setTimeout(() => {
+      var _a;
+      return (_a = this.v2) == null ? void 0 : _a.store.reindexAll();
+    }, 800);
   }
   onunload() {
+    var _a;
+    (_a = this.v2) == null ? void 0 : _a.unload();
   }
   async loadSettings() {
     this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData());
@@ -25002,7 +27356,7 @@ var MyPlugin = class extends import_obsidian.Plugin {
     }
   }
 };
-var MyFolderItemView = class extends import_obsidian.ItemView {
+var MyFolderItemView = class extends import_obsidian10.ItemView {
   constructor(leaf, plugin) {
     super(leaf);
     this.isOpen = false;
@@ -25018,7 +27372,7 @@ var MyFolderItemView = class extends import_obsidian.ItemView {
     const container = this.containerEl.children[1];
     if (!this.root) {
       container.empty();
-      this.root = (0, import_client.createRoot)(container);
+      this.root = (0, import_client3.createRoot)(container);
     }
     this.root.render(FileTreeRoot(
       TopicTree,
@@ -25090,7 +27444,7 @@ var MyFolderItemView = class extends import_obsidian.ItemView {
     this.root = null;
   }
 };
-var TopicEditorSuggest = class extends import_obsidian.EditorSuggest {
+var TopicEditorSuggest = class extends import_obsidian10.EditorSuggest {
   constructor(app, plugin) {
     super(app);
     this.plugin = plugin;
@@ -25120,7 +27474,7 @@ var TopicEditorSuggest = class extends import_obsidian.EditorSuggest {
     editor.replaceRange(topic, start, end);
   }
 };
-var TopicSuggest = class extends import_obsidian.AbstractInputSuggest {
+var TopicSuggest = class extends import_obsidian10.AbstractInputSuggest {
   constructor(app, inputEl, getTopics) {
     super(app, inputEl);
     this.getTopics = getTopics;
@@ -25138,7 +27492,7 @@ var TopicSuggest = class extends import_obsidian.AbstractInputSuggest {
     this.close();
   }
 };
-var ExampleView = class extends import_obsidian.ItemView {
+var ExampleView = class extends import_obsidian10.ItemView {
   constructor(leaf, plugin) {
     super(leaf);
     this.plugin = plugin;
@@ -25175,7 +27529,7 @@ var ExampleView = class extends import_obsidian.ItemView {
     container.empty();
     container.createEl("h4", { text: "Meeting Composer" });
     let search = "";
-    new import_obsidian.Setting(contentEl).setName("Search").addText((item) => {
+    new import_obsidian10.Setting(contentEl).setName("Search").addText((item) => {
       item.onChange((string) => {
         search = string;
       });
@@ -25201,7 +27555,7 @@ var ExampleView = class extends import_obsidian.ItemView {
   async onClose() {
   }
 };
-var MeetingComposerSettingTab = class extends import_obsidian.PluginSettingTab {
+var MeetingComposerSettingTab = class extends import_obsidian10.PluginSettingTab {
   constructor(app, plugin) {
     super(app, plugin);
     this.plugin = plugin;
@@ -25209,27 +27563,33 @@ var MeetingComposerSettingTab = class extends import_obsidian.PluginSettingTab {
   display() {
     const { containerEl } = this;
     containerEl.empty();
-    new import_obsidian.Setting(containerEl).setName("Minutes directory").setDesc("Folder containing meeting minutes files, relative to the vault root").addText((text) => text.setPlaceholder("Atas").setValue(this.plugin.settings.MeenutesDir).onChange(async (value) => {
+    new import_obsidian10.Setting(containerEl).setName("Minutes directory").setDesc("Folder containing meeting minutes files, relative to the vault root").addText((text) => text.setPlaceholder("Atas").setValue(this.plugin.settings.MeenutesDir).onChange(async (value) => {
       this.plugin.settings.MeenutesDir = value;
       await this.plugin.saveSettings();
+      this.plugin.scheduleCardReindex();
     }));
-    new import_obsidian.Setting(containerEl).setName("Output file name").setDesc("Name of the file where search results are written").addText((text) => text.setPlaceholder("output.md").setValue(this.plugin.settings.OutputFileName).onChange(async (value) => {
+    new import_obsidian10.Setting(containerEl).setName("Output file name").setDesc("Name of the file where search results are written").addText((text) => text.setPlaceholder("output.md").setValue(this.plugin.settings.OutputFileName).onChange(async (value) => {
       this.plugin.settings.OutputFileName = value;
       await this.plugin.saveSettings();
     }));
-    new import_obsidian.Setting(containerEl).setName("Output directory").setDesc("Folder where search results are written, relative to the vault root").addText((text) => text.setPlaceholder("Meeting_Composer_Search/").setValue(this.plugin.settings.OutputDir).onChange(async (value) => {
+    new import_obsidian10.Setting(containerEl).setName("Output directory").setDesc("Folder where search results are written, relative to the vault root").addText((text) => text.setPlaceholder("Meeting_Composer_Search/").setValue(this.plugin.settings.OutputDir).onChange(async (value) => {
       this.plugin.settings.OutputDir = value;
       await this.plugin.saveSettings();
+      this.plugin.scheduleCardReindex();
     }));
-    new import_obsidian.Setting(containerEl).setName("Search autocomplete").setDesc("Suggest topic names while typing in the search box and in heading lines").addToggle((toggle) => toggle.setValue(this.plugin.settings.autoComplete).onChange(async (value) => {
+    new import_obsidian10.Setting(containerEl).setName("Search autocomplete").setDesc("Suggest topic names while typing in the search box and in heading lines").addToggle((toggle) => toggle.setValue(this.plugin.settings.autoComplete).onChange(async (value) => {
       this.plugin.settings.autoComplete = value;
       await this.plugin.saveSettings();
     }));
-    new import_obsidian.Setting(containerEl).setName("Auto-reload tree on new heading").setDesc("Refresh the topic tree whenever a heading is written in a minutes file").addToggle((toggle) => toggle.setValue(this.plugin.settings.autoReload).onChange(async (value) => {
+    new import_obsidian10.Setting(containerEl).setName("Auto-reload tree on new heading").setDesc("Refresh the topic tree whenever a heading is written in a minutes file").addToggle((toggle) => toggle.setValue(this.plugin.settings.autoReload).onChange(async (value) => {
       this.plugin.settings.autoReload = value;
       await this.plugin.saveSettings();
     }));
-    new import_obsidian.Setting(containerEl).setName("Topic ordering").setHeading();
+    new import_obsidian10.Setting(containerEl).setName("Auto-assign card ids").setDesc("Append a ^card-id when a line with #open-card / #open-ticket is written right under a heading (applied when the cursor leaves the line)").addToggle((toggle) => toggle.setValue(this.plugin.settings.autoCardIds).onChange(async (value) => {
+      this.plugin.settings.autoCardIds = value;
+      await this.plugin.saveSettings();
+    }));
+    new import_obsidian10.Setting(containerEl).setName("Topic ordering").setHeading();
     const listsEl = containerEl.createDiv("mc-priority-lists");
     const makeListSection = (title, desc, getValue, setValue) => {
       const col = listsEl.createDiv("mc-priority-col");
@@ -25273,7 +27633,7 @@ var MeetingComposerSettingTab = class extends import_obsidian.PluginSettingTab {
         await this.plugin.saveSettings();
       }
     );
-    new import_obsidian.Setting(containerEl).setName("Reload minutes").setDesc("Re-scan the minutes folder and rebuild the topic tree").addButton((item) => {
+    new import_obsidian10.Setting(containerEl).setName("Reload minutes").setDesc("Re-scan the minutes folder and rebuild the topic tree").addButton((item) => {
       item.setButtonText("Reload");
       item.onClick(() => {
         this.plugin.reloadTree();
