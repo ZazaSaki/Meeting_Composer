@@ -24415,7 +24415,7 @@ __export(main_exports, {
   default: () => MyPlugin
 });
 module.exports = __toCommonJS(main_exports);
-var import_obsidian11 = require("obsidian");
+var import_obsidian12 = require("obsidian");
 
 // DataMeenutes/FileReader.ts
 var fs = __toESM(require("fs"));
@@ -24885,7 +24885,7 @@ function FileTree(data, id = 0, root = null) {
 }
 
 // src/MeetingComposerV2.ts
-var import_obsidian10 = require("obsidian");
+var import_obsidian11 = require("obsidian");
 var import_view2 = require("@codemirror/view");
 
 // src/store/VaultCardStore.ts
@@ -26303,7 +26303,7 @@ function matches(c, q) {
 
 // src/views/OrgBoardView.tsx
 var import_react4 = __toESM(require_react());
-var import_obsidian8 = require("obsidian");
+var import_obsidian9 = require("obsidian");
 var import_client2 = __toESM(require_client());
 
 // src/core/boardEngine.ts
@@ -26544,6 +26544,25 @@ function parseBoardFile(text) {
   const active = typeof o.activePresetId === "string" && presets.some((p) => p.id === o.activePresetId) ? o.activePresetId : presets[0].id;
   return { ok: true, board: { version: typeof o.version === "number" ? o.version : 1, activePresetId: active, presets } };
 }
+function simpleBoard() {
+  return {
+    version: 1,
+    activePresetId: "view-main",
+    presets: [
+      {
+        id: "view-main",
+        name: "Main",
+        layout: "kanban",
+        dropMode: "tag",
+        scopeFilter: { showClosed: true },
+        columns: [
+          { id: "col-open", title: "Open", ruleType: "status", ruleValue: "open" },
+          { id: "col-closed", title: "Closed", ruleType: "status", ruleValue: "closed" }
+        ]
+      }
+    ]
+  };
+}
 function serializeBoard(board) {
   return JSON.stringify(board, null, "	") + "\n";
 }
@@ -26674,35 +26693,6 @@ function CardDrawer({ host, component, card, onClose }) {
 
 // src/views/modals.ts
 var import_obsidian7 = require("obsidian");
-var PromptModal = class extends import_obsidian7.Modal {
-  constructor(app, title, placeholder, onSubmit) {
-    super(app);
-    this.title = title;
-    this.placeholder = placeholder;
-    this.onSubmit = onSubmit;
-    this.value = "";
-  }
-  onOpen() {
-    this.titleEl.setText(this.title);
-    const submit = () => {
-      if (this.value.trim())
-        this.onSubmit(this.value.trim());
-      this.close();
-    };
-    new import_obsidian7.Setting(this.contentEl).addText((t) => {
-      t.setPlaceholder(this.placeholder).onChange((v) => this.value = v);
-      t.inputEl.addEventListener("keydown", (e) => {
-        if (e.key === "Enter")
-          submit();
-      });
-      window.setTimeout(() => t.inputEl.focus(), 0);
-    });
-    new import_obsidian7.Setting(this.contentEl).addButton((b) => b.setButtonText("Add").setCta().onClick(submit));
-  }
-  onClose() {
-    this.contentEl.empty();
-  }
-};
 var JsonEditModal = class extends import_obsidian7.Modal {
   constructor(app, initial, onSave) {
     super(app);
@@ -26774,12 +26764,417 @@ function flattenTree(root) {
   return out;
 }
 
+// src/core/boardOps.ts
+var TAG_OK = /^#[\p{L}\p{N}_/-]+$/u;
+function parseTagList(text) {
+  const tags = [];
+  const invalid = [];
+  for (const raw of text.split(/[\s,;]+/)) {
+    if (!raw)
+      continue;
+    const t = normalizeTag(raw);
+    if (!TAG_OK.test(t) || t === "#")
+      invalid.push(raw);
+    else if (!tags.includes(t))
+      tags.push(t);
+  }
+  return { tags, invalid };
+}
+function formatTagList(tags) {
+  return (tags != null ? tags : []).join(" ");
+}
+function uniqueId(prefix, taken) {
+  const used = new Set(taken);
+  for (let i = 0; ; i++) {
+    const id = `${prefix}-${Date.now().toString(36)}${i ? "-" + i : ""}`;
+    if (!used.has(id))
+      return id;
+  }
+}
+function mapPreset(board, presetId, fn) {
+  return { ...board, presets: board.presets.map((p) => p.id === presetId ? fn(p) : p) };
+}
+function addColumn(board, presetId, col) {
+  return mapPreset(board, presetId, (p) => {
+    const id = col.id && !p.columns.some((c) => c.id === col.id) ? col.id : uniqueId("col", p.columns.map((c) => c.id));
+    return { ...p, columns: [...p.columns, cleanColumn({ ...col, id })] };
+  });
+}
+function updateColumn(board, presetId, col) {
+  return mapPreset(board, presetId, (p) => ({ ...p, columns: p.columns.map((c) => c.id === col.id ? cleanColumn(col) : c) }));
+}
+function removeColumn(board, presetId, colId) {
+  return mapPreset(board, presetId, (p) => ({ ...p, columns: p.columns.filter((c) => c.id !== colId) }));
+}
+function moveColumn(board, presetId, colId, delta) {
+  return mapPreset(board, presetId, (p) => {
+    const i = p.columns.findIndex((c) => c.id === colId);
+    const j = i + delta;
+    if (i < 0 || j < 0 || j >= p.columns.length)
+      return p;
+    const cols = [...p.columns];
+    [cols[i], cols[j]] = [cols[j], cols[i]];
+    return { ...p, columns: cols };
+  });
+}
+function cleanColumn(c) {
+  var _a;
+  const out = { id: c.id, title: c.title.trim() || c.ruleValue, ruleType: c.ruleType, ruleValue: c.ruleValue };
+  if (c.ruleType === "tag")
+    out.ruleValue = normalizeTag(c.ruleValue);
+  const req = ((_a = c.requiredTags) != null ? _a : []).map(normalizeTag).filter((t) => t !== out.ruleValue);
+  if (req.length)
+    out.requiredTags = Array.from(new Set(req));
+  if (c.color)
+    out.color = c.color;
+  return out;
+}
+function blankPreset(id, name, layout, dropMode, start, copyFrom) {
+  if (start === "copy" && copyFrom) {
+    return { ...JSON.parse(JSON.stringify(copyFrom)), id, name, layout, dropMode };
+  }
+  const columns = start === "open-closed" && dropMode === "tag" ? [
+    { id: `${id}-open`, title: "Open", ruleType: "status", ruleValue: "open" },
+    { id: `${id}-closed`, title: "Closed", ruleType: "status", ruleValue: "closed" }
+  ] : [];
+  return { id, name, layout, dropMode, scopeFilter: { showClosed: true }, columns };
+}
+function addPreset(board, preset) {
+  const id = board.presets.some((p) => p.id === preset.id) ? uniqueId("view", board.presets.map((p) => p.id)) : preset.id;
+  return { ...board, presets: [...board.presets, { ...preset, id }], activePresetId: id };
+}
+function updatePreset(board, preset) {
+  return mapPreset(board, preset.id, () => ({ ...preset, scopeFilter: cleanScope(preset.scopeFilter) }));
+}
+function removePreset(board, presetId) {
+  if (board.presets.length <= 1)
+    return board;
+  const i = board.presets.findIndex((p) => p.id === presetId);
+  if (i < 0)
+    return board;
+  const presets = board.presets.filter((p) => p.id !== presetId);
+  const active = board.activePresetId === presetId ? presets[Math.max(0, i - 1)].id : board.activePresetId;
+  return { ...board, presets, activePresetId: active };
+}
+function movePreset(board, presetId, delta) {
+  const i = board.presets.findIndex((p) => p.id === presetId);
+  const j = i + delta;
+  if (i < 0 || j < 0 || j >= board.presets.length)
+    return board;
+  const presets = [...board.presets];
+  [presets[i], presets[j]] = [presets[j], presets[i]];
+  return { ...board, presets };
+}
+function cleanScope(f) {
+  var _a, _b, _c;
+  if (!f)
+    return void 0;
+  const out = {};
+  if ((_a = f.hierarchyPrefix) == null ? void 0 : _a.trim())
+    out.hierarchyPrefix = f.hierarchyPrefix.trim();
+  if ((_b = f.includeTags) == null ? void 0 : _b.length)
+    out.includeTags = Array.from(new Set(f.includeTags.map(normalizeTag)));
+  if ((_c = f.excludeTags) == null ? void 0 : _c.length)
+    out.excludeTags = Array.from(new Set(f.excludeTags.map(normalizeTag)));
+  if (f.showClosed !== void 0)
+    out.showClosed = f.showClosed;
+  return out;
+}
+
+// src/views/boardEditors.ts
+var import_obsidian8 = require("obsidian");
+function errorLine(el) {
+  const err = el.createDiv({ cls: "mc2-error mc2-form-error" });
+  return (msg) => err.setText(msg);
+}
+function addDeleteButton(setting, label, onConfirm) {
+  setting.addButton((b) => {
+    let armed = false;
+    b.setButtonText(label).setWarning().onClick(() => {
+      if (armed)
+        return onConfirm();
+      armed = true;
+      b.setButtonText("Click again to delete");
+    });
+  });
+}
+var ColumnEditModal = class extends import_obsidian8.Modal {
+  constructor(app, opts) {
+    var _a, _b;
+    super(app);
+    this.opts = opts;
+    const c = opts.column;
+    this.title = (_a = c == null ? void 0 : c.title) != null ? _a : "";
+    this.ruleType = (_b = c == null ? void 0 : c.ruleType) != null ? _b : opts.defaultType;
+    this.tagText = (c == null ? void 0 : c.ruleType) === "tag" ? c.ruleValue : "";
+    this.status = (c == null ? void 0 : c.ruleType) === "status" && c.ruleValue === "closed" ? "closed" : "open";
+    this.headingSlug = (c == null ? void 0 : c.ruleType) === "header" ? c.ruleValue : "";
+    this.requiredText = formatTagList(c == null ? void 0 : c.requiredTags);
+    this.color = c == null ? void 0 : c.color;
+  }
+  onOpen() {
+    this.titleEl.setText(this.opts.column ? `Edit column \u201C${this.opts.column.title}\u201D` : "New column");
+    this.modalEl.addClass("mc2-form-modal");
+    this.render();
+  }
+  onClose() {
+    this.contentEl.empty();
+  }
+  render() {
+    const el = this.contentEl;
+    el.empty();
+    new import_obsidian8.Setting(el).setName("Name").setDesc("Shown at the top of the column. Leave empty to use the tag or heading.").addText((t) => t.setValue(this.title).setPlaceholder("e.g. Calling queue").onChange((v) => this.title = v));
+    new import_obsidian8.Setting(el).setName("Shows cards that\u2026").addDropdown(
+      (d) => d.addOption("tag", "have a tag").addOption("status", "are open / closed").addOption("header", "are under a heading").setValue(this.ruleType).onChange((v) => {
+        this.ruleType = v;
+        this.render();
+      })
+    );
+    if (this.ruleType === "tag") {
+      new import_obsidian8.Setting(el).setName("Tag").setDesc("Dragging a card here adds this tag (and removes the tag of the column it came from).").addText((t) => t.setValue(this.tagText).setPlaceholder("#calling").onChange((v) => this.tagText = v));
+    } else if (this.ruleType === "status") {
+      new import_obsidian8.Setting(el).setName("Status").setDesc("Dragging a card here switches it to #open-card / #closed-card.").addDropdown(
+        (d) => d.addOption("open", "Open (#open-card)").addOption("closed", "Closed (#closed-card)").setValue(this.status).onChange((v) => this.status = v)
+      );
+    } else {
+      const label = this.headingLabel();
+      new import_obsidian8.Setting(el).setName("Heading").setDesc(label ? `Selected: ${label}. Dragging a card here moves it under this heading in its note.` : "Dragging a card here moves it under this heading in its note.").addText((t) => t.setValue(this.headingSlug).setPlaceholder("aveiro/city-council").onChange((v) => this.headingSlug = v)).addButton(
+        (b) => b.setButtonText("Pick\u2026").onClick(
+          () => new HeadingSuggestModal(this.app, this.opts.headings, (n) => {
+            this.headingSlug = n.slug;
+            if (!this.title.trim())
+              this.title = n.name;
+            this.render();
+          }).open()
+        )
+      );
+    }
+    new import_obsidian8.Setting(el).setName("Also require tags").setDesc("Optional. The card must also have all of these (e.g. #urgent #important for a matrix box). Dropping a card here adds them.").addText((t) => t.setValue(this.requiredText).setPlaceholder("#urgent #important").onChange((v) => this.requiredText = v));
+    new import_obsidian8.Setting(el).setName("Color").setDesc(this.color ? "Top border of the column." : "No color.").addColorPicker((c) => {
+      var _a;
+      return c.setValue((_a = this.color) != null ? _a : "#7f7f7f").onChange((v) => this.color = v);
+    }).addExtraButton(
+      (b) => b.setIcon("rotate-ccw").setTooltip("No color").onClick(() => {
+        this.color = void 0;
+        this.render();
+      })
+    );
+    const showError = errorLine(el);
+    const buttons = new import_obsidian8.Setting(el);
+    if (this.opts.onDelete)
+      addDeleteButton(buttons, "Delete column", () => {
+        var _a, _b;
+        (_b = (_a = this.opts).onDelete) == null ? void 0 : _b.call(_a);
+        this.close();
+      });
+    buttons.addButton((b) => b.setButtonText("Cancel").onClick(() => this.close())).addButton(
+      (b) => b.setButtonText(this.opts.column ? "Save" : "Add column").setCta().onClick(() => {
+        const problem = this.save();
+        if (problem)
+          showError(problem);
+        else
+          this.close();
+      })
+    );
+  }
+  headingLabel() {
+    const n = this.opts.headings.find((h) => h.slug === this.headingSlug.trim());
+    return n ? n.segments.map((s) => s.text).join(" \u203A ") : "";
+  }
+  /** Returns an error message, or null after calling onSave. */
+  save() {
+    var _a, _b, _c, _d;
+    const req = parseTagList(this.requiredText);
+    if (req.invalid.length)
+      return `Not a valid tag: ${req.invalid.join(", ")}`;
+    let ruleValue;
+    let fallbackTitle;
+    if (this.ruleType === "tag") {
+      const t = parseTagList(this.tagText);
+      if (t.invalid.length)
+        return `Not a valid tag: ${t.invalid.join(", ")}`;
+      if (t.tags.length !== 1)
+        return t.tags.length ? "Use one tag here; put the others in \u201CAlso require tags\u201D." : "Enter a tag, e.g. #calling";
+      ruleValue = t.tags[0];
+      fallbackTitle = ruleValue;
+    } else if (this.ruleType === "status") {
+      ruleValue = this.status;
+      fallbackTitle = this.status === "open" ? "Open" : "Closed";
+    } else {
+      ruleValue = this.headingSlug.trim();
+      if (!ruleValue)
+        return "Pick a heading.";
+      fallbackTitle = (_c = (_b = (_a = this.opts.headings.find((h) => h.slug === ruleValue)) == null ? void 0 : _a.name) != null ? _b : ruleValue.split("/").pop()) != null ? _c : ruleValue;
+    }
+    this.opts.onSave({
+      id: (_d = this.opts.column) == null ? void 0 : _d.id,
+      title: this.title.trim() || fallbackTitle,
+      ruleType: this.ruleType,
+      ruleValue,
+      requiredTags: req.tags.length ? req.tags : void 0,
+      color: this.color
+    });
+    return null;
+  }
+};
+var ViewEditModal = class extends import_obsidian8.Modal {
+  constructor(app, opts) {
+    var _a, _b, _c, _d, _e;
+    super(app);
+    this.opts = opts;
+    const p = opts.preset;
+    const f = (_a = p == null ? void 0 : p.scopeFilter) != null ? _a : {};
+    this.d = {
+      name: (_b = p == null ? void 0 : p.name) != null ? _b : "",
+      layout: (_c = p == null ? void 0 : p.layout) != null ? _c : "kanban",
+      dropMode: (_d = p == null ? void 0 : p.dropMode) != null ? _d : "tag",
+      scopeFilter: { ...f, showClosed: (_e = f.showClosed) != null ? _e : true },
+      start: p ? void 0 : "open-closed"
+    };
+    this.followText = formatTagList(f.includeTags);
+    this.hideText = formatTagList(f.excludeTags);
+  }
+  onOpen() {
+    this.titleEl.setText(this.opts.preset ? `Edit view \u201C${this.opts.preset.name}\u201D` : "New view");
+    this.modalEl.addClass("mc2-form-modal");
+    this.render();
+  }
+  onClose() {
+    this.contentEl.empty();
+  }
+  render() {
+    var _a;
+    const el = this.contentEl;
+    el.empty();
+    const d = this.d;
+    new import_obsidian8.Setting(el).setName("Name").addText((t) => t.setValue(d.name).setPlaceholder("e.g. Youth calls").onChange((v) => d.name = v));
+    new import_obsidian8.Setting(el).setName("Layout").addDropdown(
+      (x) => x.addOption("kanban", "Columns side by side").addOption("matrix", "2 \xD7 2 matrix").setValue(d.layout).onChange((v) => d.layout = v)
+    );
+    new import_obsidian8.Setting(el).setName("Dragging a card between columns\u2026").addDropdown(
+      (x) => x.addOption("tag", "changes its tags / status").addOption("header", "moves it under another heading").setValue(d.dropMode).onChange((v) => d.dropMode = v)
+    );
+    if (!this.opts.preset) {
+      new import_obsidian8.Setting(el).setName("Start with").addDropdown((x) => {
+        var _a2;
+        x.addOption("open-closed", "Open and Closed columns").addOption("empty", "No columns");
+        if (this.opts.currentName)
+          x.addOption("copy", `A copy of \u201C${this.opts.currentName}\u201D`);
+        x.setValue((_a2 = d.start) != null ? _a2 : "open-closed").onChange((v) => d.start = v);
+      });
+    }
+    new import_obsidian8.Setting(el).setName("Which cards").setHeading();
+    new import_obsidian8.Setting(el).setName("Followed tags").setDesc("Only show cards with at least one of these tags. Leave empty to show every card. Cards that match a column's tag always show.").addText((t) => t.setValue(this.followText).setPlaceholder("#calling #youth").onChange((v) => this.followText = v));
+    new import_obsidian8.Setting(el).setName("Hidden tags").setDesc("Never show cards with any of these tags.").addText((t) => t.setValue(this.hideText).setPlaceholder("#private").onChange((v) => this.hideText = v));
+    const scope = (_a = d.scopeFilter.hierarchyPrefix) != null ? _a : "";
+    const scopeNode = this.opts.headings.find((h) => h.slug === scope.trim());
+    new import_obsidian8.Setting(el).setName("Only under heading").setDesc(scopeNode ? `Selected: ${scopeNode.segments.map((s) => s.text).join(" \u203A ")}` : "Optional, e.g. only cards under # Aveiro.").addText((t) => t.setValue(scope).setPlaceholder("aveiro").onChange((v) => d.scopeFilter.hierarchyPrefix = v)).addButton(
+      (b) => b.setButtonText("Pick\u2026").onClick(
+        () => new HeadingSuggestModal(this.app, this.opts.headings, (n) => {
+          d.scopeFilter.hierarchyPrefix = n.slug;
+          this.render();
+        }).open()
+      )
+    ).addExtraButton(
+      (b) => b.setIcon("x").setTooltip("Any heading").onClick(() => {
+        d.scopeFilter.hierarchyPrefix = void 0;
+        this.render();
+      })
+    );
+    new import_obsidian8.Setting(el).setName("Show closed cards").setDesc("A \u201CClosed\u201D column always shows them.").addToggle((t) => t.setValue(d.scopeFilter.showClosed !== false).onChange((v) => d.scopeFilter.showClosed = v));
+    const showError = errorLine(el);
+    const buttons = new import_obsidian8.Setting(el);
+    if (this.opts.onMove) {
+      buttons.addExtraButton((b) => b.setIcon("arrow-left").setTooltip("Move tab left").onClick(() => {
+        var _a2, _b;
+        return (_b = (_a2 = this.opts).onMove) == null ? void 0 : _b.call(_a2, -1);
+      })).addExtraButton((b) => b.setIcon("arrow-right").setTooltip("Move tab right").onClick(() => {
+        var _a2, _b;
+        return (_b = (_a2 = this.opts).onMove) == null ? void 0 : _b.call(_a2, 1);
+      }));
+    }
+    if (this.opts.onDelete)
+      addDeleteButton(buttons, "Delete view", () => {
+        var _a2, _b;
+        (_b = (_a2 = this.opts).onDelete) == null ? void 0 : _b.call(_a2);
+        this.close();
+      });
+    buttons.addButton((b) => b.setButtonText("Cancel").onClick(() => this.close())).addButton(
+      (b) => b.setButtonText(this.opts.preset ? "Save" : "Add view").setCta().onClick(() => {
+        const problem = this.save();
+        if (problem)
+          showError(problem);
+        else
+          this.close();
+      })
+    );
+  }
+  save() {
+    var _a;
+    const d = this.d;
+    if (!d.name.trim())
+      return "Give the view a name.";
+    const follow = parseTagList(this.followText);
+    const hide = parseTagList(this.hideText);
+    const bad = [...follow.invalid, ...hide.invalid];
+    if (bad.length)
+      return `Not a valid tag: ${bad.join(", ")}`;
+    this.opts.onSave({
+      ...d,
+      name: d.name.trim(),
+      scopeFilter: {
+        ...d.scopeFilter,
+        includeTags: follow.tags.length ? follow.tags : void 0,
+        excludeTags: hide.tags.length ? hide.tags : void 0,
+        hierarchyPrefix: ((_a = d.scopeFilter.hierarchyPrefix) == null ? void 0 : _a.trim()) || void 0
+      }
+    });
+    return null;
+  }
+};
+var NewBoardModal = class extends import_obsidian8.Modal {
+  constructor(app, onCreate) {
+    super(app);
+    this.onCreate = onCreate;
+    this.name = "";
+    this.template = "simple";
+  }
+  onOpen() {
+    this.titleEl.setText("New board");
+    this.modalEl.addClass("mc2-form-modal");
+    const el = this.contentEl;
+    const submit = () => {
+      const name = this.name.replace(/[\\/:*?"<>|#^[\]]/g, " ").replace(/\s+/g, " ").trim();
+      if (!name)
+        return showError("Give the board a name.");
+      this.onCreate(name, this.template);
+      this.close();
+    };
+    new import_obsidian8.Setting(el).setName("Name").addText((t) => {
+      t.setPlaceholder("e.g. Youth").onChange((v) => this.name = v);
+      t.inputEl.addEventListener("keydown", (e) => {
+        if (e.key === "Enter")
+          submit();
+      });
+      window.setTimeout(() => t.inputEl.focus(), 0);
+    });
+    new import_obsidian8.Setting(el).setName("Start with").addDropdown(
+      (d) => d.addOption("simple", "One view with Open and Closed columns").addOption("examples", "The example views (workflow, calling queue, matrix)").setValue(this.template).onChange((v) => this.template = v)
+    );
+    const showError = errorLine(el);
+    new import_obsidian8.Setting(el).addButton((b) => b.setButtonText("Cancel").onClick(() => this.close())).addButton((b) => b.setButtonText("Create board").setCta().onClick(submit));
+  }
+  onClose() {
+    this.contentEl.empty();
+  }
+};
+
 // src/views/OrgBoardView.tsx
 var import_jsx_runtime5 = __toESM(require_jsx_runtime());
 var VIEW_TYPE_ORG_BOARD = "meeting-composer-orgboard";
 var ORGBOARD_EXT = "orgboard";
 var DRAG_MIME = "application/x-meeting-composer-card";
-var OrgBoardView = class extends import_obsidian8.TextFileView {
+var OrgBoardView = class extends import_obsidian9.TextFileView {
   constructor(leaf, host) {
     super(leaf);
     this.host = host;
@@ -26846,6 +27241,9 @@ var OrgBoardView = class extends import_obsidian8.TextFileView {
     (_a = this.root) == null ? void 0 : _a.unmount();
     this.root = null;
   }
+  currentBoard() {
+    return this.board;
+  }
   render() {
     if (!this.root)
       return;
@@ -26903,27 +27301,75 @@ function BoardApp({ host, view, board, error, onChange, onEditJson }) {
     return /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("div", { className: "mc2-muted mc2-empty", children: "Loading\u2026" });
   const selectedCard = selected ? host.store.getCard(selected) : void 0;
   const setPreset = (id) => onChange({ ...board, activePresetId: id });
-  const replacePreset = (p) => onChange({ ...board, presets: board.presets.map((x) => x.id === p.id ? p : x) });
-  const addColumn = () => {
-    if (preset.dropMode === "header") {
-      const tree = buildTree(host.store.getAllPaths(), host.store.getCards(), (a, b) => host.compareTopics(a, b));
-      new HeadingSuggestModal(host.app, flattenTree(tree), (n) => {
-        replacePreset({
-          ...preset,
-          columns: [...preset.columns, { id: "col-" + Date.now().toString(36), title: n.name, ruleType: "header", ruleValue: n.slug }]
-        });
-      }).open();
-    } else {
-      new PromptModal(host.app, "New tag column", "#tag (e.g. #waiting)", (v) => {
-        const tag = v.startsWith("#") ? v : "#" + v;
-        replacePreset({
-          ...preset,
-          columns: [...preset.columns, { id: "col-" + Date.now().toString(36), title: tag, ruleType: "tag", ruleValue: tag }]
-        });
-      }).open();
-    }
+  const latest = () => {
+    var _a2;
+    return (_a2 = view.currentBoard()) != null ? _a2 : board;
   };
-  const removeColumn = (id) => replacePreset({ ...preset, columns: preset.columns.filter((c) => c.id !== id) });
+  const headings = () => flattenTree(buildTree(host.store.getAllPaths(), host.store.getCards(), (a, b) => host.compareTopics(a, b)));
+  const toColumn = (d) => {
+    var _a2;
+    return {
+      id: (_a2 = d.id) != null ? _a2 : "",
+      title: d.title,
+      ruleType: d.ruleType,
+      ruleValue: d.ruleValue,
+      requiredTags: d.requiredTags,
+      color: d.color
+    };
+  };
+  const newColumn = () => new ColumnEditModal(host.app, {
+    defaultType: preset.dropMode === "header" ? "header" : "tag",
+    headings: headings(),
+    onSave: (d) => onChange(addColumn(latest(), preset.id, toColumn(d)))
+  }).open();
+  const editColumn = (col) => new ColumnEditModal(host.app, {
+    column: col,
+    defaultType: col.ruleType,
+    headings: headings(),
+    onSave: (d) => onChange(updateColumn(latest(), preset.id, toColumn({ ...d, id: col.id }))),
+    onDelete: () => onChange(removeColumn(latest(), preset.id, col.id))
+  }).open();
+  const applyView = (p, d) => ({
+    ...p,
+    name: d.name,
+    layout: d.layout,
+    dropMode: d.dropMode,
+    scopeFilter: d.scopeFilter
+  });
+  const newView = () => new ViewEditModal(host.app, {
+    currentName: preset.name,
+    headings: headings(),
+    onSave: (d) => {
+      var _a2;
+      const id = uniqueId("view", latest().presets.map((p) => p.id));
+      const base = blankPreset(id, d.name, d.layout, d.dropMode, (_a2 = d.start) != null ? _a2 : "open-closed", preset);
+      onChange(addPreset(latest(), applyView(base, d)));
+    }
+  }).open();
+  const editView = () => {
+    const id = preset.id;
+    new ViewEditModal(host.app, {
+      preset,
+      headings: headings(),
+      onSave: (d) => {
+        const latest2 = view.currentBoard();
+        const p = latest2 == null ? void 0 : latest2.presets.find((x) => x.id === id);
+        if (latest2 && p)
+          onChange(updatePreset(latest2, applyView(p, d)));
+      },
+      onDelete: board.presets.length > 1 ? () => {
+        const latest2 = view.currentBoard();
+        if (latest2)
+          onChange(removePreset(latest2, id));
+      } : void 0,
+      onMove: (delta) => {
+        const latest2 = view.currentBoard();
+        if (latest2)
+          onChange(movePreset(latest2, id, delta));
+      }
+    }).open();
+  };
+  const shiftColumn = (id, delta) => onChange(moveColumn(board, preset.id, id, delta));
   const onDrop = async (toId, e) => {
     e.preventDefault();
     setDragOver(null);
@@ -26948,24 +27394,34 @@ function BoardApp({ host, view, board, error, onChange, onEditJson }) {
   });
   return /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("div", { className: `mc2-board ${selectedCard ? "has-drawer" : ""}`, children: [
     /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("div", { className: "mc2-board-toolbar", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("div", { className: "mc2-presets", role: "tablist", children: board.presets.map((p) => /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(
-        "button",
-        {
-          role: "tab",
-          "aria-selected": p.id === preset.id,
-          className: p.id === preset.id ? "is-active" : "",
-          onClick: () => setPreset(p.id),
-          children: p.name
-        },
-        p.id
-      )) }),
+      /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("div", { className: "mc2-presets", role: "tablist", children: [
+        board.presets.map((p) => /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(
+          "button",
+          {
+            role: "tab",
+            "aria-selected": p.id === preset.id,
+            className: p.id === preset.id ? "is-active" : "",
+            onClick: () => setPreset(p.id),
+            onDoubleClick: () => p.id === preset.id && editView(),
+            title: "Double-click to edit this view",
+            children: p.name
+          },
+          p.id
+        )),
+        /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("button", { className: "mc2-tool-btn", onClick: editView, title: "Edit this view: name, layout, followed tags\u2026", "aria-label": "Edit view", children: "\u2699" }),
+        /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("button", { className: "mc2-tool-btn", onClick: newView, title: "Add a new view (tab) to this board", children: "\uFF0B View" })
+      ] }),
       /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("input", { type: "search", placeholder: "Filter cards\u2026", value: query, onChange: (e) => setQuery(e.target.value) }),
-      /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("button", { onClick: addColumn, title: "Add a column to this view", children: "\uFF0B Column" }),
+      /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("button", { onClick: newColumn, title: "Add a column to this view", children: "\uFF0B Column" }),
+      /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("button", { onClick: () => {
+        var _a2, _b;
+        return host.promptNewBoard((_b = (_a2 = view.file) == null ? void 0 : _a2.parent) == null ? void 0 : _b.path);
+      }, title: "Create a new board file next to this one", children: "\uFF0B Board" }),
       /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("button", { onClick: onEditJson, title: "Edit the presets as JSON", children: "{ } JSON" })
     ] }),
     /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("div", { className: "mc2-board-body", children: [
       /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("div", { className: `mc2-columns mc2-layout-${preset.layout}`, children: [
-        cols.map(({ raw, norm }) => {
+        cols.map(({ raw, norm }, i) => {
           var _a2;
           const list = (_a2 = columns.get(raw.id)) != null ? _a2 : [];
           return /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)(
@@ -26988,10 +27444,14 @@ function BoardApp({ host, view, board, error, onChange, onEditJson }) {
               onDrop: (e) => onDrop(raw.id, e),
               children: [
                 /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("header", { className: "mc2-column-head", children: [
-                  /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("span", { className: "mc2-column-title", children: raw.title }),
+                  /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("button", { className: "mc2-column-title", title: "Edit column", onClick: () => editColumn(raw), children: raw.title }),
                   /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("span", { className: "mc2-muted mc2-column-rule", children: ruleLabel(norm) }),
                   /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("span", { className: "mc2-badge", children: list.length }),
-                  /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("button", { className: "mc2-icon-btn", "aria-label": `Remove column ${raw.title}`, onClick: () => removeColumn(raw.id), children: "\xD7" })
+                  /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("span", { className: "mc2-column-tools", children: [
+                    /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("button", { className: "mc2-icon-btn", "aria-label": `Move ${raw.title} left`, disabled: i === 0, onClick: () => shiftColumn(raw.id, -1), children: "\u2039" }),
+                    /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("button", { className: "mc2-icon-btn", "aria-label": `Move ${raw.title} right`, disabled: i === cols.length - 1, onClick: () => shiftColumn(raw.id, 1), children: "\u203A" }),
+                    /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("button", { className: "mc2-icon-btn", "aria-label": `Edit column ${raw.title}`, onClick: () => editColumn(raw), children: "\u270E" })
+                  ] })
                 ] }),
                 /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("div", { className: "mc2-column-cards", children: [
                   list.map((c) => /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(
@@ -27040,7 +27500,7 @@ function opToFn(op, id, known) {
     case "move": {
       const segments = segmentsForSlug(op.slug, known, op.title);
       if (segments.length === 0) {
-        new import_obsidian8.Notice("Meeting Composer: column has no heading path");
+        new import_obsidian9.Notice("Meeting Composer: column has no heading path");
         return (t) => t;
       }
       return (t) => moveCardToHeading(t, id, segments);
@@ -27049,7 +27509,7 @@ function opToFn(op, id, known) {
 }
 
 // src/views/help.ts
-var import_obsidian9 = require("obsidian");
+var import_obsidian10 = require("obsidian");
 var FENCE = "```";
 function cardHelpMarkdown(minutesDir) {
   const dir = minutesDir.trim() || "Atas";
@@ -27109,7 +27569,9 @@ function cardHelpMarkdown(minutesDir) {
     "- **Meeting cards sidebar** (ribbon icon or command *Open meeting cards sidebar*):",
     "  - **Organization tree** shows each heading with its number of open cards.",
     "  - **Context cards** lists the cards for the heading your cursor is under, or for the branch you click in the tree.",
-    "- **Boards**: command *Create new org board*, or right-click a folder \u203A *New org board*. Drag cards between columns and the plugin rewrites the tags in your note. Click a card to edit it or read its history. Use **\uFF0B Column** to add a column.",
+    "- **Boards**: command *Create new org board*, the **\uFF0B Board** button on a board, or right-click a folder \u203A *New org board*. Drag cards between columns and the plugin rewrites the tags in your note. Click a card to edit it or read its history.",
+    "  - **Columns**: **\uFF0B Column** adds one. It can show cards with a tag, open/closed cards, or cards under a heading, and can require extra tags and have a color. Click a column's name (or \u270E) to edit or delete it, and use \u2039 \u203A to move it.",
+    "  - **Views** (the tabs): **\uFF0B View** adds one. **\u2699** (or double-click the tab) edits the current view: name, layout, the **followed tags** (only cards with those tags show), hidden tags, a heading scope and whether closed cards show.",
     "",
     "## Cheat sheet",
     "| You want to\u2026 | Write / do |",
@@ -27126,13 +27588,13 @@ function cardHelpMarkdown(minutesDir) {
 }
 async function renderCardHelp(app, el, component, minutesDir) {
   el.addClass("mc2-help");
-  await import_obsidian9.MarkdownRenderer.render(app, cardHelpMarkdown(minutesDir), el, "", component);
+  await import_obsidian10.MarkdownRenderer.render(app, cardHelpMarkdown(minutesDir), el, "", component);
 }
-var CardHelpModal = class extends import_obsidian9.Modal {
+var CardHelpModal = class extends import_obsidian10.Modal {
   constructor(app, minutesDir) {
     super(app);
     this.minutesDir = minutesDir;
-    this.component = new import_obsidian9.Component();
+    this.component = new import_obsidian10.Component();
   }
   onOpen() {
     this.titleEl.setText("Meeting Composer: how to write cards");
@@ -27195,7 +27657,7 @@ var MeetingComposerV2 = class {
     this.plugin = plugin;
     this.settings = settings;
     this.saveRecallCloseState = saveRecallCloseState;
-    this.cursorEvents = new import_obsidian10.Events();
+    this.cursorEvents = new import_obsidian11.Events();
     this.cursorSlug = "";
     this.cursorTimer = null;
     this.lastMarkdown = null;
@@ -27244,7 +27706,7 @@ var MeetingComposerV2 = class {
     }
     p.addRibbonIcon("kanban-square", "Open meeting cards", () => this.activateSidebar());
     p.addCommand({ id: "open-cards-sidebar", name: "Open meeting cards sidebar", callback: () => this.activateSidebar() });
-    p.addCommand({ id: "new-org-board", name: "Create new org board", callback: () => this.createBoard() });
+    p.addCommand({ id: "new-org-board", name: "Create new org board", callback: () => this.promptNewBoard() });
     p.addCommand({
       id: "insert-recall",
       name: "Insert recall for a card\u2026",
@@ -27257,17 +27719,17 @@ var MeetingComposerV2 = class {
     p.addCommand({ id: "reindex-cards", name: "Re-index meeting cards", callback: () => this.store.reindexAll() });
     p.addCommand({ id: "card-syntax-help", name: "Show card syntax help", callback: () => this.showHelp() });
     reg(this.app.workspace.on("file-menu", (menu, file) => {
-      const folder = file instanceof import_obsidian10.TFolder ? file : file.parent;
+      const folder = file instanceof import_obsidian11.TFolder ? file : file.parent;
       if (!folder)
         return;
       menu.addItem(
-        (item) => item.setTitle("New org board").setIcon("layout-dashboard").onClick(() => this.createBoard(folder.path))
+        (item) => item.setTitle("New org board").setIcon("layout-dashboard").onClick(() => this.promptNewBoard(folder.path))
       );
     }));
     p.registerEditorExtension(import_view2.EditorView.updateListener.of((update) => {
       if (!update.selectionSet && !update.docChanged)
         return;
-      const info = update.state.field(import_obsidian10.editorInfoField, false);
+      const info = update.state.field(import_obsidian11.editorInfoField, false);
       const editor = info == null ? void 0 : info.editor;
       if (!editor || !info.file)
         return;
@@ -27278,7 +27740,7 @@ var MeetingComposerV2 = class {
     }));
     reg(this.app.workspace.on("active-leaf-change", (leaf) => {
       const v = leaf == null ? void 0 : leaf.view;
-      if (v instanceof import_obsidian10.MarkdownView) {
+      if (v instanceof import_obsidian11.MarkdownView) {
         this.lastMarkdown = v;
         if (v.file)
           this.scheduleCursor(() => v.editor.getValue(), () => v.editor.getCursor().line, v.file);
@@ -27346,7 +27808,7 @@ var MeetingComposerV2 = class {
     }
   }
   targetEditorView() {
-    const active = this.app.workspace.getActiveViewOfType(import_obsidian10.MarkdownView);
+    const active = this.app.workspace.getActiveViewOfType(import_obsidian11.MarkdownView);
     if (active)
       return active;
     if (this.lastMarkdown && this.lastMarkdown.file && this.app.workspace.getLeavesOfType("markdown").some((l) => l.view === this.lastMarkdown)) {
@@ -27361,10 +27823,10 @@ var MeetingComposerV2 = class {
     const view = this.targetEditorView();
     const origin = this.app.vault.getAbstractFileByPath(card.filePath);
     if (!view || !view.file) {
-      new import_obsidian10.Notice("Open a meeting note first, then insert the recall.");
+      new import_obsidian11.Notice("Open a meeting note first, then insert the recall.");
       return;
     }
-    if (!(origin instanceof import_obsidian10.TFile))
+    if (!(origin instanceof import_obsidian11.TFile))
       return;
     const linktext = this.app.metadataCache.fileToLinktext(origin, view.file.path, true);
     const alias = card.title.replace(/[[\]|]/g, " ").replace(/\s+/g, " ").trim();
@@ -27374,7 +27836,7 @@ var MeetingComposerV2 = class {
     editor.replaceRange(plan.text, plan.from, plan.to);
     editor.setCursor(plan.cursor);
     if (plan.addedHeadings.length)
-      new import_obsidian10.Notice(`Added missing heading${plan.addedHeadings.length > 1 ? "s" : ""}: ${plan.addedHeadings.join(" \u203A ")}`);
+      new import_obsidian11.Notice(`Added missing heading${plan.addedHeadings.length > 1 ? "s" : ""}: ${plan.addedHeadings.join(" \u203A ")}`);
     this.app.workspace.setActiveLeaf(view.leaf, { focus: true });
     editor.focus();
   }
@@ -27383,7 +27845,7 @@ var MeetingComposerV2 = class {
   }
   async openLocation(path, line) {
     const file = this.app.vault.getAbstractFileByPath(path);
-    if (!(file instanceof import_obsidian10.TFile))
+    if (!(file instanceof import_obsidian11.TFile))
       return;
     const { workspace } = this.app;
     let leaf = workspace.getLeavesOfType("markdown").find((l) => {
@@ -27392,12 +27854,12 @@ var MeetingComposerV2 = class {
     });
     if (!leaf) {
       const recent = workspace.getMostRecentLeaf();
-      leaf = recent && recent.view instanceof import_obsidian10.MarkdownView ? recent : workspace.getLeaf("tab");
+      leaf = recent && recent.view instanceof import_obsidian11.MarkdownView ? recent : workspace.getLeaf("tab");
       await leaf.openFile(file);
     }
     workspace.setActiveLeaf(leaf, { focus: true });
     const v = leaf.view;
-    if (v instanceof import_obsidian10.MarkdownView) {
+    if (v instanceof import_obsidian11.MarkdownView) {
       const pos = { line, ch: 0 };
       v.editor.setCursor(pos);
       v.editor.scrollIntoView({ from: pos, to: pos }, true);
@@ -27423,7 +27885,7 @@ var MeetingComposerV2 = class {
       lines[idx] = lines[idx].replace(re, `$1^${newId}`);
       return lines.join(eol);
     });
-    new import_obsidian10.Notice(`Card re-issued as ^${newId}`);
+    new import_obsidian11.Notice(`Card re-issued as ^${newId}`);
   }
   /** Assign missing ids AND separate prose from title lines (so ^ids are real blocks) in every minutes file. */
   async assignAllMissingIds() {
@@ -27443,17 +27905,21 @@ var MeetingComposerV2 = class {
       if (changed)
         touched++;
     }
-    new import_obsidian10.Notice(touched ? `Assigned ${ids} card id(s), updated ${touched} note(s)` : "All cards already have ids and valid blocks");
+    new import_obsidian11.Notice(touched ? `Assigned ${ids} card id(s), updated ${touched} note(s)` : "All cards already have ids and valid blocks");
   }
-  async createBoard(folderPath) {
+  promptNewBoard(folderPath) {
+    new NewBoardModal(this.app, (name, template) => void this.createBoard(folderPath, name, template)).open();
+  }
+  async createBoard(folderPath, baseName2 = "Operations", template = "examples") {
     var _a, _b;
     const folder = folderPath != null ? folderPath : this.app.fileManager.getNewFileParent((_b = (_a = this.app.workspace.getActiveFile()) == null ? void 0 : _a.path) != null ? _b : "").path;
     const base = folder && folder !== "/" ? folder + "/" : "";
-    let name = "Operations";
+    let name = baseName2;
     let i = 1;
-    while (this.app.vault.getAbstractFileByPath((0, import_obsidian10.normalizePath)(`${base}${name}.${ORGBOARD_EXT}`)))
-      name = `Operations ${i++}`;
-    const file = await this.app.vault.create((0, import_obsidian10.normalizePath)(`${base}${name}.${ORGBOARD_EXT}`), serializeBoard(DEFAULT_BOARD));
+    while (this.app.vault.getAbstractFileByPath((0, import_obsidian11.normalizePath)(`${base}${name}.${ORGBOARD_EXT}`)))
+      name = `${baseName2} ${i++}`;
+    const content = serializeBoard(template === "simple" ? simpleBoard() : DEFAULT_BOARD);
+    const file = await this.app.vault.create((0, import_obsidian11.normalizePath)(`${base}${name}.${ORGBOARD_EXT}`), content);
     await this.app.workspace.getLeaf("tab").openFile(file);
   }
 };
@@ -27479,7 +27945,7 @@ var DEFAULT_SETTINGS = {
 var TreeView = null;
 var currentToggle = () => {
 };
-var MyPlugin = class extends import_obsidian11.Plugin {
+var MyPlugin = class extends import_obsidian12.Plugin {
   constructor() {
     super(...arguments);
     this.topicTree = null;
@@ -27501,7 +27967,7 @@ var MyPlugin = class extends import_obsidian11.Plugin {
     if (!folder)
       return;
     for (const child of folder.children) {
-      if (!(child instanceof import_obsidian11.TFile) || !child.name.endsWith(".md"))
+      if (!(child instanceof import_obsidian12.TFile) || !child.name.endsWith(".md"))
         continue;
       const content = await this.app.vault.read(child);
       const name = child.name.replace(".md", "").trim();
@@ -27611,7 +28077,7 @@ var MyPlugin = class extends import_obsidian11.Plugin {
     }
   }
 };
-var MyFolderItemView = class extends import_obsidian11.ItemView {
+var MyFolderItemView = class extends import_obsidian12.ItemView {
   constructor(leaf, plugin) {
     super(leaf);
     this.isOpen = false;
@@ -27699,7 +28165,7 @@ var MyFolderItemView = class extends import_obsidian11.ItemView {
     this.root = null;
   }
 };
-var TopicEditorSuggest = class extends import_obsidian11.EditorSuggest {
+var TopicEditorSuggest = class extends import_obsidian12.EditorSuggest {
   constructor(app, plugin) {
     super(app);
     this.plugin = plugin;
@@ -27729,7 +28195,7 @@ var TopicEditorSuggest = class extends import_obsidian11.EditorSuggest {
     editor.replaceRange(topic, start, end);
   }
 };
-var TopicSuggest = class extends import_obsidian11.AbstractInputSuggest {
+var TopicSuggest = class extends import_obsidian12.AbstractInputSuggest {
   constructor(app, inputEl, getTopics) {
     super(app, inputEl);
     this.getTopics = getTopics;
@@ -27747,7 +28213,7 @@ var TopicSuggest = class extends import_obsidian11.AbstractInputSuggest {
     this.close();
   }
 };
-var ExampleView = class extends import_obsidian11.ItemView {
+var ExampleView = class extends import_obsidian12.ItemView {
   constructor(leaf, plugin) {
     super(leaf);
     this.plugin = plugin;
@@ -27784,7 +28250,7 @@ var ExampleView = class extends import_obsidian11.ItemView {
     container.empty();
     container.createEl("h4", { text: "Meeting Composer" });
     let search = "";
-    new import_obsidian11.Setting(contentEl).setName("Search").addText((item) => {
+    new import_obsidian12.Setting(contentEl).setName("Search").addText((item) => {
       item.onChange((string) => {
         search = string;
       });
@@ -27810,7 +28276,7 @@ var ExampleView = class extends import_obsidian11.ItemView {
   async onClose() {
   }
 };
-var MeetingComposerSettingTab = class extends import_obsidian11.PluginSettingTab {
+var MeetingComposerSettingTab = class extends import_obsidian12.PluginSettingTab {
   constructor(app, plugin) {
     super(app, plugin);
     this.plugin = plugin;
@@ -27818,41 +28284,41 @@ var MeetingComposerSettingTab = class extends import_obsidian11.PluginSettingTab
   display() {
     const { containerEl } = this;
     containerEl.empty();
-    new import_obsidian11.Setting(containerEl).setName("How to write cards").setDesc('The text syntax for opening, closing and following up cards. Expand below, or open it in a window (also: command "Show card syntax help", or the ? button in the Meeting cards sidebar).').addButton((b) => b.setButtonText("Open guide").onClick(() => {
+    new import_obsidian12.Setting(containerEl).setName("How to write cards").setDesc('The text syntax for opening, closing and following up cards. Expand below, or open it in a window (also: command "Show card syntax help", or the ? button in the Meeting cards sidebar).').addButton((b) => b.setButtonText("Open guide").onClick(() => {
       var _a;
       return (_a = this.plugin.v2) == null ? void 0 : _a.showHelp();
     }));
     const helpDetails = containerEl.createEl("details", { cls: "mc2-help-details" });
     helpDetails.createEl("summary", { text: "Show the card syntax guide" });
     void renderCardHelp(this.app, helpDetails.createDiv(), this.plugin, this.plugin.settings.MeenutesDir);
-    new import_obsidian11.Setting(containerEl).setName("Settings").setHeading();
-    new import_obsidian11.Setting(containerEl).setName("Minutes directory").setDesc("Folder containing meeting minutes files, relative to the vault root").addText((text) => text.setPlaceholder("Atas").setValue(this.plugin.settings.MeenutesDir).onChange(async (value) => {
+    new import_obsidian12.Setting(containerEl).setName("Settings").setHeading();
+    new import_obsidian12.Setting(containerEl).setName("Minutes directory").setDesc("Folder containing meeting minutes files, relative to the vault root").addText((text) => text.setPlaceholder("Atas").setValue(this.plugin.settings.MeenutesDir).onChange(async (value) => {
       this.plugin.settings.MeenutesDir = value;
       await this.plugin.saveSettings();
       this.plugin.scheduleCardReindex();
     }));
-    new import_obsidian11.Setting(containerEl).setName("Output file name").setDesc("Name of the file where search results are written").addText((text) => text.setPlaceholder("output.md").setValue(this.plugin.settings.OutputFileName).onChange(async (value) => {
+    new import_obsidian12.Setting(containerEl).setName("Output file name").setDesc("Name of the file where search results are written").addText((text) => text.setPlaceholder("output.md").setValue(this.plugin.settings.OutputFileName).onChange(async (value) => {
       this.plugin.settings.OutputFileName = value;
       await this.plugin.saveSettings();
     }));
-    new import_obsidian11.Setting(containerEl).setName("Output directory").setDesc("Folder where search results are written, relative to the vault root").addText((text) => text.setPlaceholder("Meeting_Composer_Search/").setValue(this.plugin.settings.OutputDir).onChange(async (value) => {
+    new import_obsidian12.Setting(containerEl).setName("Output directory").setDesc("Folder where search results are written, relative to the vault root").addText((text) => text.setPlaceholder("Meeting_Composer_Search/").setValue(this.plugin.settings.OutputDir).onChange(async (value) => {
       this.plugin.settings.OutputDir = value;
       await this.plugin.saveSettings();
       this.plugin.scheduleCardReindex();
     }));
-    new import_obsidian11.Setting(containerEl).setName("Search autocomplete").setDesc("Suggest topic names while typing in the search box and in heading lines").addToggle((toggle) => toggle.setValue(this.plugin.settings.autoComplete).onChange(async (value) => {
+    new import_obsidian12.Setting(containerEl).setName("Search autocomplete").setDesc("Suggest topic names while typing in the search box and in heading lines").addToggle((toggle) => toggle.setValue(this.plugin.settings.autoComplete).onChange(async (value) => {
       this.plugin.settings.autoComplete = value;
       await this.plugin.saveSettings();
     }));
-    new import_obsidian11.Setting(containerEl).setName("Auto-reload tree on new heading").setDesc("Refresh the topic tree whenever a heading is written in a minutes file").addToggle((toggle) => toggle.setValue(this.plugin.settings.autoReload).onChange(async (value) => {
+    new import_obsidian12.Setting(containerEl).setName("Auto-reload tree on new heading").setDesc("Refresh the topic tree whenever a heading is written in a minutes file").addToggle((toggle) => toggle.setValue(this.plugin.settings.autoReload).onChange(async (value) => {
       this.plugin.settings.autoReload = value;
       await this.plugin.saveSettings();
     }));
-    new import_obsidian11.Setting(containerEl).setName("Auto-assign card ids").setDesc("Append a ^card-id when a line with #open-card / #open-ticket is written right under a heading (applied when the cursor leaves the line)").addToggle((toggle) => toggle.setValue(this.plugin.settings.autoCardIds).onChange(async (value) => {
+    new import_obsidian12.Setting(containerEl).setName("Auto-assign card ids").setDesc("Append a ^card-id when a line with #open-card / #open-ticket is written right under a heading (applied when the cursor leaves the line)").addToggle((toggle) => toggle.setValue(this.plugin.settings.autoCardIds).onChange(async (value) => {
       this.plugin.settings.autoCardIds = value;
       await this.plugin.saveSettings();
     }));
-    new import_obsidian11.Setting(containerEl).setName("Topic ordering").setHeading();
+    new import_obsidian12.Setting(containerEl).setName("Topic ordering").setHeading();
     const listsEl = containerEl.createDiv("mc-priority-lists");
     const makeListSection = (title, desc, getValue, setValue) => {
       const col = listsEl.createDiv("mc-priority-col");
@@ -27896,7 +28362,7 @@ var MeetingComposerSettingTab = class extends import_obsidian11.PluginSettingTab
         await this.plugin.saveSettings();
       }
     );
-    new import_obsidian11.Setting(containerEl).setName("Reload minutes").setDesc("Re-scan the minutes folder and rebuild the topic tree").addButton((item) => {
+    new import_obsidian12.Setting(containerEl).setName("Reload minutes").setDesc("Re-scan the minutes folder and rebuild the topic tree").addButton((item) => {
       item.setButtonText("Reload");
       item.onClick(() => {
         this.plugin.reloadTree();

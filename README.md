@@ -59,13 +59,15 @@ Ribbon icon **Open meeting cards**. Tab 1 is the organization tree with open-car
 
 ### `.orgboard` boards
 
-Command **Create new org board** (or right-click a folder → *New org board*). A board is a JSON file with several views (presets):
+Command **Create new org board**, the **＋ Board** button on a board, or right-click a folder → *New org board* (asks for a name; start from one simple view or the example views). A board is a JSON file with several views (presets):
 
 - `kanban` or `matrix` layout; columns match `status` (`open`/`closed`), a `tag` (optionally with `requiredTags`), or a `header` path (`aveiro/city-council`).
 - Each card appears in exactly one column: closed → closed column; else the most specific tag column (rightmost on ties); else the matching header column; else the open column.
 - Dragging a card rewrites its Markdown: tag columns swap tags, status columns swap `#open-card`/`#closed-card`, header columns move the card (and its own sub-heading) under that heading in the same note, creating the heading if needed.
 - Click a card to edit title, description and tags, and to read its recall history.
-- Use **＋ Column** or **{ } JSON** in the toolbar to change views.
+- **Columns ("boxes")**: **＋ Column** opens a form: name, what it shows (a tag, open/closed status, or a heading), extra required tags and a color. Click a column's name or ✎ to edit or delete it; ‹ › move it.
+- **Views (tabs)**: **＋ View** adds one (Open/Closed columns, empty, or a copy of the current view). **⚙** or double-clicking the tab edits it: name, layout, drag behaviour, **followed tags** (only cards with at least one of them show; cards matching a column's tag always show), hidden tags, heading scope, show closed cards, tab order, delete.
+- **{ } JSON** is still there for raw edits.
 
 ### Commands
 

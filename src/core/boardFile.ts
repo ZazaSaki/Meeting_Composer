@@ -81,6 +81,27 @@ export function parseBoardFile(text: string): BoardParseResult {
 	return { ok: true, board: { version: typeof o.version === "number" ? o.version : 1, activePresetId: active, presets } };
 }
 
+/** A fresh board with one "Main" view (Open / Closed columns). */
+export function simpleBoard(): OrgBoardFileSchema {
+	return {
+		version: 1,
+		activePresetId: "view-main",
+		presets: [
+			{
+				id: "view-main",
+				name: "Main",
+				layout: "kanban",
+				dropMode: "tag",
+				scopeFilter: { showClosed: true },
+				columns: [
+					{ id: "col-open", title: "Open", ruleType: "status", ruleValue: "open" },
+					{ id: "col-closed", title: "Closed", ruleType: "status", ruleValue: "closed" },
+				],
+			},
+		],
+	};
+}
+
 export function serializeBoard(board: OrgBoardFileSchema): string {
 	return JSON.stringify(board, null, "\t") + "\n";
 }

@@ -18,7 +18,8 @@ import { assignMissingIds } from "./core/autoId";
 import { planRecallInsert } from "./core/recallInsert";
 import { newCardId } from "./core/ids";
 import { formatTimestamp } from "./core/syntax";
-import { DEFAULT_BOARD, serializeBoard } from "./core/boardFile";
+import { DEFAULT_BOARD, serializeBoard, simpleBoard } from "./core/boardFile";
+import { BoardTemplate, NewBoardModal } from "./views/boardEditors";
 
 export interface V2Settings {
 	minutesDir: string;
@@ -97,7 +98,7 @@ export class MeetingComposerV2 implements V2Host {
 		p.addRibbonIcon("kanban-square", "Open meeting cards", () => this.activateSidebar());
 
 		p.addCommand({ id: "open-cards-sidebar", name: "Open meeting cards sidebar", callback: () => this.activateSidebar() });
-		p.addCommand({ id: "new-org-board", name: "Create new org board", callback: () => this.createBoard() });
+		p.addCommand({ id: "new-org-board", name: "Create new org board", callback: () => this.promptNewBoard() });
 		p.addCommand({
 			id: "insert-recall",
 			name: "Insert recall for a card…",
@@ -114,7 +115,7 @@ export class MeetingComposerV2 implements V2Host {
 			const folder = file instanceof TFolder ? file : file.parent;
 			if (!folder) return;
 			menu.addItem(item =>
-				item.setTitle("New org board").setIcon("layout-dashboard").onClick(() => this.createBoard(folder.path)),
+				item.setTitle("New org board").setIcon("layout-dashboard").onClick(() => this.promptNewBoard(folder.path)),
 			);
 		}));
 
@@ -295,13 +296,18 @@ export class MeetingComposerV2 implements V2Host {
 		new Notice(touched ? `Assigned ${ids} card id(s), updated ${touched} note(s)` : "All cards already have ids and valid blocks");
 	}
 
-	async createBoard(folderPath?: string): Promise<void> {
+	promptNewBoard(folderPath?: string): void {
+		new NewBoardModal(this.app, (name, template) => void this.createBoard(folderPath, name, template)).open();
+	}
+
+	async createBoard(folderPath?: string, baseName = "Operations", template: BoardTemplate = "examples"): Promise<void> {
 		const folder = folderPath ?? this.app.fileManager.getNewFileParent(this.app.workspace.getActiveFile()?.path ?? "").path;
 		const base = folder && folder !== "/" ? folder + "/" : "";
-		let name = "Operations";
+		let name = baseName;
 		let i = 1;
-		while (this.app.vault.getAbstractFileByPath(normalizePath(`${base}${name}.${ORGBOARD_EXT}`))) name = `Operations ${i++}`;
-		const file = await this.app.vault.create(normalizePath(`${base}${name}.${ORGBOARD_EXT}`), serializeBoard(DEFAULT_BOARD));
+		while (this.app.vault.getAbstractFileByPath(normalizePath(`${base}${name}.${ORGBOARD_EXT}`))) name = `${baseName} ${i++}`;
+		const content = serializeBoard(template === "simple" ? simpleBoard() : DEFAULT_BOARD);
+		const file = await this.app.vault.create(normalizePath(`${base}${name}.${ORGBOARD_EXT}`), content);
 		await this.app.workspace.getLeaf("tab").openFile(file);
 	}
 }

@@ -4,7 +4,7 @@
 import React, { useMemo, useState } from "react";
 import { Notice, TextFileView, WorkspaceLeaf } from "obsidian";
 import { createRoot, Root } from "react-dom/client";
-import { BoardViewPreset, CardNode, OrgBoardFileSchema } from "../types";
+import { BoardColumnRule, BoardViewPreset, CardNode, OrgBoardFileSchema } from "../types";
 import { assignColumn, cardsForPreset, DropOp, normalizeColumn, planDrop } from "../core/boardEngine";
 import { parseBoardFile, serializeBoard } from "../core/boardFile";
 import * as M from "../core/mutations";
@@ -13,7 +13,9 @@ import { V2Host } from "./host";
 import { CardFace, useStoreVersion } from "./components";
 import { CardDrawer } from "./CardDrawer";
 import { matches } from "./CardsSidebarView";
-import { flattenTree, HeadingSuggestModal, JsonEditModal, PromptModal } from "./modals";
+import { flattenTree, JsonEditModal } from "./modals";
+import { addColumn, addPreset, blankPreset, moveColumn, movePreset, removeColumn, removePreset, uniqueId, updateColumn, updatePreset } from "../core/boardOps";
+import { ColumnDraft, ColumnEditModal, ViewDraft, ViewEditModal } from "./boardEditors";
 
 export const VIEW_TYPE_ORG_BOARD = "meeting-composer-orgboard";
 export const ORGBOARD_EXT = "orgboard";
@@ -84,6 +86,10 @@ export class OrgBoardView extends TextFileView {
 		this.requestSave();
 		this.render();
 	};
+
+	currentBoard(): OrgBoardFileSchema | null {
+		return this.board;
+	}
 
 	private editJson = () => {
 		new JsonEditModal(this.app, this.board ? serializeBoard(this.board) : this.raw, text => {
@@ -156,30 +162,80 @@ function BoardApp({ host, view, board, error, onChange, onEditJson }: BoardAppPr
 	const selectedCard = selected ? host.store.getCard(selected) : undefined;
 
 	const setPreset = (id: string) => onChange({ ...board, activePresetId: id });
-	const replacePreset = (p: BoardViewPreset) =>
-		onChange({ ...board, presets: board.presets.map(x => (x.id === p.id ? p : x)) });
 
-	const addColumn = () => {
-		if (preset.dropMode === "header") {
-			const tree = buildTree(host.store.getAllPaths(), host.store.getCards(), (a, b) => host.compareTopics(a, b));
-			new HeadingSuggestModal(host.app, flattenTree(tree), n => {
-				replacePreset({
-					...preset,
-					columns: [...preset.columns, { id: "col-" + Date.now().toString(36), title: n.name, ruleType: "header", ruleValue: n.slug }],
-				});
-			}).open();
-		} else {
-			new PromptModal(host.app, "New tag column", "#tag (e.g. #waiting)", v => {
-				const tag = v.startsWith("#") ? v : "#" + v;
-				replacePreset({
-					...preset,
-					columns: [...preset.columns, { id: "col-" + Date.now().toString(36), title: tag, ruleType: "tag", ruleValue: tag }],
-				});
-			}).open();
-		}
+	// modals outlive this render: always edit the latest board
+	const latest = () => view.currentBoard() ?? board;
+
+	const headings = () =>
+		flattenTree(buildTree(host.store.getAllPaths(), host.store.getCards(), (a, b) => host.compareTopics(a, b)));
+
+	const toColumn = (d: ColumnDraft): BoardColumnRule => ({
+		id: d.id ?? "",
+		title: d.title,
+		ruleType: d.ruleType,
+		ruleValue: d.ruleValue,
+		requiredTags: d.requiredTags,
+		color: d.color,
+	});
+
+	const newColumn = () =>
+		new ColumnEditModal(host.app, {
+			defaultType: preset.dropMode === "header" ? "header" : "tag",
+			headings: headings(),
+			onSave: d => onChange(addColumn(latest(), preset.id, toColumn(d))),
+		}).open();
+
+	const editColumn = (col: BoardColumnRule) =>
+		new ColumnEditModal(host.app, {
+			column: col,
+			defaultType: col.ruleType,
+			headings: headings(),
+			onSave: d => onChange(updateColumn(latest(), preset.id, toColumn({ ...d, id: col.id }))),
+			onDelete: () => onChange(removeColumn(latest(), preset.id, col.id)),
+		}).open();
+
+	const applyView = (p: BoardViewPreset, d: ViewDraft): BoardViewPreset => ({
+		...p,
+		name: d.name,
+		layout: d.layout,
+		dropMode: d.dropMode,
+		scopeFilter: d.scopeFilter,
+	});
+
+	const newView = () =>
+		new ViewEditModal(host.app, {
+			currentName: preset.name,
+			headings: headings(),
+			onSave: d => {
+				const id = uniqueId("view", latest().presets.map(p => p.id));
+				const base = blankPreset(id, d.name, d.layout, d.dropMode, d.start ?? "open-closed", preset);
+				onChange(addPreset(latest(), applyView(base, d)));
+			},
+		}).open();
+
+	const editView = () => {
+		// the modal outlives this render: always act on the latest board
+		const id = preset.id;
+		new ViewEditModal(host.app, {
+			preset,
+			headings: headings(),
+			onSave: d => {
+				const latest = view.currentBoard();
+				const p = latest?.presets.find(x => x.id === id);
+				if (latest && p) onChange(updatePreset(latest, applyView(p, d)));
+			},
+			onDelete: board.presets.length > 1 ? () => {
+				const latest = view.currentBoard();
+				if (latest) onChange(removePreset(latest, id));
+			} : undefined,
+			onMove: delta => {
+				const latest = view.currentBoard();
+				if (latest) onChange(movePreset(latest, id, delta));
+			},
+		}).open();
 	};
 
-	const removeColumn = (id: string) => replacePreset({ ...preset, columns: preset.columns.filter(c => c.id !== id) });
+	const shiftColumn = (id: string, delta: number) => onChange(moveColumn(board, preset.id, id, delta));
 
 	const onDrop = async (toId: string, e: React.DragEvent) => {
 		e.preventDefault();
@@ -211,19 +267,30 @@ function BoardApp({ host, view, board, error, onChange, onEditJson }: BoardAppPr
 							aria-selected={p.id === preset.id}
 							className={p.id === preset.id ? "is-active" : ""}
 							onClick={() => setPreset(p.id)}
+							onDoubleClick={() => p.id === preset.id && editView()}
+							title="Double-click to edit this view"
 						>
 							{p.name}
 						</button>
 					))}
+					<button className="mc2-tool-btn" onClick={editView} title="Edit this view: name, layout, followed tags…" aria-label="Edit view">
+						⚙
+					</button>
+					<button className="mc2-tool-btn" onClick={newView} title="Add a new view (tab) to this board">
+						＋ View
+					</button>
 				</div>
 				<input type="search" placeholder="Filter cards…" value={query} onChange={e => setQuery(e.target.value)} />
-				<button onClick={addColumn} title="Add a column to this view">＋ Column</button>
+				<button onClick={newColumn} title="Add a column to this view">＋ Column</button>
+				<button onClick={() => host.promptNewBoard(view.file?.parent?.path)} title="Create a new board file next to this one">
+					＋ Board
+				</button>
 				<button onClick={onEditJson} title="Edit the presets as JSON">{"{ } JSON"}</button>
 			</div>
 
 			<div className="mc2-board-body">
 				<div className={`mc2-columns mc2-layout-${preset.layout}`}>
-					{cols.map(({ raw, norm }) => {
+					{cols.map(({ raw, norm }, i) => {
 						const list = columns.get(raw.id) ?? [];
 						return (
 							<section
@@ -242,12 +309,22 @@ function BoardApp({ host, view, board, error, onChange, onEditJson }: BoardAppPr
 								onDrop={e => onDrop(raw.id, e)}
 							>
 								<header className="mc2-column-head">
-									<span className="mc2-column-title">{raw.title}</span>
+									<button className="mc2-column-title" title="Edit column" onClick={() => editColumn(raw)}>
+										{raw.title}
+									</button>
 									<span className="mc2-muted mc2-column-rule">{ruleLabel(norm)}</span>
 									<span className="mc2-badge">{list.length}</span>
-									<button className="mc2-icon-btn" aria-label={`Remove column ${raw.title}`} onClick={() => removeColumn(raw.id)}>
-										×
-									</button>
+									<span className="mc2-column-tools">
+										<button className="mc2-icon-btn" aria-label={`Move ${raw.title} left`} disabled={i === 0} onClick={() => shiftColumn(raw.id, -1)}>
+											‹
+										</button>
+										<button className="mc2-icon-btn" aria-label={`Move ${raw.title} right`} disabled={i === cols.length - 1} onClick={() => shiftColumn(raw.id, 1)}>
+											›
+										</button>
+										<button className="mc2-icon-btn" aria-label={`Edit column ${raw.title}`} onClick={() => editColumn(raw)}>
+											✎
+										</button>
+									</span>
 								</header>
 								<div className="mc2-column-cards">
 									{list.map(c => (

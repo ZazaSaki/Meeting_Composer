@@ -12,6 +12,10 @@ export interface V2Host {
 	insertRecall(card: CardNode): void;
 	/** Open the card syntax guide. */
 	showHelp(): void;
+	/** Ask for a name/template, then create the board. */
+	promptNewBoard(folderPath?: string): void;
+	/** Create a new .orgboard file (in `folderPath`, or next to the active file) and open it. */
+	createBoard(folderPath?: string, name?: string, template?: "examples" | "simple"): Promise<void>;
 	openCard(card: CardNode): Promise<void>;
 	openLocation(path: string, line: number): Promise<void>;
 	reissueId(card: CardNode): Promise<void>;

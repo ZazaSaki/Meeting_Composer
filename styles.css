@@ -261,3 +261,27 @@
 .mc2-help pre { white-space: pre-wrap; }
 .mc2-help table { width: 100%; }
 .mc2-help-modal { width: min(760px, 92vw); }
+
+/* v2 board editing: clickable column titles, column tools, view/column forms */
+button.mc2-column-title {
+    background: none !important;
+    box-shadow: none !important;
+    border: none;
+    padding: 0;
+    height: auto;
+    font-size: inherit;
+    color: var(--text-normal);
+    cursor: pointer;
+    text-align: left;
+}
+button.mc2-column-title:hover { color: var(--text-accent); text-decoration: underline; }
+.mc2-column-tools { margin-left: auto; display: flex; opacity: 0.35; transition: opacity 120ms; }
+.mc2-column:hover .mc2-column-tools,
+.mc2-column-tools:focus-within { opacity: 1; }
+.mc2-icon-btn:disabled { opacity: 0.3; cursor: default; }
+.mc2-presets .mc2-tool-btn { background: none; box-shadow: none; color: var(--text-muted); }
+.mc2-presets .mc2-tool-btn:hover { color: var(--text-normal); }
+.mc2-form-modal { width: min(620px, 94vw); }
+.mc2-form-modal .setting-item-control input[type="text"] { min-width: 14em; }
+.mc2-form-error:empty { display: none; }
+.mc2-form-error { margin: 6px 0; }
