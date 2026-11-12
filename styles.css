@@ -246,3 +246,18 @@
     .mc2-drawer { max-width: none; flex-basis: auto; border-left: none; border-top: 1px solid var(--background-modifier-border); }
     .mc2-layout-matrix { grid-template-columns: 1fr; }
 }
+
+/* v2 help guide (settings + modal) */
+.mc2-help-btn { flex: 0 0 auto !important; min-width: 2em; font-weight: 600; }
+.mc2-help-details {
+    margin: 0 0 1em;
+    padding: 0.5em 0.75em;
+    border: 1px solid var(--background-modifier-border);
+    border-radius: var(--radius-m);
+}
+.mc2-help-details > summary { cursor: pointer; font-weight: 600; }
+.mc2-help { user-select: text; }
+.mc2-help h2 { font-size: var(--h4-size); margin-top: 1.2em; }
+.mc2-help pre { white-space: pre-wrap; }
+.mc2-help table { width: 100%; }
+.mc2-help-modal { width: min(760px, 92vw); }

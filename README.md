@@ -73,6 +73,7 @@ Command **Create new org board** (or right-click a folder → *New org board*). 
 - Insert recall for a card…
 - Assign missing card ids & fix card blocks in minutes folder
 - Re-index meeting cards
+- Show card syntax help (the same guide is at the top of the plugin settings and behind the **?** button in the Meeting cards sidebar)
 
 ## Settings
 

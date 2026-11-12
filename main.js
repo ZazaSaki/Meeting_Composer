@@ -247,20 +247,20 @@ var require_react_development = __commonJS({
         {
           Object.freeze(emptyObject);
         }
-        function Component(props, context, updater) {
+        function Component2(props, context, updater) {
           this.props = props;
           this.context = context;
           this.refs = emptyObject;
           this.updater = updater || ReactNoopUpdateQueue;
         }
-        Component.prototype.isReactComponent = {};
-        Component.prototype.setState = function(partialState, callback) {
+        Component2.prototype.isReactComponent = {};
+        Component2.prototype.setState = function(partialState, callback) {
           if (typeof partialState !== "object" && typeof partialState !== "function" && partialState != null) {
             throw new Error("setState(...): takes an object of state variables to update or a function which returns an object of state variables.");
           }
           this.updater.enqueueSetState(this, partialState, callback, "setState");
         };
-        Component.prototype.forceUpdate = function(callback) {
+        Component2.prototype.forceUpdate = function(callback) {
           this.updater.enqueueForceUpdate(this, callback, "forceUpdate");
         };
         {
@@ -269,7 +269,7 @@ var require_react_development = __commonJS({
             replaceState: ["replaceState", "Refactor your code to use setState instead (see https://github.com/facebook/react/issues/3236)."]
           };
           var defineDeprecationWarning = function(methodName, info) {
-            Object.defineProperty(Component.prototype, methodName, {
+            Object.defineProperty(Component2.prototype, methodName, {
               get: function() {
                 warn("%s(...) is deprecated in plain JavaScript React classes. %s", info[0], info[1]);
                 return void 0;
@@ -284,7 +284,7 @@ var require_react_development = __commonJS({
         }
         function ComponentDummy() {
         }
-        ComponentDummy.prototype = Component.prototype;
+        ComponentDummy.prototype = Component2.prototype;
         function PureComponent(props, context, updater) {
           this.props = props;
           this.context = context;
@@ -293,7 +293,7 @@ var require_react_development = __commonJS({
         }
         var pureComponentPrototype = PureComponent.prototype = new ComponentDummy();
         pureComponentPrototype.constructor = PureComponent;
-        assign(pureComponentPrototype, Component.prototype);
+        assign(pureComponentPrototype, Component2.prototype);
         pureComponentPrototype.isPureReactComponent = true;
         function createRef() {
           var refObject = {
@@ -1358,8 +1358,8 @@ var require_react_development = __commonJS({
             return describeNativeComponentFrame(fn, false);
           }
         }
-        function shouldConstruct(Component2) {
-          var prototype = Component2.prototype;
+        function shouldConstruct(Component3) {
+          var prototype = Component3.prototype;
           return !!(prototype && prototype.isReactComponent);
         }
         function describeUnknownElementTypeFrameInDEV(type, source, ownerFn) {
@@ -1865,7 +1865,7 @@ var require_react_development = __commonJS({
           only: onlyChild
         };
         exports.Children = Children;
-        exports.Component = Component;
+        exports.Component = Component2;
         exports.Fragment = REACT_FRAGMENT_TYPE;
         exports.Profiler = REACT_PROFILER_TYPE;
         exports.PureComponent = PureComponent;
@@ -3428,8 +3428,8 @@ var require_react_dom_development = __commonJS({
             return describeNativeComponentFrame(fn, false);
           }
         }
-        function shouldConstruct(Component) {
-          var prototype = Component.prototype;
+        function shouldConstruct(Component2) {
+          var prototype = Component2.prototype;
           return !!(prototype && prototype.isReactComponent);
         }
         function describeUnknownElementTypeFrameInDEV(type, source, ownerFn) {
@@ -10862,9 +10862,9 @@ var require_react_dom_development = __commonJS({
         var contextStackCursor = createCursor(emptyContextObject);
         var didPerformWorkStackCursor = createCursor(false);
         var previousContext = emptyContextObject;
-        function getUnmaskedContext(workInProgress2, Component, didPushOwnContextIfProvider) {
+        function getUnmaskedContext(workInProgress2, Component2, didPushOwnContextIfProvider) {
           {
-            if (didPushOwnContextIfProvider && isContextProvider(Component)) {
+            if (didPushOwnContextIfProvider && isContextProvider(Component2)) {
               return previousContext;
             }
             return contextStackCursor.current;
@@ -11001,8 +11001,8 @@ var require_react_dom_development = __commonJS({
                 case HostRoot:
                   return node.stateNode.context;
                 case ClassComponent: {
-                  var Component = node.type;
-                  if (isContextProvider(Component)) {
+                  var Component2 = node.type;
+                  if (isContextProvider(Component2)) {
                     return node.stateNode.__reactInternalMemoizedMergedChildContext;
                   }
                   break;
@@ -11764,10 +11764,10 @@ var require_react_dom_development = __commonJS({
             pendingLegacyContextWarning = /* @__PURE__ */ new Map();
           };
         }
-        function resolveDefaultProps(Component, baseProps) {
-          if (Component && Component.defaultProps) {
+        function resolveDefaultProps(Component2, baseProps) {
+          if (Component2 && Component2.defaultProps) {
             var props = assign({}, baseProps);
-            var defaultProps = Component.defaultProps;
+            var defaultProps = Component2.defaultProps;
             for (var propName in defaultProps) {
               if (props[propName] === void 0) {
                 props[propName] = defaultProps[propName];
@@ -14062,7 +14062,7 @@ var require_react_dom_development = __commonJS({
           }
           return true;
         }
-        function renderWithHooks(current2, workInProgress2, Component, props, secondArg, nextRenderLanes) {
+        function renderWithHooks(current2, workInProgress2, Component2, props, secondArg, nextRenderLanes) {
           renderLanes = nextRenderLanes;
           currentlyRenderingFiber$1 = workInProgress2;
           {
@@ -14082,7 +14082,7 @@ var require_react_dom_development = __commonJS({
               ReactCurrentDispatcher$1.current = HooksDispatcherOnMountInDEV;
             }
           }
-          var children = Component(props, secondArg);
+          var children = Component2(props, secondArg);
           if (didScheduleRenderPhaseUpdateDuringThisPass) {
             var numberOfReRenders = 0;
             do {
@@ -14102,7 +14102,7 @@ var require_react_dom_development = __commonJS({
                 hookTypesUpdateIndexDev = -1;
               }
               ReactCurrentDispatcher$1.current = HooksDispatcherOnRerenderInDEV;
-              children = Component(props, secondArg);
+              children = Component2(props, secondArg);
             } while (didScheduleRenderPhaseUpdateDuringThisPass);
           }
           ReactCurrentDispatcher$1.current = ContextOnlyDispatcher;
@@ -16212,22 +16212,22 @@ var require_react_dom_development = __commonJS({
           workInProgress2.child = reconcileChildFibers(workInProgress2, current2.child, null, renderLanes2);
           workInProgress2.child = reconcileChildFibers(workInProgress2, null, nextChildren, renderLanes2);
         }
-        function updateForwardRef(current2, workInProgress2, Component, nextProps, renderLanes2) {
+        function updateForwardRef(current2, workInProgress2, Component2, nextProps, renderLanes2) {
           {
             if (workInProgress2.type !== workInProgress2.elementType) {
-              var innerPropTypes = Component.propTypes;
+              var innerPropTypes = Component2.propTypes;
               if (innerPropTypes) {
                 checkPropTypes(
                   innerPropTypes,
                   nextProps,
                   // Resolved props
                   "prop",
-                  getComponentNameFromType(Component)
+                  getComponentNameFromType(Component2)
                 );
               }
             }
           }
-          var render2 = Component.render;
+          var render2 = Component2.render;
           var ref = workInProgress2.ref;
           var nextChildren;
           var hasId;
@@ -16265,11 +16265,11 @@ var require_react_dom_development = __commonJS({
           reconcileChildren(current2, workInProgress2, nextChildren, renderLanes2);
           return workInProgress2.child;
         }
-        function updateMemoComponent(current2, workInProgress2, Component, nextProps, renderLanes2) {
+        function updateMemoComponent(current2, workInProgress2, Component2, nextProps, renderLanes2) {
           if (current2 === null) {
-            var type = Component.type;
-            if (isSimpleFunctionComponent(type) && Component.compare === null && // SimpleMemoComponent codepath doesn't resolve outer props either.
-            Component.defaultProps === void 0) {
+            var type = Component2.type;
+            if (isSimpleFunctionComponent(type) && Component2.compare === null && // SimpleMemoComponent codepath doesn't resolve outer props either.
+            Component2.defaultProps === void 0) {
               var resolvedType = type;
               {
                 resolvedType = resolveFunctionForHotReloading(type);
@@ -16293,14 +16293,14 @@ var require_react_dom_development = __commonJS({
                 );
               }
             }
-            var child = createFiberFromTypeAndProps(Component.type, null, nextProps, workInProgress2, workInProgress2.mode, renderLanes2);
+            var child = createFiberFromTypeAndProps(Component2.type, null, nextProps, workInProgress2, workInProgress2.mode, renderLanes2);
             child.ref = workInProgress2.ref;
             child.return = workInProgress2;
             workInProgress2.child = child;
             return child;
           }
           {
-            var _type = Component.type;
+            var _type = Component2.type;
             var _innerPropTypes = _type.propTypes;
             if (_innerPropTypes) {
               checkPropTypes(
@@ -16316,7 +16316,7 @@ var require_react_dom_development = __commonJS({
           var hasScheduledUpdateOrContext = checkScheduledUpdateOrContext(current2, renderLanes2);
           if (!hasScheduledUpdateOrContext) {
             var prevProps = currentChild.memoizedProps;
-            var compare = Component.compare;
+            var compare = Component2.compare;
             compare = compare !== null ? compare : shallowEqual;
             if (compare(prevProps, nextProps) && current2.ref === workInProgress2.ref) {
               return bailoutOnAlreadyFinishedWork(current2, workInProgress2, renderLanes2);
@@ -16329,7 +16329,7 @@ var require_react_dom_development = __commonJS({
           workInProgress2.child = newChild;
           return newChild;
         }
-        function updateSimpleMemoComponent(current2, workInProgress2, Component, nextProps, renderLanes2) {
+        function updateSimpleMemoComponent(current2, workInProgress2, Component2, nextProps, renderLanes2) {
           {
             if (workInProgress2.type !== workInProgress2.elementType) {
               var outerMemoType = workInProgress2.elementType;
@@ -16369,7 +16369,7 @@ var require_react_dom_development = __commonJS({
               }
             }
           }
-          return updateFunctionComponent(current2, workInProgress2, Component, nextProps, renderLanes2);
+          return updateFunctionComponent(current2, workInProgress2, Component2, nextProps, renderLanes2);
         }
         function updateOffscreenComponent(current2, workInProgress2, renderLanes2) {
           var nextProps = workInProgress2.pendingProps;
@@ -16459,24 +16459,24 @@ var require_react_dom_development = __commonJS({
             }
           }
         }
-        function updateFunctionComponent(current2, workInProgress2, Component, nextProps, renderLanes2) {
+        function updateFunctionComponent(current2, workInProgress2, Component2, nextProps, renderLanes2) {
           {
             if (workInProgress2.type !== workInProgress2.elementType) {
-              var innerPropTypes = Component.propTypes;
+              var innerPropTypes = Component2.propTypes;
               if (innerPropTypes) {
                 checkPropTypes(
                   innerPropTypes,
                   nextProps,
                   // Resolved props
                   "prop",
-                  getComponentNameFromType(Component)
+                  getComponentNameFromType(Component2)
                 );
               }
             }
           }
           var context;
           {
-            var unmaskedContext = getUnmaskedContext(workInProgress2, Component, true);
+            var unmaskedContext = getUnmaskedContext(workInProgress2, Component2, true);
             context = getMaskedContext(workInProgress2, unmaskedContext);
           }
           var nextChildren;
@@ -16488,12 +16488,12 @@ var require_react_dom_development = __commonJS({
           {
             ReactCurrentOwner$1.current = workInProgress2;
             setIsRendering(true);
-            nextChildren = renderWithHooks(current2, workInProgress2, Component, nextProps, context, renderLanes2);
+            nextChildren = renderWithHooks(current2, workInProgress2, Component2, nextProps, context, renderLanes2);
             hasId = checkDidRenderIdHook();
             if (workInProgress2.mode & StrictLegacyMode) {
               setIsStrictModeForDevtools(true);
               try {
-                nextChildren = renderWithHooks(current2, workInProgress2, Component, nextProps, context, renderLanes2);
+                nextChildren = renderWithHooks(current2, workInProgress2, Component2, nextProps, context, renderLanes2);
                 hasId = checkDidRenderIdHook();
               } finally {
                 setIsStrictModeForDevtools(false);
@@ -16515,7 +16515,7 @@ var require_react_dom_development = __commonJS({
           reconcileChildren(current2, workInProgress2, nextChildren, renderLanes2);
           return workInProgress2.child;
         }
-        function updateClassComponent(current2, workInProgress2, Component, nextProps, renderLanes2) {
+        function updateClassComponent(current2, workInProgress2, Component2, nextProps, renderLanes2) {
           {
             switch (shouldError(workInProgress2)) {
               case false: {
@@ -16538,20 +16538,20 @@ var require_react_dom_development = __commonJS({
               }
             }
             if (workInProgress2.type !== workInProgress2.elementType) {
-              var innerPropTypes = Component.propTypes;
+              var innerPropTypes = Component2.propTypes;
               if (innerPropTypes) {
                 checkPropTypes(
                   innerPropTypes,
                   nextProps,
                   // Resolved props
                   "prop",
-                  getComponentNameFromType(Component)
+                  getComponentNameFromType(Component2)
                 );
               }
             }
           }
           var hasContext;
-          if (isContextProvider(Component)) {
+          if (isContextProvider(Component2)) {
             hasContext = true;
             pushContextProvider(workInProgress2);
           } else {
@@ -16562,15 +16562,15 @@ var require_react_dom_development = __commonJS({
           var shouldUpdate;
           if (instance === null) {
             resetSuspendedCurrentOnMountInLegacyMode(current2, workInProgress2);
-            constructClassInstance(workInProgress2, Component, nextProps);
-            mountClassInstance(workInProgress2, Component, nextProps, renderLanes2);
+            constructClassInstance(workInProgress2, Component2, nextProps);
+            mountClassInstance(workInProgress2, Component2, nextProps, renderLanes2);
             shouldUpdate = true;
           } else if (current2 === null) {
-            shouldUpdate = resumeMountClassInstance(workInProgress2, Component, nextProps, renderLanes2);
+            shouldUpdate = resumeMountClassInstance(workInProgress2, Component2, nextProps, renderLanes2);
           } else {
-            shouldUpdate = updateClassInstance(current2, workInProgress2, Component, nextProps, renderLanes2);
+            shouldUpdate = updateClassInstance(current2, workInProgress2, Component2, nextProps, renderLanes2);
           }
-          var nextUnitOfWork = finishClassComponent(current2, workInProgress2, Component, shouldUpdate, hasContext, renderLanes2);
+          var nextUnitOfWork = finishClassComponent(current2, workInProgress2, Component2, shouldUpdate, hasContext, renderLanes2);
           {
             var inst = workInProgress2.stateNode;
             if (shouldUpdate && inst.props !== nextProps) {
@@ -16582,19 +16582,19 @@ var require_react_dom_development = __commonJS({
           }
           return nextUnitOfWork;
         }
-        function finishClassComponent(current2, workInProgress2, Component, shouldUpdate, hasContext, renderLanes2) {
+        function finishClassComponent(current2, workInProgress2, Component2, shouldUpdate, hasContext, renderLanes2) {
           markRef(current2, workInProgress2);
           var didCaptureError = (workInProgress2.flags & DidCapture) !== NoFlags;
           if (!shouldUpdate && !didCaptureError) {
             if (hasContext) {
-              invalidateContextProvider(workInProgress2, Component, false);
+              invalidateContextProvider(workInProgress2, Component2, false);
             }
             return bailoutOnAlreadyFinishedWork(current2, workInProgress2, renderLanes2);
           }
           var instance = workInProgress2.stateNode;
           ReactCurrentOwner$1.current = workInProgress2;
           var nextChildren;
-          if (didCaptureError && typeof Component.getDerivedStateFromError !== "function") {
+          if (didCaptureError && typeof Component2.getDerivedStateFromError !== "function") {
             nextChildren = null;
             {
               stopProfilerTimerIfRunning();
@@ -16628,7 +16628,7 @@ var require_react_dom_development = __commonJS({
           }
           workInProgress2.memoizedState = instance.state;
           if (hasContext) {
-            invalidateContextProvider(workInProgress2, Component, true);
+            invalidateContextProvider(workInProgress2, Component2, true);
           }
           return workInProgress2.child;
         }
@@ -16728,45 +16728,45 @@ var require_react_dom_development = __commonJS({
           var lazyComponent = elementType;
           var payload = lazyComponent._payload;
           var init = lazyComponent._init;
-          var Component = init(payload);
-          workInProgress2.type = Component;
-          var resolvedTag = workInProgress2.tag = resolveLazyComponentTag(Component);
-          var resolvedProps = resolveDefaultProps(Component, props);
+          var Component2 = init(payload);
+          workInProgress2.type = Component2;
+          var resolvedTag = workInProgress2.tag = resolveLazyComponentTag(Component2);
+          var resolvedProps = resolveDefaultProps(Component2, props);
           var child;
           switch (resolvedTag) {
             case FunctionComponent: {
               {
-                validateFunctionComponentInDev(workInProgress2, Component);
-                workInProgress2.type = Component = resolveFunctionForHotReloading(Component);
+                validateFunctionComponentInDev(workInProgress2, Component2);
+                workInProgress2.type = Component2 = resolveFunctionForHotReloading(Component2);
               }
-              child = updateFunctionComponent(null, workInProgress2, Component, resolvedProps, renderLanes2);
+              child = updateFunctionComponent(null, workInProgress2, Component2, resolvedProps, renderLanes2);
               return child;
             }
             case ClassComponent: {
               {
-                workInProgress2.type = Component = resolveClassForHotReloading(Component);
+                workInProgress2.type = Component2 = resolveClassForHotReloading(Component2);
               }
-              child = updateClassComponent(null, workInProgress2, Component, resolvedProps, renderLanes2);
+              child = updateClassComponent(null, workInProgress2, Component2, resolvedProps, renderLanes2);
               return child;
             }
             case ForwardRef: {
               {
-                workInProgress2.type = Component = resolveForwardRefForHotReloading(Component);
+                workInProgress2.type = Component2 = resolveForwardRefForHotReloading(Component2);
               }
-              child = updateForwardRef(null, workInProgress2, Component, resolvedProps, renderLanes2);
+              child = updateForwardRef(null, workInProgress2, Component2, resolvedProps, renderLanes2);
               return child;
             }
             case MemoComponent: {
               {
                 if (workInProgress2.type !== workInProgress2.elementType) {
-                  var outerPropTypes = Component.propTypes;
+                  var outerPropTypes = Component2.propTypes;
                   if (outerPropTypes) {
                     checkPropTypes(
                       outerPropTypes,
                       resolvedProps,
                       // Resolved for outer only
                       "prop",
-                      getComponentNameFromType(Component)
+                      getComponentNameFromType(Component2)
                     );
                   }
                 }
@@ -16774,8 +16774,8 @@ var require_react_dom_development = __commonJS({
               child = updateMemoComponent(
                 null,
                 workInProgress2,
-                Component,
-                resolveDefaultProps(Component.type, resolvedProps),
+                Component2,
+                resolveDefaultProps(Component2.type, resolvedProps),
                 // The inner type can have defaults too
                 renderLanes2
               );
@@ -16784,33 +16784,33 @@ var require_react_dom_development = __commonJS({
           }
           var hint = "";
           {
-            if (Component !== null && typeof Component === "object" && Component.$$typeof === REACT_LAZY_TYPE) {
+            if (Component2 !== null && typeof Component2 === "object" && Component2.$$typeof === REACT_LAZY_TYPE) {
               hint = " Did you wrap a component in React.lazy() more than once?";
             }
           }
-          throw new Error("Element type is invalid. Received a promise that resolves to: " + Component + ". " + ("Lazy element type must resolve to a class or function." + hint));
+          throw new Error("Element type is invalid. Received a promise that resolves to: " + Component2 + ". " + ("Lazy element type must resolve to a class or function." + hint));
         }
-        function mountIncompleteClassComponent(_current, workInProgress2, Component, nextProps, renderLanes2) {
+        function mountIncompleteClassComponent(_current, workInProgress2, Component2, nextProps, renderLanes2) {
           resetSuspendedCurrentOnMountInLegacyMode(_current, workInProgress2);
           workInProgress2.tag = ClassComponent;
           var hasContext;
-          if (isContextProvider(Component)) {
+          if (isContextProvider(Component2)) {
             hasContext = true;
             pushContextProvider(workInProgress2);
           } else {
             hasContext = false;
           }
           prepareToReadContext(workInProgress2, renderLanes2);
-          constructClassInstance(workInProgress2, Component, nextProps);
-          mountClassInstance(workInProgress2, Component, nextProps, renderLanes2);
-          return finishClassComponent(null, workInProgress2, Component, true, hasContext, renderLanes2);
+          constructClassInstance(workInProgress2, Component2, nextProps);
+          mountClassInstance(workInProgress2, Component2, nextProps, renderLanes2);
+          return finishClassComponent(null, workInProgress2, Component2, true, hasContext, renderLanes2);
         }
-        function mountIndeterminateComponent(_current, workInProgress2, Component, renderLanes2) {
+        function mountIndeterminateComponent(_current, workInProgress2, Component2, renderLanes2) {
           resetSuspendedCurrentOnMountInLegacyMode(_current, workInProgress2);
           var props = workInProgress2.pendingProps;
           var context;
           {
-            var unmaskedContext = getUnmaskedContext(workInProgress2, Component, false);
+            var unmaskedContext = getUnmaskedContext(workInProgress2, Component2, false);
             context = getMaskedContext(workInProgress2, unmaskedContext);
           }
           prepareToReadContext(workInProgress2, renderLanes2);
@@ -16820,8 +16820,8 @@ var require_react_dom_development = __commonJS({
             markComponentRenderStarted(workInProgress2);
           }
           {
-            if (Component.prototype && typeof Component.prototype.render === "function") {
-              var componentName = getComponentNameFromType(Component) || "Unknown";
+            if (Component2.prototype && typeof Component2.prototype.render === "function") {
+              var componentName = getComponentNameFromType(Component2) || "Unknown";
               if (!didWarnAboutBadClass[componentName]) {
                 error("The <%s /> component appears to have a render method, but doesn't extend React.Component. This is likely to cause errors. Change %s to extend React.Component instead.", componentName, componentName);
                 didWarnAboutBadClass[componentName] = true;
@@ -16832,7 +16832,7 @@ var require_react_dom_development = __commonJS({
             }
             setIsRendering(true);
             ReactCurrentOwner$1.current = workInProgress2;
-            value = renderWithHooks(null, workInProgress2, Component, props, context, renderLanes2);
+            value = renderWithHooks(null, workInProgress2, Component2, props, context, renderLanes2);
             hasId = checkDidRenderIdHook();
             setIsRendering(false);
           }
@@ -16842,7 +16842,7 @@ var require_react_dom_development = __commonJS({
           workInProgress2.flags |= PerformedWork;
           {
             if (typeof value === "object" && value !== null && typeof value.render === "function" && value.$$typeof === void 0) {
-              var _componentName = getComponentNameFromType(Component) || "Unknown";
+              var _componentName = getComponentNameFromType(Component2) || "Unknown";
               if (!didWarnAboutModulePatternComponent[_componentName]) {
                 error("The <%s /> component appears to be a function component that returns a class instance. Change %s to a class that extends React.Component instead. If you can't use a class try assigning the prototype on the function as a workaround. `%s.prototype = React.Component.prototype`. Don't use an arrow function since it cannot be called with `new` by React.", _componentName, _componentName, _componentName);
                 didWarnAboutModulePatternComponent[_componentName] = true;
@@ -16855,7 +16855,7 @@ var require_react_dom_development = __commonJS({
             typeof value === "object" && value !== null && typeof value.render === "function" && value.$$typeof === void 0
           ) {
             {
-              var _componentName2 = getComponentNameFromType(Component) || "Unknown";
+              var _componentName2 = getComponentNameFromType(Component2) || "Unknown";
               if (!didWarnAboutModulePatternComponent[_componentName2]) {
                 error("The <%s /> component appears to be a function component that returns a class instance. Change %s to a class that extends React.Component instead. If you can't use a class try assigning the prototype on the function as a workaround. `%s.prototype = React.Component.prototype`. Don't use an arrow function since it cannot be called with `new` by React.", _componentName2, _componentName2, _componentName2);
                 didWarnAboutModulePatternComponent[_componentName2] = true;
@@ -16865,7 +16865,7 @@ var require_react_dom_development = __commonJS({
             workInProgress2.memoizedState = null;
             workInProgress2.updateQueue = null;
             var hasContext = false;
-            if (isContextProvider(Component)) {
+            if (isContextProvider(Component2)) {
               hasContext = true;
               pushContextProvider(workInProgress2);
             } else {
@@ -16874,15 +16874,15 @@ var require_react_dom_development = __commonJS({
             workInProgress2.memoizedState = value.state !== null && value.state !== void 0 ? value.state : null;
             initializeUpdateQueue(workInProgress2);
             adoptClassInstance(workInProgress2, value);
-            mountClassInstance(workInProgress2, Component, props, renderLanes2);
-            return finishClassComponent(null, workInProgress2, Component, true, hasContext, renderLanes2);
+            mountClassInstance(workInProgress2, Component2, props, renderLanes2);
+            return finishClassComponent(null, workInProgress2, Component2, true, hasContext, renderLanes2);
           } else {
             workInProgress2.tag = FunctionComponent;
             {
               if (workInProgress2.mode & StrictLegacyMode) {
                 setIsStrictModeForDevtools(true);
                 try {
-                  value = renderWithHooks(null, workInProgress2, Component, props, context, renderLanes2);
+                  value = renderWithHooks(null, workInProgress2, Component2, props, context, renderLanes2);
                   hasId = checkDidRenderIdHook();
                 } finally {
                   setIsStrictModeForDevtools(false);
@@ -16894,16 +16894,16 @@ var require_react_dom_development = __commonJS({
             }
             reconcileChildren(null, workInProgress2, value, renderLanes2);
             {
-              validateFunctionComponentInDev(workInProgress2, Component);
+              validateFunctionComponentInDev(workInProgress2, Component2);
             }
             return workInProgress2.child;
           }
         }
-        function validateFunctionComponentInDev(workInProgress2, Component) {
+        function validateFunctionComponentInDev(workInProgress2, Component2) {
           {
-            if (Component) {
-              if (Component.childContextTypes) {
-                error("%s(...): childContextTypes cannot be defined on a function component.", Component.displayName || Component.name || "Component");
+            if (Component2) {
+              if (Component2.childContextTypes) {
+                error("%s(...): childContextTypes cannot be defined on a function component.", Component2.displayName || Component2.name || "Component");
               }
             }
             if (workInProgress2.ref !== null) {
@@ -16922,15 +16922,15 @@ var require_react_dom_development = __commonJS({
                 error("Function components cannot be given refs. Attempts to access this ref will fail. Did you mean to use React.forwardRef()?%s", info);
               }
             }
-            if (typeof Component.getDerivedStateFromProps === "function") {
-              var _componentName3 = getComponentNameFromType(Component) || "Unknown";
+            if (typeof Component2.getDerivedStateFromProps === "function") {
+              var _componentName3 = getComponentNameFromType(Component2) || "Unknown";
               if (!didWarnAboutGetDerivedStateOnFunctionComponent[_componentName3]) {
                 error("%s: Function components do not support getDerivedStateFromProps.", _componentName3);
                 didWarnAboutGetDerivedStateOnFunctionComponent[_componentName3] = true;
               }
             }
-            if (typeof Component.contextType === "object" && Component.contextType !== null) {
-              var _componentName4 = getComponentNameFromType(Component) || "Unknown";
+            if (typeof Component2.contextType === "object" && Component2.contextType !== null) {
+              var _componentName4 = getComponentNameFromType(Component2) || "Unknown";
               if (!didWarnAboutContextTypeOnFunctionComponent[_componentName4]) {
                 error("%s: Function components do not support contextType.", _componentName4);
                 didWarnAboutContextTypeOnFunctionComponent[_componentName4] = true;
@@ -17692,8 +17692,8 @@ var require_react_dom_development = __commonJS({
               pushHostContext(workInProgress2);
               break;
             case ClassComponent: {
-              var Component = workInProgress2.type;
-              if (isContextProvider(Component)) {
+              var Component2 = workInProgress2.type;
+              if (isContextProvider(Component2)) {
                 pushContextProvider(workInProgress2);
               }
               break;
@@ -17820,10 +17820,10 @@ var require_react_dom_development = __commonJS({
               return mountLazyComponent(current2, workInProgress2, elementType, renderLanes2);
             }
             case FunctionComponent: {
-              var Component = workInProgress2.type;
+              var Component2 = workInProgress2.type;
               var unresolvedProps = workInProgress2.pendingProps;
-              var resolvedProps = workInProgress2.elementType === Component ? unresolvedProps : resolveDefaultProps(Component, unresolvedProps);
-              return updateFunctionComponent(current2, workInProgress2, Component, resolvedProps, renderLanes2);
+              var resolvedProps = workInProgress2.elementType === Component2 ? unresolvedProps : resolveDefaultProps(Component2, unresolvedProps);
+              return updateFunctionComponent(current2, workInProgress2, Component2, resolvedProps, renderLanes2);
             }
             case ClassComponent: {
               var _Component = workInProgress2.type;
@@ -18128,8 +18128,8 @@ var require_react_dom_development = __commonJS({
               bubbleProperties(workInProgress2);
               return null;
             case ClassComponent: {
-              var Component = workInProgress2.type;
-              if (isContextProvider(Component)) {
+              var Component2 = workInProgress2.type;
+              if (isContextProvider(Component2)) {
                 popContext(workInProgress2);
               }
               bubbleProperties(workInProgress2);
@@ -18447,8 +18447,8 @@ var require_react_dom_development = __commonJS({
           popTreeContext(workInProgress2);
           switch (workInProgress2.tag) {
             case ClassComponent: {
-              var Component = workInProgress2.type;
-              if (isContextProvider(Component)) {
+              var Component2 = workInProgress2.type;
+              if (isContextProvider(Component2)) {
                 popContext(workInProgress2);
               }
               var flags = workInProgress2.flags;
@@ -22135,18 +22135,18 @@ var require_react_dom_development = __commonJS({
         var createFiber = function(tag, pendingProps, key, mode) {
           return new FiberNode(tag, pendingProps, key, mode);
         };
-        function shouldConstruct$1(Component) {
-          var prototype = Component.prototype;
+        function shouldConstruct$1(Component2) {
+          var prototype = Component2.prototype;
           return !!(prototype && prototype.isReactComponent);
         }
         function isSimpleFunctionComponent(type) {
           return typeof type === "function" && !shouldConstruct$1(type) && type.defaultProps === void 0;
         }
-        function resolveLazyComponentTag(Component) {
-          if (typeof Component === "function") {
-            return shouldConstruct$1(Component) ? ClassComponent : FunctionComponent;
-          } else if (Component !== void 0 && Component !== null) {
-            var $$typeof = Component.$$typeof;
+        function resolveLazyComponentTag(Component2) {
+          if (typeof Component2 === "function") {
+            return shouldConstruct$1(Component2) ? ClassComponent : FunctionComponent;
+          } else if (Component2 !== void 0 && Component2 !== null) {
+            var $$typeof = Component2.$$typeof;
             if ($$typeof === REACT_FORWARD_REF_TYPE) {
               return ForwardRef;
             }
@@ -22583,9 +22583,9 @@ var require_react_dom_development = __commonJS({
           var fiber = get(parentComponent);
           var parentContext = findCurrentUnmaskedContext(fiber);
           if (fiber.tag === ClassComponent) {
-            var Component = fiber.type;
-            if (isContextProvider(Component)) {
-              return processChildContext(fiber, Component, parentContext);
+            var Component2 = fiber.type;
+            if (isContextProvider(Component2)) {
+              return processChildContext(fiber, Component2, parentContext);
             }
           }
           return parentContext;
@@ -23880,8 +23880,8 @@ var require_react_jsx_runtime_development = __commonJS({
             return describeNativeComponentFrame(fn, false);
           }
         }
-        function shouldConstruct(Component) {
-          var prototype = Component.prototype;
+        function shouldConstruct(Component2) {
+          var prototype = Component2.prototype;
           return !!(prototype && prototype.isReactComponent);
         }
         function describeUnknownElementTypeFrameInDEV(type, source, ownerFn) {
@@ -24415,7 +24415,7 @@ __export(main_exports, {
   default: () => MyPlugin
 });
 module.exports = __toCommonJS(main_exports);
-var import_obsidian10 = require("obsidian");
+var import_obsidian11 = require("obsidian");
 
 // DataMeenutes/FileReader.ts
 var fs = __toESM(require("fs"));
@@ -24885,7 +24885,7 @@ function FileTree(data, id = 0, root = null) {
 }
 
 // src/MeetingComposerV2.ts
-var import_obsidian9 = require("obsidian");
+var import_obsidian10 = require("obsidian");
 var import_view2 = require("@codemirror/view");
 
 // src/store/VaultCardStore.ts
@@ -26111,11 +26111,19 @@ function SidebarApp({ host, component }) {
         "Context cards (",
         openInScope,
         ")"
-      ] })
+      ] }),
+      /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("button", { className: "mc2-help-btn", "aria-label": "How to write cards", title: "How to write cards", onClick: () => host.showHelp(), children: "?" })
     ] }),
     /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(DuplicateBanner, { host }),
     tab === "tree" ? /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "mc2-tree", children: [
-      tree.children.length === 0 && /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("div", { className: "mc2-muted mc2-empty", children: "No headings found in the minutes folder yet." }),
+      tree.children.length === 0 && /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "mc2-muted mc2-empty", children: [
+        "No headings found in the minutes folder yet.",
+        " ",
+        /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("a", { href: "#", onClick: (e) => {
+          e.preventDefault();
+          host.showHelp();
+        }, children: "How to write cards" })
+      ] }),
       tree.children.map((n) => /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(TreeRow, { node: n, depth: 0, expanded, toggle, pick, cursorSlug }, n.slug))
     ] }) : /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "mc2-feed", children: [
       /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "mc2-scope", children: [
@@ -26147,7 +26155,14 @@ function SidebarApp({ host, component }) {
           }
         )
       ] }),
-      cards.length === 0 && /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("div", { className: "mc2-muted mc2-empty", children: "No cards in this scope." }),
+      cards.length === 0 && /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "mc2-muted mc2-empty", children: [
+        "No cards in this scope.",
+        " ",
+        /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("a", { href: "#", onClick: (e) => {
+          e.preventDefault();
+          host.showHelp();
+        }, children: "How to write cards" })
+      ] }),
       cards.map((c) => /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: `mc2-card ${openCard === c.id ? "is-expanded" : ""}`, children: [
         /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("div", { className: "mc2-card-click", onClick: () => setOpenCard(openCard === c.id ? null : c.id), children: /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(CardFace, { card: c }) }),
         /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "mc2-card-actions", children: [
@@ -26954,13 +26969,107 @@ function opToFn(op, id, known) {
   }
 }
 
+// src/views/help.ts
+var import_obsidian9 = require("obsidian");
+var FENCE = "```";
+function cardHelpMarkdown(minutesDir) {
+  const dir = minutesDir.trim() || "Atas";
+  return [
+    "## 1. Open a card",
+    `In a note inside the **\`${dir}/\`** folder, write a heading (\`#\`, \`##\` or \`###\`). On the **first line under it**, write the card title followed by **\`#open-card\`**:`,
+    "",
+    FENCE + "markdown",
+    "# Aveiro",
+    "## University of Aveiro",
+    "Confirm lab equipment budget #open-card #calling",
+    "",
+    "Vendor quote is \u20AC4,500. Ask for a discount.",
+    "- Contact: Prof. Silva",
+    FENCE,
+    "",
+    "- The card **title** is that line without the tags.",
+    "- Everything below it (until the next heading, a `---` line or a recall line) is the card's **description**.",
+    "- Other tags on the title line (`#calling`, `#urgent`, `#waiting`\u2026) are **operational tags**. Boards use them for their columns.",
+    "- The headings above the card (`Aveiro \u203A University of Aveiro`) are its **place** in the organization tree.",
+    "- `#open-ticket` works the same as `#open-card`.",
+    "",
+    "## 2. The card id (added for you)",
+    "When your cursor **leaves the title line**, the plugin adds an id at the end of the line:",
+    "",
+    FENCE + "markdown",
+    "Confirm lab equipment budget #open-card #calling ^card-k3x9f2",
+    FENCE,
+    "",
+    "Don't edit or delete the `^card-\u2026` part: it's how recalls and boards find the card. Ctrl+Z won't remove it. Notes written before you installed v2 have no ids yet: run the command **Assign missing card ids & fix card blocks in minutes folder** once.",
+    "",
+    "## 3. Close a card",
+    "Change `#open-card` to **`#closed-card`** on the title line (or `#closed-ticket`):",
+    "",
+    FENCE + "markdown",
+    "Confirm lab equipment budget #closed-card #calling ^card-k3x9f2",
+    FENCE,
+    "",
+    "To re-open it, change it back to `#open-card`. A plain `#closed` does **not** count.",
+    "",
+    "## 4. Follow up in a later meeting (recall)",
+    "In the new meeting note, put your cursor where you want the follow-up. Open the **Meeting cards** sidebar (ribbon icon), go to **Context cards** and click **Insert recall** on the card. Or use the command **Insert recall for a card\u2026**. This inserts:",
+    "",
+    FENCE + "markdown",
+    "[[2026-11-04 Meeting#^card-k3x9f2|Confirm lab equipment budget]] %%recall:2026-11-11 14:30%%",
+    "Vendor sent a new quote: \u20AC4,150.",
+    FENCE,
+    "",
+    "- Write your follow-up notes on the lines **below** it. They become part of the card's history.",
+    "- The `%%recall:\u2026%%` part is hidden in reading view. Keep it: it marks the line as a recall.",
+    "- To **close the card from here**, add `#closed-card` at the end of the recall line. The original card is closed once. If you re-open it by hand later, it stays open.",
+    "",
+    "## 5. See your cards",
+    "- **Meeting cards sidebar** (ribbon icon or command *Open meeting cards sidebar*):",
+    "  - **Organization tree** shows each heading with its number of open cards.",
+    "  - **Context cards** lists the cards for the heading your cursor is under, or for the branch you click in the tree.",
+    "- **Boards**: command *Create new org board*, or right-click a folder \u203A *New org board*. Drag cards between columns and the plugin rewrites the tags in your note. Click a card to edit it or read its history. Use **\uFF0B Column** to add a column.",
+    "",
+    "## Cheat sheet",
+    "| You want to\u2026 | Write / do |",
+    "|---|---|",
+    "| Open a card | First line under a heading: `Title #open-card` |",
+    "| Tag a card | Add tags on the title line: `#calling #urgent` |",
+    "| Close a card | `#open-card` \u2192 `#closed-card` |",
+    "| Follow up later | Sidebar \u203A Context cards \u203A **Insert recall**, then write below the link |",
+    "| Close from a follow-up | Add `#closed-card` at the end of the recall line |",
+    "| Fix old notes | Command *Assign missing card ids & fix card blocks in minutes folder* |",
+    "| Not seeing a card? | It must be in the minutes folder, on the first non-empty line under a `#`/`##`/`###` heading, with `#open-card` exactly |"
+  ].join("\n");
+}
+async function renderCardHelp(app, el, component, minutesDir) {
+  el.addClass("mc2-help");
+  await import_obsidian9.MarkdownRenderer.render(app, cardHelpMarkdown(minutesDir), el, "", component);
+}
+var CardHelpModal = class extends import_obsidian9.Modal {
+  constructor(app, minutesDir) {
+    super(app);
+    this.minutesDir = minutesDir;
+    this.component = new import_obsidian9.Component();
+  }
+  onOpen() {
+    this.titleEl.setText("Meeting Composer: how to write cards");
+    this.modalEl.addClass("mc2-help-modal");
+    this.component.load();
+    void renderCardHelp(this.app, this.contentEl.createDiv(), this.component, this.minutesDir);
+  }
+  onClose() {
+    this.component.unload();
+    this.contentEl.empty();
+  }
+};
+
 // src/MeetingComposerV2.ts
 var MeetingComposerV2 = class {
   constructor(plugin, settings, saveProcessedRecallCloses) {
     this.plugin = plugin;
     this.settings = settings;
     this.saveProcessedRecallCloses = saveProcessedRecallCloses;
-    this.cursorEvents = new import_obsidian9.Events();
+    this.cursorEvents = new import_obsidian10.Events();
     this.cursorSlug = "";
     this.cursorTimer = null;
     this.lastMarkdown = null;
@@ -27008,8 +27117,9 @@ var MeetingComposerV2 = class {
     });
     p.addCommand({ id: "assign-missing-ids", name: "Assign missing card ids & fix card blocks in minutes folder", callback: () => this.assignAllMissingIds() });
     p.addCommand({ id: "reindex-cards", name: "Re-index meeting cards", callback: () => this.store.reindexAll() });
+    p.addCommand({ id: "card-syntax-help", name: "Show card syntax help", callback: () => this.showHelp() });
     reg(this.app.workspace.on("file-menu", (menu, file) => {
-      const folder = file instanceof import_obsidian9.TFolder ? file : file.parent;
+      const folder = file instanceof import_obsidian10.TFolder ? file : file.parent;
       if (!folder)
         return;
       menu.addItem(
@@ -27019,7 +27129,7 @@ var MeetingComposerV2 = class {
     p.registerEditorExtension(import_view2.EditorView.updateListener.of((update) => {
       if (!update.selectionSet && !update.docChanged)
         return;
-      const info = update.state.field(import_obsidian9.editorInfoField, false);
+      const info = update.state.field(import_obsidian10.editorInfoField, false);
       const editor = info == null ? void 0 : info.editor;
       if (!editor || !info.file)
         return;
@@ -27030,7 +27140,7 @@ var MeetingComposerV2 = class {
     }));
     reg(this.app.workspace.on("active-leaf-change", (leaf) => {
       const v = leaf == null ? void 0 : leaf.view;
-      if (v instanceof import_obsidian9.MarkdownView) {
+      if (v instanceof import_obsidian10.MarkdownView) {
         this.lastMarkdown = v;
         if (v.file)
           this.scheduleCursor(() => v.editor.getValue(), () => v.editor.getCursor().line, v.file);
@@ -27098,7 +27208,7 @@ var MeetingComposerV2 = class {
     }
   }
   targetEditorView() {
-    const active = this.app.workspace.getActiveViewOfType(import_obsidian9.MarkdownView);
+    const active = this.app.workspace.getActiveViewOfType(import_obsidian10.MarkdownView);
     if (active)
       return active;
     if (this.lastMarkdown && this.lastMarkdown.file && this.app.workspace.getLeavesOfType("markdown").some((l) => l.view === this.lastMarkdown)) {
@@ -27106,14 +27216,17 @@ var MeetingComposerV2 = class {
     }
     return null;
   }
+  showHelp() {
+    new CardHelpModal(this.app, this.settings().minutesDir).open();
+  }
   insertRecall(card) {
     const view = this.targetEditorView();
     const origin = this.app.vault.getAbstractFileByPath(card.filePath);
     if (!view || !view.file) {
-      new import_obsidian9.Notice("Open a meeting note first, then insert the recall.");
+      new import_obsidian10.Notice("Open a meeting note first, then insert the recall.");
       return;
     }
-    if (!(origin instanceof import_obsidian9.TFile))
+    if (!(origin instanceof import_obsidian10.TFile))
       return;
     const linktext = this.app.metadataCache.fileToLinktext(origin, view.file.path, true);
     const alias = card.title.replace(/[[\]|]/g, " ").replace(/\s+/g, " ").trim();
@@ -27136,7 +27249,7 @@ var MeetingComposerV2 = class {
   }
   async openLocation(path, line) {
     const file = this.app.vault.getAbstractFileByPath(path);
-    if (!(file instanceof import_obsidian9.TFile))
+    if (!(file instanceof import_obsidian10.TFile))
       return;
     const { workspace } = this.app;
     let leaf = workspace.getLeavesOfType("markdown").find((l) => {
@@ -27145,12 +27258,12 @@ var MeetingComposerV2 = class {
     });
     if (!leaf) {
       const recent = workspace.getMostRecentLeaf();
-      leaf = recent && recent.view instanceof import_obsidian9.MarkdownView ? recent : workspace.getLeaf("tab");
+      leaf = recent && recent.view instanceof import_obsidian10.MarkdownView ? recent : workspace.getLeaf("tab");
       await leaf.openFile(file);
     }
     workspace.setActiveLeaf(leaf, { focus: true });
     const v = leaf.view;
-    if (v instanceof import_obsidian9.MarkdownView) {
+    if (v instanceof import_obsidian10.MarkdownView) {
       const pos = { line, ch: 0 };
       v.editor.setCursor(pos);
       v.editor.scrollIntoView({ from: pos, to: pos }, true);
@@ -27176,7 +27289,7 @@ var MeetingComposerV2 = class {
       lines[idx] = lines[idx].replace(re, `$1^${newId}`);
       return lines.join(eol);
     });
-    new import_obsidian9.Notice(`Card re-issued as ^${newId}`);
+    new import_obsidian10.Notice(`Card re-issued as ^${newId}`);
   }
   /** Assign missing ids AND separate prose from title lines (so ^ids are real blocks) in every minutes file. */
   async assignAllMissingIds() {
@@ -27196,7 +27309,7 @@ var MeetingComposerV2 = class {
       if (changed)
         touched++;
     }
-    new import_obsidian9.Notice(touched ? `Assigned ${ids} card id(s), updated ${touched} note(s)` : "All cards already have ids and valid blocks");
+    new import_obsidian10.Notice(touched ? `Assigned ${ids} card id(s), updated ${touched} note(s)` : "All cards already have ids and valid blocks");
   }
   async createBoard(folderPath) {
     var _a, _b;
@@ -27204,9 +27317,9 @@ var MeetingComposerV2 = class {
     const base = folder && folder !== "/" ? folder + "/" : "";
     let name = "Operations";
     let i = 1;
-    while (this.app.vault.getAbstractFileByPath((0, import_obsidian9.normalizePath)(`${base}${name}.${ORGBOARD_EXT}`)))
+    while (this.app.vault.getAbstractFileByPath((0, import_obsidian10.normalizePath)(`${base}${name}.${ORGBOARD_EXT}`)))
       name = `Operations ${i++}`;
-    const file = await this.app.vault.create((0, import_obsidian9.normalizePath)(`${base}${name}.${ORGBOARD_EXT}`), serializeBoard(DEFAULT_BOARD));
+    const file = await this.app.vault.create((0, import_obsidian10.normalizePath)(`${base}${name}.${ORGBOARD_EXT}`), serializeBoard(DEFAULT_BOARD));
     await this.app.workspace.getLeaf("tab").openFile(file);
   }
 };
@@ -27231,7 +27344,7 @@ var DEFAULT_SETTINGS = {
 var TreeView = null;
 var currentToggle = () => {
 };
-var MyPlugin = class extends import_obsidian10.Plugin {
+var MyPlugin = class extends import_obsidian11.Plugin {
   constructor() {
     super(...arguments);
     this.topicTree = null;
@@ -27253,7 +27366,7 @@ var MyPlugin = class extends import_obsidian10.Plugin {
     if (!folder)
       return;
     for (const child of folder.children) {
-      if (!(child instanceof import_obsidian10.TFile) || !child.name.endsWith(".md"))
+      if (!(child instanceof import_obsidian11.TFile) || !child.name.endsWith(".md"))
         continue;
       const content = await this.app.vault.read(child);
       const name = child.name.replace(".md", "").trim();
@@ -27356,7 +27469,7 @@ var MyPlugin = class extends import_obsidian10.Plugin {
     }
   }
 };
-var MyFolderItemView = class extends import_obsidian10.ItemView {
+var MyFolderItemView = class extends import_obsidian11.ItemView {
   constructor(leaf, plugin) {
     super(leaf);
     this.isOpen = false;
@@ -27444,7 +27557,7 @@ var MyFolderItemView = class extends import_obsidian10.ItemView {
     this.root = null;
   }
 };
-var TopicEditorSuggest = class extends import_obsidian10.EditorSuggest {
+var TopicEditorSuggest = class extends import_obsidian11.EditorSuggest {
   constructor(app, plugin) {
     super(app);
     this.plugin = plugin;
@@ -27474,7 +27587,7 @@ var TopicEditorSuggest = class extends import_obsidian10.EditorSuggest {
     editor.replaceRange(topic, start, end);
   }
 };
-var TopicSuggest = class extends import_obsidian10.AbstractInputSuggest {
+var TopicSuggest = class extends import_obsidian11.AbstractInputSuggest {
   constructor(app, inputEl, getTopics) {
     super(app, inputEl);
     this.getTopics = getTopics;
@@ -27492,7 +27605,7 @@ var TopicSuggest = class extends import_obsidian10.AbstractInputSuggest {
     this.close();
   }
 };
-var ExampleView = class extends import_obsidian10.ItemView {
+var ExampleView = class extends import_obsidian11.ItemView {
   constructor(leaf, plugin) {
     super(leaf);
     this.plugin = plugin;
@@ -27529,7 +27642,7 @@ var ExampleView = class extends import_obsidian10.ItemView {
     container.empty();
     container.createEl("h4", { text: "Meeting Composer" });
     let search = "";
-    new import_obsidian10.Setting(contentEl).setName("Search").addText((item) => {
+    new import_obsidian11.Setting(contentEl).setName("Search").addText((item) => {
       item.onChange((string) => {
         search = string;
       });
@@ -27555,7 +27668,7 @@ var ExampleView = class extends import_obsidian10.ItemView {
   async onClose() {
   }
 };
-var MeetingComposerSettingTab = class extends import_obsidian10.PluginSettingTab {
+var MeetingComposerSettingTab = class extends import_obsidian11.PluginSettingTab {
   constructor(app, plugin) {
     super(app, plugin);
     this.plugin = plugin;
@@ -27563,33 +27676,41 @@ var MeetingComposerSettingTab = class extends import_obsidian10.PluginSettingTab
   display() {
     const { containerEl } = this;
     containerEl.empty();
-    new import_obsidian10.Setting(containerEl).setName("Minutes directory").setDesc("Folder containing meeting minutes files, relative to the vault root").addText((text) => text.setPlaceholder("Atas").setValue(this.plugin.settings.MeenutesDir).onChange(async (value) => {
+    new import_obsidian11.Setting(containerEl).setName("How to write cards").setDesc('The text syntax for opening, closing and following up cards. Expand below, or open it in a window (also: command "Show card syntax help", or the ? button in the Meeting cards sidebar).').addButton((b) => b.setButtonText("Open guide").onClick(() => {
+      var _a;
+      return (_a = this.plugin.v2) == null ? void 0 : _a.showHelp();
+    }));
+    const helpDetails = containerEl.createEl("details", { cls: "mc2-help-details" });
+    helpDetails.createEl("summary", { text: "Show the card syntax guide" });
+    void renderCardHelp(this.app, helpDetails.createDiv(), this.plugin, this.plugin.settings.MeenutesDir);
+    new import_obsidian11.Setting(containerEl).setName("Settings").setHeading();
+    new import_obsidian11.Setting(containerEl).setName("Minutes directory").setDesc("Folder containing meeting minutes files, relative to the vault root").addText((text) => text.setPlaceholder("Atas").setValue(this.plugin.settings.MeenutesDir).onChange(async (value) => {
       this.plugin.settings.MeenutesDir = value;
       await this.plugin.saveSettings();
       this.plugin.scheduleCardReindex();
     }));
-    new import_obsidian10.Setting(containerEl).setName("Output file name").setDesc("Name of the file where search results are written").addText((text) => text.setPlaceholder("output.md").setValue(this.plugin.settings.OutputFileName).onChange(async (value) => {
+    new import_obsidian11.Setting(containerEl).setName("Output file name").setDesc("Name of the file where search results are written").addText((text) => text.setPlaceholder("output.md").setValue(this.plugin.settings.OutputFileName).onChange(async (value) => {
       this.plugin.settings.OutputFileName = value;
       await this.plugin.saveSettings();
     }));
-    new import_obsidian10.Setting(containerEl).setName("Output directory").setDesc("Folder where search results are written, relative to the vault root").addText((text) => text.setPlaceholder("Meeting_Composer_Search/").setValue(this.plugin.settings.OutputDir).onChange(async (value) => {
+    new import_obsidian11.Setting(containerEl).setName("Output directory").setDesc("Folder where search results are written, relative to the vault root").addText((text) => text.setPlaceholder("Meeting_Composer_Search/").setValue(this.plugin.settings.OutputDir).onChange(async (value) => {
       this.plugin.settings.OutputDir = value;
       await this.plugin.saveSettings();
       this.plugin.scheduleCardReindex();
     }));
-    new import_obsidian10.Setting(containerEl).setName("Search autocomplete").setDesc("Suggest topic names while typing in the search box and in heading lines").addToggle((toggle) => toggle.setValue(this.plugin.settings.autoComplete).onChange(async (value) => {
+    new import_obsidian11.Setting(containerEl).setName("Search autocomplete").setDesc("Suggest topic names while typing in the search box and in heading lines").addToggle((toggle) => toggle.setValue(this.plugin.settings.autoComplete).onChange(async (value) => {
       this.plugin.settings.autoComplete = value;
       await this.plugin.saveSettings();
     }));
-    new import_obsidian10.Setting(containerEl).setName("Auto-reload tree on new heading").setDesc("Refresh the topic tree whenever a heading is written in a minutes file").addToggle((toggle) => toggle.setValue(this.plugin.settings.autoReload).onChange(async (value) => {
+    new import_obsidian11.Setting(containerEl).setName("Auto-reload tree on new heading").setDesc("Refresh the topic tree whenever a heading is written in a minutes file").addToggle((toggle) => toggle.setValue(this.plugin.settings.autoReload).onChange(async (value) => {
       this.plugin.settings.autoReload = value;
       await this.plugin.saveSettings();
     }));
-    new import_obsidian10.Setting(containerEl).setName("Auto-assign card ids").setDesc("Append a ^card-id when a line with #open-card / #open-ticket is written right under a heading (applied when the cursor leaves the line)").addToggle((toggle) => toggle.setValue(this.plugin.settings.autoCardIds).onChange(async (value) => {
+    new import_obsidian11.Setting(containerEl).setName("Auto-assign card ids").setDesc("Append a ^card-id when a line with #open-card / #open-ticket is written right under a heading (applied when the cursor leaves the line)").addToggle((toggle) => toggle.setValue(this.plugin.settings.autoCardIds).onChange(async (value) => {
       this.plugin.settings.autoCardIds = value;
       await this.plugin.saveSettings();
     }));
-    new import_obsidian10.Setting(containerEl).setName("Topic ordering").setHeading();
+    new import_obsidian11.Setting(containerEl).setName("Topic ordering").setHeading();
     const listsEl = containerEl.createDiv("mc-priority-lists");
     const makeListSection = (title, desc, getValue, setValue) => {
       const col = listsEl.createDiv("mc-priority-col");
@@ -27633,7 +27754,7 @@ var MeetingComposerSettingTab = class extends import_obsidian10.PluginSettingTab
         await this.plugin.saveSettings();
       }
     );
-    new import_obsidian10.Setting(containerEl).setName("Reload minutes").setDesc("Re-scan the minutes folder and rebuild the topic tree").addButton((item) => {
+    new import_obsidian11.Setting(containerEl).setName("Reload minutes").setDesc("Re-scan the minutes folder and rebuild the topic tree").addButton((item) => {
       item.setButtonText("Reload");
       item.onClick(() => {
         this.plugin.reloadTree();

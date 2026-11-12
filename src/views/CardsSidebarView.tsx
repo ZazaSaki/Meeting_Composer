@@ -112,6 +112,9 @@ function SidebarApp({ host, component }: ViewProps) {
 				<button role="tab" aria-selected={tab === "cards"} className={tab === "cards" ? "is-active" : ""} onClick={() => setTab("cards")}>
 					Context cards ({openInScope})
 				</button>
+				<button className="mc2-help-btn" aria-label="How to write cards" title="How to write cards" onClick={() => host.showHelp()}>
+					?
+				</button>
 			</div>
 
 			<DuplicateBanner host={host} />
@@ -119,7 +122,10 @@ function SidebarApp({ host, component }: ViewProps) {
 			{tab === "tree" ? (
 				<div className="mc2-tree">
 					{tree.children.length === 0 && (
-						<div className="mc2-muted mc2-empty">No headings found in the minutes folder yet.</div>
+						<div className="mc2-muted mc2-empty">
+							No headings found in the minutes folder yet.{" "}
+							<a href="#" onClick={e => { e.preventDefault(); host.showHelp(); }}>How to write cards</a>
+						</div>
 					)}
 					{tree.children.map(n => (
 						<TreeRow key={n.slug} node={n} depth={0} expanded={expanded} toggle={toggle} pick={pick} cursorSlug={cursorSlug} />
@@ -156,7 +162,12 @@ function SidebarApp({ host, component }: ViewProps) {
 							onChange={e => setQuery(e.target.value)}
 						/>
 					</div>
-					{cards.length === 0 && <div className="mc2-muted mc2-empty">No cards in this scope.</div>}
+					{cards.length === 0 && (
+							<div className="mc2-muted mc2-empty">
+								No cards in this scope.{" "}
+								<a href="#" onClick={e => { e.preventDefault(); host.showHelp(); }}>How to write cards</a>
+							</div>
+						)}
 					{cards.map(c => (
 						<div key={c.id} className={`mc2-card ${openCard === c.id ? "is-expanded" : ""}`}>
 							<div className="mc2-card-click" onClick={() => setOpenCard(openCard === c.id ? null : c.id)}>

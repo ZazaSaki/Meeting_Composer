@@ -4,6 +4,7 @@ import { createRoot, Root } from 'react-dom/client';
 import { FileTreeRoot } from './FileTree';
 import { writeAnswer } from 'DataMeenutes/FileReader';
 import { MeetingComposerV2 } from './src/MeetingComposerV2';
+import { renderCardHelp } from './src/views/help';
 
 const MDParser = new MarkdownParser();
 let OutputWindow: WorkspaceLeaf | null = null;
@@ -430,6 +431,17 @@ class MeetingComposerSettingTab extends PluginSettingTab {
 	display(): void {
 		const { containerEl } = this;
 		containerEl.empty();
+
+		// v2 help: how to write cards, recalls and boards
+		new Setting(containerEl)
+			.setName('How to write cards')
+			.setDesc('The text syntax for opening, closing and following up cards. Expand below, or open it in a window (also: command "Show card syntax help", or the ? button in the Meeting cards sidebar).')
+			.addButton(b => b.setButtonText('Open guide').onClick(() => this.plugin.v2?.showHelp()));
+		const helpDetails = containerEl.createEl('details', { cls: 'mc2-help-details' });
+		helpDetails.createEl('summary', { text: 'Show the card syntax guide' });
+		void renderCardHelp(this.app, helpDetails.createDiv(), this.plugin, this.plugin.settings.MeenutesDir);
+
+		new Setting(containerEl).setName('Settings').setHeading();
 
 		new Setting(containerEl)
 			.setName('Minutes directory')

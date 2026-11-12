@@ -10,6 +10,7 @@ import { RemoteCloser } from "./sync/RemoteCloser";
 import { CardsSidebarView, VIEW_TYPE_CARDS } from "./views/CardsSidebarView";
 import { OrgBoardView, ORGBOARD_EXT, VIEW_TYPE_ORG_BOARD } from "./views/OrgBoardView";
 import { CardSuggestModal } from "./views/modals";
+import { CardHelpModal } from "./views/help";
 import { V2Host } from "./views/host";
 import { CardNode } from "./types";
 import { hierarchyAt } from "./core/cardParser";
@@ -93,6 +94,7 @@ export class MeetingComposerV2 implements V2Host {
 		});
 		p.addCommand({ id: "assign-missing-ids", name: "Assign missing card ids & fix card blocks in minutes folder", callback: () => this.assignAllMissingIds() });
 		p.addCommand({ id: "reindex-cards", name: "Re-index meeting cards", callback: () => this.store.reindexAll() });
+		p.addCommand({ id: "card-syntax-help", name: "Show card syntax help", callback: () => this.showHelp() });
 
 		reg(this.app.workspace.on("file-menu", (menu: Menu, file: TAbstractFile) => {
 			const folder = file instanceof TFolder ? file : file.parent;
@@ -194,6 +196,10 @@ export class MeetingComposerV2 implements V2Host {
 			return this.lastMarkdown;
 		}
 		return null;
+	}
+
+	showHelp(): void {
+		new CardHelpModal(this.app, this.settings().minutesDir).open();
 	}
 
 	insertRecall(card: CardNode): void {

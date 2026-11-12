@@ -10,6 +10,8 @@ export interface V2Host {
 	store: VaultCardStore;
 	mutator: MarkdownMutator;
 	insertRecall(card: CardNode): void;
+	/** Open the card syntax guide. */
+	showHelp(): void;
 	openCard(card: CardNode): Promise<void>;
 	openLocation(path: string, line: number): Promise<void>;
 	reissueId(card: CardNode): Promise<void>;
