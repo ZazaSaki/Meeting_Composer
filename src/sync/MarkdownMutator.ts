@@ -1,9 +1,13 @@
 // Applies pure text mutations to vault files.
-//  * File open in an editor  -> one minimal editor.replaceRange (undoable, cursor-safe).
+//  * File open in an editor  -> one minimal editor change (cursor-safe). User actions (board, drawer)
+//                               are undoable; automatic ones (remote close/re-open) pass
+//                               { undoable: false } so Ctrl+Z can't silently revert them.
 //  * Otherwise               -> app.vault.process (atomic read-modify-write).
 // No "pendingWrites" echo suppression: every mutation is idempotent and the store re-index is too.
 
 import { App, MarkdownView, Notice, TFile } from "obsidian";
+import { EditorView } from "@codemirror/view";
+import { Transaction } from "@codemirror/state";
 import { minimalChange } from "../core/diff";
 import * as M from "../core/mutations";
 import { CardNode, HeadingSegment } from "../types";
@@ -21,7 +25,7 @@ export class MarkdownMutator {
 	}
 
 	/** Returns true when the file changed. */
-	async apply(filePath: string, fn: (text: string) => string): Promise<boolean> {
+	async apply(filePath: string, fn: (text: string) => string, opts: { undoable?: boolean } = {}): Promise<boolean> {
 		const file = this.app.vault.getAbstractFileByPath(filePath);
 		if (!(file instanceof TFile)) {
 			new Notice(`Meeting Composer: file not found: ${filePath}`);
@@ -35,7 +39,16 @@ export class MarkdownMutator {
 				const after = fn(before);
 				const change = minimalChange(before, after);
 				if (!change) return false;
-				editor.replaceRange(change.insert, editor.offsetToPos(change.start), editor.offsetToPos(change.end));
+				// eslint-disable-next-line @typescript-eslint/no-explicit-any
+				const cm = (editor as any).cm as EditorView | undefined;
+				if (opts.undoable === false && cm && typeof cm.dispatch === "function") {
+					cm.dispatch({
+						changes: { from: change.start, to: change.end, insert: change.insert },
+						annotations: Transaction.addToHistory.of(false),
+					});
+				} else {
+					editor.replaceRange(change.insert, editor.offsetToPos(change.start), editor.offsetToPos(change.end));
+				}
 				this.store.indexNow(file, after);
 				return true;
 			}
@@ -55,8 +68,8 @@ export class MarkdownMutator {
 		}
 	}
 
-	setStatus(card: CardNode, status: "open" | "closed") {
-		return this.apply(card.filePath, t => M.setStatus(t, card.id, status));
+	setStatus(card: CardNode, status: "open" | "closed", opts: { undoable?: boolean } = {}) {
+		return this.apply(card.filePath, t => M.setStatus(t, card.id, status), opts);
 	}
 
 	addTag(card: CardNode, tag: string) {

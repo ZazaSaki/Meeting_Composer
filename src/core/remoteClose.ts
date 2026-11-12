@@ -43,22 +43,26 @@ export interface RemoteReopenPlan {
 }
 
 /**
- * Undo a remote close when #closed-card is erased from the recall that did it. Only recalls in
- * `closedBy` (they really closed the card) count, and the card is re-opened only if it is still
- * closed and no other recall in `closedBy` still carries #closed-card. A recall line that disappears
- * entirely (deleted, or its file renamed) is ignored, so renames never re-open anything.
+ * Erasing #closed-card from a recall:
+ *  - forgets the recall (its key leaves `processed` and `closedBy`), so adding the tag back closes
+ *    the card again; this applies to every recall already acted on, not only ones that closed;
+ *  - re-opens the card when that recall is the one that closed it (in `closedBy`), the card is
+ *    still closed, and no other recall in `closedBy` still carries #closed-card.
+ * A recall line that disappears entirely (deleted, or its file renamed) is ignored, so renames
+ * never re-open anything.
  */
-export function planRemoteReopens(cards: CardNode[], closedBy: Set<string>): RemoteReopenPlan {
+export function planRemoteReopens(cards: CardNode[], processed: Set<string>, closedBy: Set<string>): RemoteReopenPlan {
 	const toReopen: CardNode[] = [];
 	const releasedKeys: string[] = [];
-	if (closedBy.size === 0) return { toReopen, releasedKeys };
+	if (processed.size === 0 && closedBy.size === 0) return { toReopen, releasedKeys };
 	for (const card of cards) {
 		const released = card.recalls
 			.filter(r => !r.closes)
 			.map(r => recallKey(card.id, r.sourceFilePath, r.timestamp, r.anchorLine))
-			.filter(k => closedBy.has(k));
+			.filter(k => processed.has(k) || closedBy.has(k));
 		if (released.length === 0) continue;
 		releasedKeys.push(...released);
+		if (!released.some(k => closedBy.has(k))) continue;
 		// another recall that itself closed this card (and still says so) keeps it closed; older
 		// #closed-card recalls that were already overridden by a manual re-open don't count
 		const stillClosedByOther = card.recalls.some(

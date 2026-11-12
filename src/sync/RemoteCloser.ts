@@ -37,11 +37,11 @@ export class RemoteCloser {
 		}
 		this.running = true;
 		try {
-			const reopen = planRemoteReopens(this.store.getCards(), this.keys.closedBy());
+			const reopen = planRemoteReopens(this.store.getCards(), this.keys.get(), this.keys.closedBy());
 			if (reopen.releasedKeys.length) {
 				await this.keys.release(reopen.releasedKeys);
 				for (const card of reopen.toReopen) {
-					if (await this.mutator.setStatus(card, "open")) {
+					if (await this.mutator.setStatus(card, "open", { undoable: false })) {
 						new Notice(`Re-opened "${card.title}": #closed-card was removed from its recall`);
 					}
 				}
@@ -52,7 +52,7 @@ export class RemoteCloser {
 			// persist first: even if a write fails we never re-close a card the user re-opened
 			await this.keys.add(plan.newKeys, plan.closingKeys);
 			for (const card of plan.toClose) {
-				if (await this.mutator.setStatus(card, "closed")) {
+				if (await this.mutator.setStatus(card, "closed", { undoable: false })) {
 					new Notice(`Closed "${card.title}" from a recall`);
 				}
 			}

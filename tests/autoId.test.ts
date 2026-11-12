@@ -115,7 +115,7 @@ describe("erasing #closed-card from a recall re-opens the card (planRemoteReopen
 	it("re-opens the card and releases the key once the tag is gone", () => {
 		const first = planRemoteCloses(index(closing).map(c => ({ ...c, status: "open" as const })), new Set());
 		expect(first.closingKeys).toHaveLength(1);
-		const plan = planRemoteReopens(index(erased), new Set(first.closingKeys));
+		const plan = planRemoteReopens(index(erased), new Set(), new Set(first.closingKeys));
 		expect(plan.toReopen.map(c => c.id)).toEqual(["card-1"]);
 		expect(plan.releasedKeys).toEqual(first.closingKeys);
 		// after release, adding the tag back closes again
@@ -125,14 +125,14 @@ describe("erasing #closed-card from a recall re-opens the card (planRemoteReopen
 
 	it("does nothing while the tag is still there", () => {
 		const keys = planRemoteCloses(index(closing).map(c => ({ ...c, status: "open" as const })), new Set()).closingKeys;
-		expect(planRemoteReopens(index(closing), new Set(keys)).releasedKeys).toEqual([]);
+		expect(planRemoteReopens(index(closing), new Set(), new Set(keys)).releasedKeys).toEqual([]);
 	});
 
 	it("does not re-open a card the recall didn't close (it was already closed by hand)", () => {
 		const plan = planRemoteCloses(index(closing), new Set()); // origin already closed
 		expect(plan.toClose).toHaveLength(0);
 		expect(plan.closingKeys).toEqual([]);
-		expect(planRemoteReopens(index(erased), new Set(plan.closingKeys)).toReopen).toHaveLength(0);
+		expect(planRemoteReopens(index(erased), new Set(), new Set(plan.closingKeys)).toReopen).toHaveLength(0);
 	});
 
 	it("keeps the card closed only when another recall that closed it still has the tag", () => {
@@ -146,10 +146,21 @@ describe("erasing #closed-card from a recall re-opens the card (planRemoteReopen
 		];
 		const key = "card-1|b.md|2026-11-18 10:15";
 		const otherKey = "card-1|c.md|2026-11-25 09:00";
-		const plan = planRemoteReopens(cards, new Set([key, otherKey]));
+		const plan = planRemoteReopens(cards, new Set(), new Set([key, otherKey]));
 		expect(plan.releasedKeys).toEqual([key]);
 		expect(plan.toReopen).toHaveLength(0);
 		// an older #closed-card that did not close it (card was re-opened by hand since) doesn't block
-		expect(planRemoteReopens(cards, new Set([key])).toReopen.map(c => c.id)).toEqual(["card-1"]);
+		expect(planRemoteReopens(cards, new Set(), new Set([key])).toReopen.map(c => c.id)).toEqual(["card-1"]);
+	});
+
+	it("erasing the tag frees a recall that was already handled, so re-adding it closes again", () => {
+		// the recall was handled but the card is open now (e.g. re-opened by hand / an older version)
+		const key = "card-1|b.md|2026-11-18 10:15";
+		const openCards = index(erased).map(c => ({ ...c, status: "open" as const }));
+		const plan = planRemoteReopens(openCards, new Set([key]), new Set());
+		expect(plan.releasedKeys).toEqual([key]);
+		expect(plan.toReopen).toHaveLength(0);
+		const again = planRemoteCloses(index(closing).map(c => ({ ...c, status: "open" as const })), new Set());
+		expect(again.toClose.map(c => c.id)).toEqual(["card-1"]);
 	});
 });

@@ -147,7 +147,15 @@ export default class MyPlugin extends Plugin {
 	}
 
 	async loadSettings() {
-		this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData());
+		const data = await this.loadData();
+		this.settings = Object.assign({}, DEFAULT_SETTINGS, data);
+		// One-time migration: data saved before recallClosedBy existed can hold "handled" recalls whose
+		// close was lost (e.g. reverted with Ctrl+Z), leaving a #closed-card recall that never acts again.
+		// Forget them so every #closed-card recall gets evaluated once more.
+		if (data && Array.isArray(data.processedRecallCloses) && !Array.isArray(data.recallClosedBy)) {
+			this.settings.processedRecallCloses = [];
+			this.settings.recallClosedBy = [];
+		}
 	}
 
 	async saveSettings() {

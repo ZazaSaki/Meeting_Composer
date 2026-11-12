@@ -25382,6 +25382,7 @@ var VaultCardStore = class extends import_obsidian.Events {
 
 // src/sync/MarkdownMutator.ts
 var import_obsidian2 = require("obsidian");
+var import_state = require("@codemirror/state");
 
 // src/core/diff.ts
 function minimalChange(a, b) {
@@ -25606,7 +25607,7 @@ var MarkdownMutator = class {
     return null;
   }
   /** Returns true when the file changed. */
-  async apply(filePath, fn) {
+  async apply(filePath, fn, opts = {}) {
     const file = this.app.vault.getAbstractFileByPath(filePath);
     if (!(file instanceof import_obsidian2.TFile)) {
       new import_obsidian2.Notice(`Meeting Composer: file not found: ${filePath}`);
@@ -25621,7 +25622,15 @@ var MarkdownMutator = class {
         const change = minimalChange(before, after);
         if (!change)
           return false;
-        editor.replaceRange(change.insert, editor.offsetToPos(change.start), editor.offsetToPos(change.end));
+        const cm = editor.cm;
+        if (opts.undoable === false && cm && typeof cm.dispatch === "function") {
+          cm.dispatch({
+            changes: { from: change.start, to: change.end, insert: change.insert },
+            annotations: import_state.Transaction.addToHistory.of(false)
+          });
+        } else {
+          editor.replaceRange(change.insert, editor.offsetToPos(change.start), editor.offsetToPos(change.end));
+        }
         this.store.indexNow(file, after);
         return true;
       }
@@ -25641,8 +25650,8 @@ var MarkdownMutator = class {
       return false;
     }
   }
-  setStatus(card, status) {
-    return this.apply(card.filePath, (t) => setStatus(t, card.id, status));
+  setStatus(card, status, opts = {}) {
+    return this.apply(card.filePath, (t) => setStatus(t, card.id, status), opts);
   }
   addTag(card, tag) {
     return this.apply(card.filePath, (t) => addTag(t, card.id, tag));
@@ -25668,7 +25677,7 @@ var MarkdownMutator = class {
 // src/sync/AutoIdListener.ts
 var import_obsidian3 = require("obsidian");
 var import_view = require("@codemirror/view");
-var import_state = require("@codemirror/state");
+var import_state2 = require("@codemirror/state");
 
 // src/core/ids.ts
 var ALPHABET = "0123456789abcdefghijklmnopqrstuvwxyz";
@@ -25802,7 +25811,7 @@ var AutoIdListener = class {
           const line = doc.line(e.line + 1);
           return { from: line.from + e.fromCh, to: line.from + e.toCh, insert: e.insert };
         }),
-        annotations: import_state.Transaction.addToHistory.of(false)
+        annotations: import_state2.Transaction.addToHistory.of(false)
       });
     } else {
       editor.transaction({
@@ -25853,16 +25862,18 @@ function planRemoteCloses(cards, processed) {
   }
   return { toClose, newKeys, closingKeys };
 }
-function planRemoteReopens(cards, closedBy) {
+function planRemoteReopens(cards, processed, closedBy) {
   const toReopen = [];
   const releasedKeys = [];
-  if (closedBy.size === 0)
+  if (processed.size === 0 && closedBy.size === 0)
     return { toReopen, releasedKeys };
   for (const card of cards) {
-    const released = card.recalls.filter((r) => !r.closes).map((r) => recallKey(card.id, r.sourceFilePath, r.timestamp, r.anchorLine)).filter((k) => closedBy.has(k));
+    const released = card.recalls.filter((r) => !r.closes).map((r) => recallKey(card.id, r.sourceFilePath, r.timestamp, r.anchorLine)).filter((k) => processed.has(k) || closedBy.has(k));
     if (released.length === 0)
       continue;
     releasedKeys.push(...released);
+    if (!released.some((k) => closedBy.has(k)))
+      continue;
     const stillClosedByOther = card.recalls.some(
       (r) => r.closes && closedBy.has(recallKey(card.id, r.sourceFilePath, r.timestamp, r.anchorLine))
     );
@@ -25891,11 +25902,11 @@ var RemoteCloser = class {
     }
     this.running = true;
     try {
-      const reopen = planRemoteReopens(this.store.getCards(), this.keys.closedBy());
+      const reopen = planRemoteReopens(this.store.getCards(), this.keys.get(), this.keys.closedBy());
       if (reopen.releasedKeys.length) {
         await this.keys.release(reopen.releasedKeys);
         for (const card of reopen.toReopen) {
-          if (await this.mutator.setStatus(card, "open")) {
+          if (await this.mutator.setStatus(card, "open", { undoable: false })) {
             new import_obsidian4.Notice(`Re-opened "${card.title}": #closed-card was removed from its recall`);
           }
         }
@@ -25905,7 +25916,7 @@ var RemoteCloser = class {
         return;
       await this.keys.add(plan.newKeys, plan.closingKeys);
       for (const card of plan.toClose) {
-        if (await this.mutator.setStatus(card, "closed")) {
+        if (await this.mutator.setStatus(card, "closed", { undoable: false })) {
           new import_obsidian4.Notice(`Closed "${card.title}" from a recall`);
         }
       }
@@ -27563,7 +27574,12 @@ var MyPlugin = class extends import_obsidian11.Plugin {
     (_a = this.v2) == null ? void 0 : _a.unload();
   }
   async loadSettings() {
-    this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData());
+    const data = await this.loadData();
+    this.settings = Object.assign({}, DEFAULT_SETTINGS, data);
+    if (data && Array.isArray(data.processedRecallCloses) && !Array.isArray(data.recallClosedBy)) {
+      this.settings.processedRecallCloses = [];
+      this.settings.recallClosedBy = [];
+    }
   }
   async saveSettings() {
     await this.saveData(this.settings);
