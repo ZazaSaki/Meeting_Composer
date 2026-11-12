@@ -247,20 +247,20 @@ var require_react_development = __commonJS({
         {
           Object.freeze(emptyObject);
         }
-        function Component2(props, context, updater) {
+        function Component3(props, context, updater) {
           this.props = props;
           this.context = context;
           this.refs = emptyObject;
           this.updater = updater || ReactNoopUpdateQueue;
         }
-        Component2.prototype.isReactComponent = {};
-        Component2.prototype.setState = function(partialState, callback) {
+        Component3.prototype.isReactComponent = {};
+        Component3.prototype.setState = function(partialState, callback) {
           if (typeof partialState !== "object" && typeof partialState !== "function" && partialState != null) {
             throw new Error("setState(...): takes an object of state variables to update or a function which returns an object of state variables.");
           }
           this.updater.enqueueSetState(this, partialState, callback, "setState");
         };
-        Component2.prototype.forceUpdate = function(callback) {
+        Component3.prototype.forceUpdate = function(callback) {
           this.updater.enqueueForceUpdate(this, callback, "forceUpdate");
         };
         {
@@ -269,7 +269,7 @@ var require_react_development = __commonJS({
             replaceState: ["replaceState", "Refactor your code to use setState instead (see https://github.com/facebook/react/issues/3236)."]
           };
           var defineDeprecationWarning = function(methodName, info) {
-            Object.defineProperty(Component2.prototype, methodName, {
+            Object.defineProperty(Component3.prototype, methodName, {
               get: function() {
                 warn("%s(...) is deprecated in plain JavaScript React classes. %s", info[0], info[1]);
                 return void 0;
@@ -284,7 +284,7 @@ var require_react_development = __commonJS({
         }
         function ComponentDummy() {
         }
-        ComponentDummy.prototype = Component2.prototype;
+        ComponentDummy.prototype = Component3.prototype;
         function PureComponent(props, context, updater) {
           this.props = props;
           this.context = context;
@@ -293,7 +293,7 @@ var require_react_development = __commonJS({
         }
         var pureComponentPrototype = PureComponent.prototype = new ComponentDummy();
         pureComponentPrototype.constructor = PureComponent;
-        assign(pureComponentPrototype, Component2.prototype);
+        assign(pureComponentPrototype, Component3.prototype);
         pureComponentPrototype.isPureReactComponent = true;
         function createRef() {
           var refObject = {
@@ -1358,8 +1358,8 @@ var require_react_development = __commonJS({
             return describeNativeComponentFrame(fn, false);
           }
         }
-        function shouldConstruct(Component3) {
-          var prototype = Component3.prototype;
+        function shouldConstruct(Component4) {
+          var prototype = Component4.prototype;
           return !!(prototype && prototype.isReactComponent);
         }
         function describeUnknownElementTypeFrameInDEV(type, source, ownerFn) {
@@ -1865,7 +1865,7 @@ var require_react_development = __commonJS({
           only: onlyChild
         };
         exports.Children = Children;
-        exports.Component = Component2;
+        exports.Component = Component3;
         exports.Fragment = REACT_FRAGMENT_TYPE;
         exports.Profiler = REACT_PROFILER_TYPE;
         exports.PureComponent = PureComponent;
@@ -3428,8 +3428,8 @@ var require_react_dom_development = __commonJS({
             return describeNativeComponentFrame(fn, false);
           }
         }
-        function shouldConstruct(Component2) {
-          var prototype = Component2.prototype;
+        function shouldConstruct(Component3) {
+          var prototype = Component3.prototype;
           return !!(prototype && prototype.isReactComponent);
         }
         function describeUnknownElementTypeFrameInDEV(type, source, ownerFn) {
@@ -10862,9 +10862,9 @@ var require_react_dom_development = __commonJS({
         var contextStackCursor = createCursor(emptyContextObject);
         var didPerformWorkStackCursor = createCursor(false);
         var previousContext = emptyContextObject;
-        function getUnmaskedContext(workInProgress2, Component2, didPushOwnContextIfProvider) {
+        function getUnmaskedContext(workInProgress2, Component3, didPushOwnContextIfProvider) {
           {
-            if (didPushOwnContextIfProvider && isContextProvider(Component2)) {
+            if (didPushOwnContextIfProvider && isContextProvider(Component3)) {
               return previousContext;
             }
             return contextStackCursor.current;
@@ -11001,8 +11001,8 @@ var require_react_dom_development = __commonJS({
                 case HostRoot:
                   return node.stateNode.context;
                 case ClassComponent: {
-                  var Component2 = node.type;
-                  if (isContextProvider(Component2)) {
+                  var Component3 = node.type;
+                  if (isContextProvider(Component3)) {
                     return node.stateNode.__reactInternalMemoizedMergedChildContext;
                   }
                   break;
@@ -11764,10 +11764,10 @@ var require_react_dom_development = __commonJS({
             pendingLegacyContextWarning = /* @__PURE__ */ new Map();
           };
         }
-        function resolveDefaultProps(Component2, baseProps) {
-          if (Component2 && Component2.defaultProps) {
+        function resolveDefaultProps(Component3, baseProps) {
+          if (Component3 && Component3.defaultProps) {
             var props = assign({}, baseProps);
-            var defaultProps = Component2.defaultProps;
+            var defaultProps = Component3.defaultProps;
             for (var propName in defaultProps) {
               if (props[propName] === void 0) {
                 props[propName] = defaultProps[propName];
@@ -14062,7 +14062,7 @@ var require_react_dom_development = __commonJS({
           }
           return true;
         }
-        function renderWithHooks(current2, workInProgress2, Component2, props, secondArg, nextRenderLanes) {
+        function renderWithHooks(current2, workInProgress2, Component3, props, secondArg, nextRenderLanes) {
           renderLanes = nextRenderLanes;
           currentlyRenderingFiber$1 = workInProgress2;
           {
@@ -14082,7 +14082,7 @@ var require_react_dom_development = __commonJS({
               ReactCurrentDispatcher$1.current = HooksDispatcherOnMountInDEV;
             }
           }
-          var children = Component2(props, secondArg);
+          var children = Component3(props, secondArg);
           if (didScheduleRenderPhaseUpdateDuringThisPass) {
             var numberOfReRenders = 0;
             do {
@@ -14102,7 +14102,7 @@ var require_react_dom_development = __commonJS({
                 hookTypesUpdateIndexDev = -1;
               }
               ReactCurrentDispatcher$1.current = HooksDispatcherOnRerenderInDEV;
-              children = Component2(props, secondArg);
+              children = Component3(props, secondArg);
             } while (didScheduleRenderPhaseUpdateDuringThisPass);
           }
           ReactCurrentDispatcher$1.current = ContextOnlyDispatcher;
@@ -16212,22 +16212,22 @@ var require_react_dom_development = __commonJS({
           workInProgress2.child = reconcileChildFibers(workInProgress2, current2.child, null, renderLanes2);
           workInProgress2.child = reconcileChildFibers(workInProgress2, null, nextChildren, renderLanes2);
         }
-        function updateForwardRef(current2, workInProgress2, Component2, nextProps, renderLanes2) {
+        function updateForwardRef(current2, workInProgress2, Component3, nextProps, renderLanes2) {
           {
             if (workInProgress2.type !== workInProgress2.elementType) {
-              var innerPropTypes = Component2.propTypes;
+              var innerPropTypes = Component3.propTypes;
               if (innerPropTypes) {
                 checkPropTypes(
                   innerPropTypes,
                   nextProps,
                   // Resolved props
                   "prop",
-                  getComponentNameFromType(Component2)
+                  getComponentNameFromType(Component3)
                 );
               }
             }
           }
-          var render2 = Component2.render;
+          var render2 = Component3.render;
           var ref = workInProgress2.ref;
           var nextChildren;
           var hasId;
@@ -16265,11 +16265,11 @@ var require_react_dom_development = __commonJS({
           reconcileChildren(current2, workInProgress2, nextChildren, renderLanes2);
           return workInProgress2.child;
         }
-        function updateMemoComponent(current2, workInProgress2, Component2, nextProps, renderLanes2) {
+        function updateMemoComponent(current2, workInProgress2, Component3, nextProps, renderLanes2) {
           if (current2 === null) {
-            var type = Component2.type;
-            if (isSimpleFunctionComponent(type) && Component2.compare === null && // SimpleMemoComponent codepath doesn't resolve outer props either.
-            Component2.defaultProps === void 0) {
+            var type = Component3.type;
+            if (isSimpleFunctionComponent(type) && Component3.compare === null && // SimpleMemoComponent codepath doesn't resolve outer props either.
+            Component3.defaultProps === void 0) {
               var resolvedType = type;
               {
                 resolvedType = resolveFunctionForHotReloading(type);
@@ -16293,14 +16293,14 @@ var require_react_dom_development = __commonJS({
                 );
               }
             }
-            var child = createFiberFromTypeAndProps(Component2.type, null, nextProps, workInProgress2, workInProgress2.mode, renderLanes2);
+            var child = createFiberFromTypeAndProps(Component3.type, null, nextProps, workInProgress2, workInProgress2.mode, renderLanes2);
             child.ref = workInProgress2.ref;
             child.return = workInProgress2;
             workInProgress2.child = child;
             return child;
           }
           {
-            var _type = Component2.type;
+            var _type = Component3.type;
             var _innerPropTypes = _type.propTypes;
             if (_innerPropTypes) {
               checkPropTypes(
@@ -16316,7 +16316,7 @@ var require_react_dom_development = __commonJS({
           var hasScheduledUpdateOrContext = checkScheduledUpdateOrContext(current2, renderLanes2);
           if (!hasScheduledUpdateOrContext) {
             var prevProps = currentChild.memoizedProps;
-            var compare = Component2.compare;
+            var compare = Component3.compare;
             compare = compare !== null ? compare : shallowEqual;
             if (compare(prevProps, nextProps) && current2.ref === workInProgress2.ref) {
               return bailoutOnAlreadyFinishedWork(current2, workInProgress2, renderLanes2);
@@ -16329,7 +16329,7 @@ var require_react_dom_development = __commonJS({
           workInProgress2.child = newChild;
           return newChild;
         }
-        function updateSimpleMemoComponent(current2, workInProgress2, Component2, nextProps, renderLanes2) {
+        function updateSimpleMemoComponent(current2, workInProgress2, Component3, nextProps, renderLanes2) {
           {
             if (workInProgress2.type !== workInProgress2.elementType) {
               var outerMemoType = workInProgress2.elementType;
@@ -16369,7 +16369,7 @@ var require_react_dom_development = __commonJS({
               }
             }
           }
-          return updateFunctionComponent(current2, workInProgress2, Component2, nextProps, renderLanes2);
+          return updateFunctionComponent(current2, workInProgress2, Component3, nextProps, renderLanes2);
         }
         function updateOffscreenComponent(current2, workInProgress2, renderLanes2) {
           var nextProps = workInProgress2.pendingProps;
@@ -16459,24 +16459,24 @@ var require_react_dom_development = __commonJS({
             }
           }
         }
-        function updateFunctionComponent(current2, workInProgress2, Component2, nextProps, renderLanes2) {
+        function updateFunctionComponent(current2, workInProgress2, Component3, nextProps, renderLanes2) {
           {
             if (workInProgress2.type !== workInProgress2.elementType) {
-              var innerPropTypes = Component2.propTypes;
+              var innerPropTypes = Component3.propTypes;
               if (innerPropTypes) {
                 checkPropTypes(
                   innerPropTypes,
                   nextProps,
                   // Resolved props
                   "prop",
-                  getComponentNameFromType(Component2)
+                  getComponentNameFromType(Component3)
                 );
               }
             }
           }
           var context;
           {
-            var unmaskedContext = getUnmaskedContext(workInProgress2, Component2, true);
+            var unmaskedContext = getUnmaskedContext(workInProgress2, Component3, true);
             context = getMaskedContext(workInProgress2, unmaskedContext);
           }
           var nextChildren;
@@ -16488,12 +16488,12 @@ var require_react_dom_development = __commonJS({
           {
             ReactCurrentOwner$1.current = workInProgress2;
             setIsRendering(true);
-            nextChildren = renderWithHooks(current2, workInProgress2, Component2, nextProps, context, renderLanes2);
+            nextChildren = renderWithHooks(current2, workInProgress2, Component3, nextProps, context, renderLanes2);
             hasId = checkDidRenderIdHook();
             if (workInProgress2.mode & StrictLegacyMode) {
               setIsStrictModeForDevtools(true);
               try {
-                nextChildren = renderWithHooks(current2, workInProgress2, Component2, nextProps, context, renderLanes2);
+                nextChildren = renderWithHooks(current2, workInProgress2, Component3, nextProps, context, renderLanes2);
                 hasId = checkDidRenderIdHook();
               } finally {
                 setIsStrictModeForDevtools(false);
@@ -16515,7 +16515,7 @@ var require_react_dom_development = __commonJS({
           reconcileChildren(current2, workInProgress2, nextChildren, renderLanes2);
           return workInProgress2.child;
         }
-        function updateClassComponent(current2, workInProgress2, Component2, nextProps, renderLanes2) {
+        function updateClassComponent(current2, workInProgress2, Component3, nextProps, renderLanes2) {
           {
             switch (shouldError(workInProgress2)) {
               case false: {
@@ -16538,20 +16538,20 @@ var require_react_dom_development = __commonJS({
               }
             }
             if (workInProgress2.type !== workInProgress2.elementType) {
-              var innerPropTypes = Component2.propTypes;
+              var innerPropTypes = Component3.propTypes;
               if (innerPropTypes) {
                 checkPropTypes(
                   innerPropTypes,
                   nextProps,
                   // Resolved props
                   "prop",
-                  getComponentNameFromType(Component2)
+                  getComponentNameFromType(Component3)
                 );
               }
             }
           }
           var hasContext;
-          if (isContextProvider(Component2)) {
+          if (isContextProvider(Component3)) {
             hasContext = true;
             pushContextProvider(workInProgress2);
           } else {
@@ -16562,15 +16562,15 @@ var require_react_dom_development = __commonJS({
           var shouldUpdate;
           if (instance === null) {
             resetSuspendedCurrentOnMountInLegacyMode(current2, workInProgress2);
-            constructClassInstance(workInProgress2, Component2, nextProps);
-            mountClassInstance(workInProgress2, Component2, nextProps, renderLanes2);
+            constructClassInstance(workInProgress2, Component3, nextProps);
+            mountClassInstance(workInProgress2, Component3, nextProps, renderLanes2);
             shouldUpdate = true;
           } else if (current2 === null) {
-            shouldUpdate = resumeMountClassInstance(workInProgress2, Component2, nextProps, renderLanes2);
+            shouldUpdate = resumeMountClassInstance(workInProgress2, Component3, nextProps, renderLanes2);
           } else {
-            shouldUpdate = updateClassInstance(current2, workInProgress2, Component2, nextProps, renderLanes2);
+            shouldUpdate = updateClassInstance(current2, workInProgress2, Component3, nextProps, renderLanes2);
           }
-          var nextUnitOfWork = finishClassComponent(current2, workInProgress2, Component2, shouldUpdate, hasContext, renderLanes2);
+          var nextUnitOfWork = finishClassComponent(current2, workInProgress2, Component3, shouldUpdate, hasContext, renderLanes2);
           {
             var inst = workInProgress2.stateNode;
             if (shouldUpdate && inst.props !== nextProps) {
@@ -16582,19 +16582,19 @@ var require_react_dom_development = __commonJS({
           }
           return nextUnitOfWork;
         }
-        function finishClassComponent(current2, workInProgress2, Component2, shouldUpdate, hasContext, renderLanes2) {
+        function finishClassComponent(current2, workInProgress2, Component3, shouldUpdate, hasContext, renderLanes2) {
           markRef(current2, workInProgress2);
           var didCaptureError = (workInProgress2.flags & DidCapture) !== NoFlags;
           if (!shouldUpdate && !didCaptureError) {
             if (hasContext) {
-              invalidateContextProvider(workInProgress2, Component2, false);
+              invalidateContextProvider(workInProgress2, Component3, false);
             }
             return bailoutOnAlreadyFinishedWork(current2, workInProgress2, renderLanes2);
           }
           var instance = workInProgress2.stateNode;
           ReactCurrentOwner$1.current = workInProgress2;
           var nextChildren;
-          if (didCaptureError && typeof Component2.getDerivedStateFromError !== "function") {
+          if (didCaptureError && typeof Component3.getDerivedStateFromError !== "function") {
             nextChildren = null;
             {
               stopProfilerTimerIfRunning();
@@ -16628,7 +16628,7 @@ var require_react_dom_development = __commonJS({
           }
           workInProgress2.memoizedState = instance.state;
           if (hasContext) {
-            invalidateContextProvider(workInProgress2, Component2, true);
+            invalidateContextProvider(workInProgress2, Component3, true);
           }
           return workInProgress2.child;
         }
@@ -16728,45 +16728,45 @@ var require_react_dom_development = __commonJS({
           var lazyComponent = elementType;
           var payload = lazyComponent._payload;
           var init = lazyComponent._init;
-          var Component2 = init(payload);
-          workInProgress2.type = Component2;
-          var resolvedTag = workInProgress2.tag = resolveLazyComponentTag(Component2);
-          var resolvedProps = resolveDefaultProps(Component2, props);
+          var Component3 = init(payload);
+          workInProgress2.type = Component3;
+          var resolvedTag = workInProgress2.tag = resolveLazyComponentTag(Component3);
+          var resolvedProps = resolveDefaultProps(Component3, props);
           var child;
           switch (resolvedTag) {
             case FunctionComponent: {
               {
-                validateFunctionComponentInDev(workInProgress2, Component2);
-                workInProgress2.type = Component2 = resolveFunctionForHotReloading(Component2);
+                validateFunctionComponentInDev(workInProgress2, Component3);
+                workInProgress2.type = Component3 = resolveFunctionForHotReloading(Component3);
               }
-              child = updateFunctionComponent(null, workInProgress2, Component2, resolvedProps, renderLanes2);
+              child = updateFunctionComponent(null, workInProgress2, Component3, resolvedProps, renderLanes2);
               return child;
             }
             case ClassComponent: {
               {
-                workInProgress2.type = Component2 = resolveClassForHotReloading(Component2);
+                workInProgress2.type = Component3 = resolveClassForHotReloading(Component3);
               }
-              child = updateClassComponent(null, workInProgress2, Component2, resolvedProps, renderLanes2);
+              child = updateClassComponent(null, workInProgress2, Component3, resolvedProps, renderLanes2);
               return child;
             }
             case ForwardRef: {
               {
-                workInProgress2.type = Component2 = resolveForwardRefForHotReloading(Component2);
+                workInProgress2.type = Component3 = resolveForwardRefForHotReloading(Component3);
               }
-              child = updateForwardRef(null, workInProgress2, Component2, resolvedProps, renderLanes2);
+              child = updateForwardRef(null, workInProgress2, Component3, resolvedProps, renderLanes2);
               return child;
             }
             case MemoComponent: {
               {
                 if (workInProgress2.type !== workInProgress2.elementType) {
-                  var outerPropTypes = Component2.propTypes;
+                  var outerPropTypes = Component3.propTypes;
                   if (outerPropTypes) {
                     checkPropTypes(
                       outerPropTypes,
                       resolvedProps,
                       // Resolved for outer only
                       "prop",
-                      getComponentNameFromType(Component2)
+                      getComponentNameFromType(Component3)
                     );
                   }
                 }
@@ -16774,8 +16774,8 @@ var require_react_dom_development = __commonJS({
               child = updateMemoComponent(
                 null,
                 workInProgress2,
-                Component2,
-                resolveDefaultProps(Component2.type, resolvedProps),
+                Component3,
+                resolveDefaultProps(Component3.type, resolvedProps),
                 // The inner type can have defaults too
                 renderLanes2
               );
@@ -16784,33 +16784,33 @@ var require_react_dom_development = __commonJS({
           }
           var hint = "";
           {
-            if (Component2 !== null && typeof Component2 === "object" && Component2.$$typeof === REACT_LAZY_TYPE) {
+            if (Component3 !== null && typeof Component3 === "object" && Component3.$$typeof === REACT_LAZY_TYPE) {
               hint = " Did you wrap a component in React.lazy() more than once?";
             }
           }
-          throw new Error("Element type is invalid. Received a promise that resolves to: " + Component2 + ". " + ("Lazy element type must resolve to a class or function." + hint));
+          throw new Error("Element type is invalid. Received a promise that resolves to: " + Component3 + ". " + ("Lazy element type must resolve to a class or function." + hint));
         }
-        function mountIncompleteClassComponent(_current, workInProgress2, Component2, nextProps, renderLanes2) {
+        function mountIncompleteClassComponent(_current, workInProgress2, Component3, nextProps, renderLanes2) {
           resetSuspendedCurrentOnMountInLegacyMode(_current, workInProgress2);
           workInProgress2.tag = ClassComponent;
           var hasContext;
-          if (isContextProvider(Component2)) {
+          if (isContextProvider(Component3)) {
             hasContext = true;
             pushContextProvider(workInProgress2);
           } else {
             hasContext = false;
           }
           prepareToReadContext(workInProgress2, renderLanes2);
-          constructClassInstance(workInProgress2, Component2, nextProps);
-          mountClassInstance(workInProgress2, Component2, nextProps, renderLanes2);
-          return finishClassComponent(null, workInProgress2, Component2, true, hasContext, renderLanes2);
+          constructClassInstance(workInProgress2, Component3, nextProps);
+          mountClassInstance(workInProgress2, Component3, nextProps, renderLanes2);
+          return finishClassComponent(null, workInProgress2, Component3, true, hasContext, renderLanes2);
         }
-        function mountIndeterminateComponent(_current, workInProgress2, Component2, renderLanes2) {
+        function mountIndeterminateComponent(_current, workInProgress2, Component3, renderLanes2) {
           resetSuspendedCurrentOnMountInLegacyMode(_current, workInProgress2);
           var props = workInProgress2.pendingProps;
           var context;
           {
-            var unmaskedContext = getUnmaskedContext(workInProgress2, Component2, false);
+            var unmaskedContext = getUnmaskedContext(workInProgress2, Component3, false);
             context = getMaskedContext(workInProgress2, unmaskedContext);
           }
           prepareToReadContext(workInProgress2, renderLanes2);
@@ -16820,8 +16820,8 @@ var require_react_dom_development = __commonJS({
             markComponentRenderStarted(workInProgress2);
           }
           {
-            if (Component2.prototype && typeof Component2.prototype.render === "function") {
-              var componentName = getComponentNameFromType(Component2) || "Unknown";
+            if (Component3.prototype && typeof Component3.prototype.render === "function") {
+              var componentName = getComponentNameFromType(Component3) || "Unknown";
               if (!didWarnAboutBadClass[componentName]) {
                 error("The <%s /> component appears to have a render method, but doesn't extend React.Component. This is likely to cause errors. Change %s to extend React.Component instead.", componentName, componentName);
                 didWarnAboutBadClass[componentName] = true;
@@ -16832,7 +16832,7 @@ var require_react_dom_development = __commonJS({
             }
             setIsRendering(true);
             ReactCurrentOwner$1.current = workInProgress2;
-            value = renderWithHooks(null, workInProgress2, Component2, props, context, renderLanes2);
+            value = renderWithHooks(null, workInProgress2, Component3, props, context, renderLanes2);
             hasId = checkDidRenderIdHook();
             setIsRendering(false);
           }
@@ -16842,7 +16842,7 @@ var require_react_dom_development = __commonJS({
           workInProgress2.flags |= PerformedWork;
           {
             if (typeof value === "object" && value !== null && typeof value.render === "function" && value.$$typeof === void 0) {
-              var _componentName = getComponentNameFromType(Component2) || "Unknown";
+              var _componentName = getComponentNameFromType(Component3) || "Unknown";
               if (!didWarnAboutModulePatternComponent[_componentName]) {
                 error("The <%s /> component appears to be a function component that returns a class instance. Change %s to a class that extends React.Component instead. If you can't use a class try assigning the prototype on the function as a workaround. `%s.prototype = React.Component.prototype`. Don't use an arrow function since it cannot be called with `new` by React.", _componentName, _componentName, _componentName);
                 didWarnAboutModulePatternComponent[_componentName] = true;
@@ -16855,7 +16855,7 @@ var require_react_dom_development = __commonJS({
             typeof value === "object" && value !== null && typeof value.render === "function" && value.$$typeof === void 0
           ) {
             {
-              var _componentName2 = getComponentNameFromType(Component2) || "Unknown";
+              var _componentName2 = getComponentNameFromType(Component3) || "Unknown";
               if (!didWarnAboutModulePatternComponent[_componentName2]) {
                 error("The <%s /> component appears to be a function component that returns a class instance. Change %s to a class that extends React.Component instead. If you can't use a class try assigning the prototype on the function as a workaround. `%s.prototype = React.Component.prototype`. Don't use an arrow function since it cannot be called with `new` by React.", _componentName2, _componentName2, _componentName2);
                 didWarnAboutModulePatternComponent[_componentName2] = true;
@@ -16865,7 +16865,7 @@ var require_react_dom_development = __commonJS({
             workInProgress2.memoizedState = null;
             workInProgress2.updateQueue = null;
             var hasContext = false;
-            if (isContextProvider(Component2)) {
+            if (isContextProvider(Component3)) {
               hasContext = true;
               pushContextProvider(workInProgress2);
             } else {
@@ -16874,15 +16874,15 @@ var require_react_dom_development = __commonJS({
             workInProgress2.memoizedState = value.state !== null && value.state !== void 0 ? value.state : null;
             initializeUpdateQueue(workInProgress2);
             adoptClassInstance(workInProgress2, value);
-            mountClassInstance(workInProgress2, Component2, props, renderLanes2);
-            return finishClassComponent(null, workInProgress2, Component2, true, hasContext, renderLanes2);
+            mountClassInstance(workInProgress2, Component3, props, renderLanes2);
+            return finishClassComponent(null, workInProgress2, Component3, true, hasContext, renderLanes2);
           } else {
             workInProgress2.tag = FunctionComponent;
             {
               if (workInProgress2.mode & StrictLegacyMode) {
                 setIsStrictModeForDevtools(true);
                 try {
-                  value = renderWithHooks(null, workInProgress2, Component2, props, context, renderLanes2);
+                  value = renderWithHooks(null, workInProgress2, Component3, props, context, renderLanes2);
                   hasId = checkDidRenderIdHook();
                 } finally {
                   setIsStrictModeForDevtools(false);
@@ -16894,16 +16894,16 @@ var require_react_dom_development = __commonJS({
             }
             reconcileChildren(null, workInProgress2, value, renderLanes2);
             {
-              validateFunctionComponentInDev(workInProgress2, Component2);
+              validateFunctionComponentInDev(workInProgress2, Component3);
             }
             return workInProgress2.child;
           }
         }
-        function validateFunctionComponentInDev(workInProgress2, Component2) {
+        function validateFunctionComponentInDev(workInProgress2, Component3) {
           {
-            if (Component2) {
-              if (Component2.childContextTypes) {
-                error("%s(...): childContextTypes cannot be defined on a function component.", Component2.displayName || Component2.name || "Component");
+            if (Component3) {
+              if (Component3.childContextTypes) {
+                error("%s(...): childContextTypes cannot be defined on a function component.", Component3.displayName || Component3.name || "Component");
               }
             }
             if (workInProgress2.ref !== null) {
@@ -16922,15 +16922,15 @@ var require_react_dom_development = __commonJS({
                 error("Function components cannot be given refs. Attempts to access this ref will fail. Did you mean to use React.forwardRef()?%s", info);
               }
             }
-            if (typeof Component2.getDerivedStateFromProps === "function") {
-              var _componentName3 = getComponentNameFromType(Component2) || "Unknown";
+            if (typeof Component3.getDerivedStateFromProps === "function") {
+              var _componentName3 = getComponentNameFromType(Component3) || "Unknown";
               if (!didWarnAboutGetDerivedStateOnFunctionComponent[_componentName3]) {
                 error("%s: Function components do not support getDerivedStateFromProps.", _componentName3);
                 didWarnAboutGetDerivedStateOnFunctionComponent[_componentName3] = true;
               }
             }
-            if (typeof Component2.contextType === "object" && Component2.contextType !== null) {
-              var _componentName4 = getComponentNameFromType(Component2) || "Unknown";
+            if (typeof Component3.contextType === "object" && Component3.contextType !== null) {
+              var _componentName4 = getComponentNameFromType(Component3) || "Unknown";
               if (!didWarnAboutContextTypeOnFunctionComponent[_componentName4]) {
                 error("%s: Function components do not support contextType.", _componentName4);
                 didWarnAboutContextTypeOnFunctionComponent[_componentName4] = true;
@@ -17692,8 +17692,8 @@ var require_react_dom_development = __commonJS({
               pushHostContext(workInProgress2);
               break;
             case ClassComponent: {
-              var Component2 = workInProgress2.type;
-              if (isContextProvider(Component2)) {
+              var Component3 = workInProgress2.type;
+              if (isContextProvider(Component3)) {
                 pushContextProvider(workInProgress2);
               }
               break;
@@ -17820,10 +17820,10 @@ var require_react_dom_development = __commonJS({
               return mountLazyComponent(current2, workInProgress2, elementType, renderLanes2);
             }
             case FunctionComponent: {
-              var Component2 = workInProgress2.type;
+              var Component3 = workInProgress2.type;
               var unresolvedProps = workInProgress2.pendingProps;
-              var resolvedProps = workInProgress2.elementType === Component2 ? unresolvedProps : resolveDefaultProps(Component2, unresolvedProps);
-              return updateFunctionComponent(current2, workInProgress2, Component2, resolvedProps, renderLanes2);
+              var resolvedProps = workInProgress2.elementType === Component3 ? unresolvedProps : resolveDefaultProps(Component3, unresolvedProps);
+              return updateFunctionComponent(current2, workInProgress2, Component3, resolvedProps, renderLanes2);
             }
             case ClassComponent: {
               var _Component = workInProgress2.type;
@@ -18128,8 +18128,8 @@ var require_react_dom_development = __commonJS({
               bubbleProperties(workInProgress2);
               return null;
             case ClassComponent: {
-              var Component2 = workInProgress2.type;
-              if (isContextProvider(Component2)) {
+              var Component3 = workInProgress2.type;
+              if (isContextProvider(Component3)) {
                 popContext(workInProgress2);
               }
               bubbleProperties(workInProgress2);
@@ -18447,8 +18447,8 @@ var require_react_dom_development = __commonJS({
           popTreeContext(workInProgress2);
           switch (workInProgress2.tag) {
             case ClassComponent: {
-              var Component2 = workInProgress2.type;
-              if (isContextProvider(Component2)) {
+              var Component3 = workInProgress2.type;
+              if (isContextProvider(Component3)) {
                 popContext(workInProgress2);
               }
               var flags = workInProgress2.flags;
@@ -22135,18 +22135,18 @@ var require_react_dom_development = __commonJS({
         var createFiber = function(tag, pendingProps, key, mode) {
           return new FiberNode(tag, pendingProps, key, mode);
         };
-        function shouldConstruct$1(Component2) {
-          var prototype = Component2.prototype;
+        function shouldConstruct$1(Component3) {
+          var prototype = Component3.prototype;
           return !!(prototype && prototype.isReactComponent);
         }
         function isSimpleFunctionComponent(type) {
           return typeof type === "function" && !shouldConstruct$1(type) && type.defaultProps === void 0;
         }
-        function resolveLazyComponentTag(Component2) {
-          if (typeof Component2 === "function") {
-            return shouldConstruct$1(Component2) ? ClassComponent : FunctionComponent;
-          } else if (Component2 !== void 0 && Component2 !== null) {
-            var $$typeof = Component2.$$typeof;
+        function resolveLazyComponentTag(Component3) {
+          if (typeof Component3 === "function") {
+            return shouldConstruct$1(Component3) ? ClassComponent : FunctionComponent;
+          } else if (Component3 !== void 0 && Component3 !== null) {
+            var $$typeof = Component3.$$typeof;
             if ($$typeof === REACT_FORWARD_REF_TYPE) {
               return ForwardRef;
             }
@@ -22583,9 +22583,9 @@ var require_react_dom_development = __commonJS({
           var fiber = get(parentComponent);
           var parentContext = findCurrentUnmaskedContext(fiber);
           if (fiber.tag === ClassComponent) {
-            var Component2 = fiber.type;
-            if (isContextProvider(Component2)) {
-              return processChildContext(fiber, Component2, parentContext);
+            var Component3 = fiber.type;
+            if (isContextProvider(Component3)) {
+              return processChildContext(fiber, Component3, parentContext);
             }
           }
           return parentContext;
@@ -23047,7 +23047,7 @@ var require_react_dom_development = __commonJS({
             unmarkContainerAsRoot(container);
           }
         };
-        function createRoot4(container, options2) {
+        function createRoot3(container, options2) {
           if (!isValidContainer(container)) {
             throw new Error("createRoot(...): Target container is not a DOM element.");
           }
@@ -23418,7 +23418,7 @@ var require_react_dom_development = __commonJS({
               error('You are importing createRoot from "react-dom" which is not supported. You should instead import it from "react-dom/client".');
             }
           }
-          return createRoot4(container, options2);
+          return createRoot3(container, options2);
         }
         function hydrateRoot$1(container, initialChildren, options2) {
           {
@@ -23880,8 +23880,8 @@ var require_react_jsx_runtime_development = __commonJS({
             return describeNativeComponentFrame(fn, false);
           }
         }
-        function shouldConstruct(Component2) {
-          var prototype = Component2.prototype;
+        function shouldConstruct(Component3) {
+          var prototype = Component3.prototype;
           return !!(prototype && prototype.isReactComponent);
         }
         function describeUnknownElementTypeFrameInDEV(type, source, ownerFn) {
@@ -24384,11 +24384,11 @@ var require_react_jsx_runtime_development = __commonJS({
             return jsxWithValidation(type, props, key, false);
           }
         }
-        var jsx6 = jsxWithValidationDynamic;
-        var jsxs6 = jsxWithValidationStatic;
+        var jsx5 = jsxWithValidationDynamic;
+        var jsxs5 = jsxWithValidationStatic;
         exports.Fragment = REACT_FRAGMENT_TYPE;
-        exports.jsx = jsx6;
-        exports.jsxs = jsxs6;
+        exports.jsx = jsx5;
+        exports.jsxs = jsxs5;
       })();
     }
   }
@@ -24409,24 +24409,16 @@ var require_jsx_runtime = __commonJS({
 // main.ts
 var main_exports = {};
 __export(main_exports, {
-  ExampleView: () => ExampleView,
-  VIEW_TYPE_EXAMPLE: () => VIEW_TYPE_EXAMPLE,
-  VIEW_TYPE_FILE: () => VIEW_TYPE_FILE,
   default: () => MyPlugin
 });
 module.exports = __toCommonJS(main_exports);
-var import_obsidian12 = require("obsidian");
+var import_obsidian15 = require("obsidian");
 
 // DataMeenutes/FileReader.ts
 var fs = __toESM(require("fs"));
 function readMDFile(Dir) {
   let path = fs.realpathSync(Dir);
   return fs.readFileSync(path, { encoding: "utf-8" });
-}
-function writeAnswer(Dir, outputName, data) {
-  Dir += `/${outputName}`;
-  const path = fs.realpathSync(Dir);
-  fs.writeFileSync(Dir, data, { encoding: "utf-8" });
 }
 
 // DataMeenutes/App.ts
@@ -24810,79 +24802,6 @@ var MarkdownParser = class {
     return str;
   }
 };
-
-// main.ts
-var import_client3 = __toESM(require_client());
-
-// FileTree.tsx
-var import_jsx_runtime = __toESM(require_jsx_runtime());
-function FileTreeRoot(data, onRefresh, scopedSearch = false, onToggleScope = () => {
-}, priorityBeforeCities = [], cities = [], priorityAfterCities = []) {
-  const children = data.children || [];
-  const categorize = (child) => {
-    const lower = child.name.toLowerCase();
-    if (priorityBeforeCities.some((t) => t.toLowerCase() === lower))
-      return "org";
-    if (cities.some((c) => lower.includes(c.toLowerCase())))
-      return "sector";
-    if (priorityAfterCities.some((t) => t.toLowerCase() === lower))
-      return "important";
-    return "other";
-  };
-  const orgs = children.filter((c) => categorize(c) === "org");
-  const sectors = children.filter((c) => categorize(c) === "sector");
-  const important = children.filter((c) => categorize(c) === "important" || categorize(c) === "other");
-  const Column = ({ label, items }) => /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "mc-tree-col", children: [
-    /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { className: "mc-tree-col-header", children: label }),
-    items.map((child, i) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { children: FileTree(child, 0, data) }, i))
-  ] });
-  return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { children: [
-    /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "mc-tree-toolbar", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime.jsx)("button", { onClick: onRefresh, children: "\u27F3 Refresh" }),
-      /* @__PURE__ */ (0, import_jsx_runtime.jsx)("button", { onClick: onToggleScope, children: scopedSearch ? "\u{1F4CD} Scoped" : "\u{1F310} Global" })
-    ] }),
-    /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "mc-tree-columns", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Column, { label: "Organizations", items: orgs }),
-      /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Column, { label: "Sectors", items: sectors }),
-      /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Column, { label: "Important Topics", items: important })
-    ] })
-  ] });
-}
-function FileTree(data, id = 0, root = null) {
-  const space = () => {
-    let out = "";
-    for (let index = 0; index < id; index++) {
-      out += "|----";
-    }
-    return out;
-  };
-  const sign = () => {
-    var _a;
-    if (((_a = data.children) == null ? void 0 : _a.length) > 0) {
-      if (!data.isOpen) {
-        return "+";
-      }
-      return "";
-    }
-  };
-  const renderChildren = (children) => {
-    return children.map((child) => {
-      return /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { children: FileTree(child, id + 1, root) });
-    });
-  };
-  return /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { className: "file-tree-item", children: data.children ? /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("span", { onClick: (e) => {
-    e.stopPropagation();
-    data.toggleFolder(data, root, true, data.name, data.path || []);
-  }, className: `folder ${data.isOpen ? "open" : ""}`, children: [
-    space(),
-    data.name,
-    sign(),
-    data.isOpen && data.children && /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { className: "children", children: renderChildren(data.children) })
-  ] }) : /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("span", { className: "file", children: [
-    space(),
-    data.name
-  ] }) });
-}
 
 // src/MeetingComposerV2.ts
 var import_obsidian11 = require("obsidian");
@@ -25987,7 +25906,7 @@ function inScope(cardSlug, scopeSlug) {
 // src/views/components.tsx
 var import_react = __toESM(require_react());
 var import_obsidian5 = require("obsidian");
-var import_jsx_runtime2 = __toESM(require_jsx_runtime());
+var import_jsx_runtime = __toESM(require_jsx_runtime());
 function useStoreVersion(store) {
   const [v, setV] = (0, import_react.useState)(0);
   (0, import_react.useEffect)(() => {
@@ -25999,12 +25918,12 @@ function useStoreVersion(store) {
 function HierarchyPill({ h }) {
   if (h.segments.length === 0)
     return null;
-  return /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { className: "mc2-pill", children: h.segments.map((s) => s.text).join(" \u2192 ") });
+  return /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { className: "mc2-pill", children: h.segments.map((s) => s.text).join(" \u2192 ") });
 }
 function TagChips({ tags, onRemove }) {
-  return /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { className: "mc2-tags", children: tags.map((t) => /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("span", { className: "mc2-tag", children: [
+  return /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { className: "mc2-tags", children: tags.map((t) => /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("span", { className: "mc2-tag", children: [
     t,
-    onRemove && /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("button", { className: "mc2-tag-x", "aria-label": `Remove ${t}`, onClick: (e) => {
+    onRemove && /* @__PURE__ */ (0, import_jsx_runtime.jsx)("button", { className: "mc2-tag-x", "aria-label": `Remove ${t}`, onClick: (e) => {
       e.stopPropagation();
       onRemove(t);
     }, children: "\xD7" })
@@ -26014,15 +25933,15 @@ function plural(n, word) {
   return `${n} ${word}${n === 1 ? "" : "s"}`;
 }
 function CardFace({ card, compact }) {
-  return /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "mc2-card-face", children: [
-    /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "mc2-card-title", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { className: `mc2-status mc2-status-${card.status}`, "aria-label": card.status }),
-      card.title || /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("em", { children: "(untitled)" })
+  return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "mc2-card-face", children: [
+    /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "mc2-card-title", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { className: `mc2-status mc2-status-${card.status}`, "aria-label": card.status }),
+      card.title || /* @__PURE__ */ (0, import_jsx_runtime.jsx)("em", { children: "(untitled)" })
     ] }),
-    !compact && /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(HierarchyPill, { h: card.hierarchy }),
-    /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "mc2-card-meta", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(TagChips, { tags: card.tags }),
-      /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("span", { className: "mc2-muted", children: [
+    !compact && /* @__PURE__ */ (0, import_jsx_runtime.jsx)(HierarchyPill, { h: card.hierarchy }),
+    /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "mc2-card-meta", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime.jsx)(TagChips, { tags: card.tags }),
+      /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("span", { className: "mc2-muted", children: [
         plural(card.recalls.length, "recall"),
         card.lastUpdated ? ` \xB7 ${card.lastUpdated}` : ""
       ] })
@@ -26039,28 +25958,28 @@ function MarkdownBlock({ host, component, markdown, sourcePath }) {
     if (markdown.trim())
       void import_obsidian5.MarkdownRenderer.render(host.app, markdown, el, sourcePath, component);
   }, [markdown, sourcePath]);
-  return /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { ref, className: "mc2-md" });
+  return /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { ref, className: "mc2-md" });
 }
 function baseName(path) {
   var _a;
   return (_a = path.split("/").pop()) != null ? _a : path;
 }
 function CardHistory({ host, component, card, hideDescription }) {
-  return /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "mc2-history", children: [
-    !hideDescription && /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("section", { children: [
-      /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "mc2-section-title", children: [
+  return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "mc2-history", children: [
+    !hideDescription && /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("section", { children: [
+      /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "mc2-section-title", children: [
         "Description",
         card.openedAt ? ` (opened ${card.openedAt})` : ""
       ] }),
-      card.description.trim() ? /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(MarkdownBlock, { host, component, markdown: card.description, sourcePath: card.filePath }) : /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { className: "mc2-muted", children: "No description" })
+      card.description.trim() ? /* @__PURE__ */ (0, import_jsx_runtime.jsx)(MarkdownBlock, { host, component, markdown: card.description, sourcePath: card.filePath }) : /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { className: "mc2-muted", children: "No description" })
     ] }),
-    /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("section", { children: [
-      /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { className: "mc2-section-title", children: "Recall history" }),
-      card.recalls.length === 0 && /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { className: "mc2-muted", children: "No recalls yet" }),
+    /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("section", { children: [
+      /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { className: "mc2-section-title", children: "Recall history" }),
+      card.recalls.length === 0 && /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { className: "mc2-muted", children: "No recalls yet" }),
       card.recalls.map((r) => {
         var _a;
-        return /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "mc2-recall", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)(
+        return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "mc2-recall", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(
             "a",
             {
               className: "mc2-recall-head",
@@ -26071,11 +25990,11 @@ function CardHistory({ host, component, card, hideDescription }) {
                 (_a = r.timestamp) != null ? _a : "no timestamp",
                 "] \u2014 ",
                 baseName(r.sourceFilePath),
-                r.closes && /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { className: "mc2-tag", children: "#closed-card" })
+                r.closes && /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { className: "mc2-tag", children: "#closed-card" })
               ]
             }
           ),
-          /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(MarkdownBlock, { host, component, markdown: r.content, sourcePath: r.sourceFilePath })
+          /* @__PURE__ */ (0, import_jsx_runtime.jsx)(MarkdownBlock, { host, component, markdown: r.content, sourcePath: r.sourceFilePath })
         ] }, r.sourceFilePath + ":" + r.anchorLine);
       })
     ] })
@@ -26085,26 +26004,26 @@ function DuplicateBanner({ host }) {
   const dups = host.store.getDuplicates();
   if (dups.length === 0)
     return null;
-  return /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "mc2-warning", children: [
-    /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { children: [
+  return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "mc2-warning", children: [
+    /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { children: [
       "\u26A0 ",
       plural(dups.length, "duplicate card id"),
       " (copied card lines?)"
     ] }),
-    dups.map((d) => /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "mc2-dup", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("a", { onClick: () => host.openCard(d), children: [
+    dups.map((d) => /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { className: "mc2-dup", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("a", { onClick: () => host.openCard(d), children: [
         "^",
         d.id,
         " in ",
         baseName(d.filePath)
       ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("button", { onClick: () => host.reissueId(d), children: "Re-issue id" })
+      /* @__PURE__ */ (0, import_jsx_runtime.jsx)("button", { onClick: () => host.reissueId(d), children: "Re-issue id" })
     ] }, d.filePath + d.titleLine))
   ] });
 }
 
 // src/views/CardsSidebarView.tsx
-var import_jsx_runtime3 = __toESM(require_jsx_runtime());
+var import_jsx_runtime2 = __toESM(require_jsx_runtime());
 var VIEW_TYPE_CARDS = "meeting-composer-cards";
 var CardsSidebarView = class extends import_obsidian6.ItemView {
   constructor(leaf, host) {
@@ -26126,7 +26045,7 @@ var CardsSidebarView = class extends import_obsidian6.ItemView {
     container.empty();
     container.addClass("mc2-sidebar");
     this.root = (0, import_client.createRoot)(container);
-    this.root.render(/* @__PURE__ */ (0, import_jsx_runtime3.jsx)(SidebarApp, { host: this.host, component: this }));
+    this.root.render(/* @__PURE__ */ (0, import_jsx_runtime2.jsx)(SidebarApp, { host: this.host, component: this }));
   }
   async onClose() {
     var _a;
@@ -26183,34 +26102,34 @@ function SidebarApp({ host, component }) {
     return next;
   });
   const openInScope = cards.filter((c) => c.status === "open").length;
-  return /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "mc2-sidebar-app", children: [
-    /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "mc2-tabs", role: "tablist", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("button", { role: "tab", "aria-selected": tab === "tree", className: tab === "tree" ? "is-active" : "", onClick: () => setTab("tree"), children: "Organization tree" }),
-      /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("button", { role: "tab", "aria-selected": tab === "cards", className: tab === "cards" ? "is-active" : "", onClick: () => setTab("cards"), children: [
+  return /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "mc2-sidebar-app", children: [
+    /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "mc2-tabs", role: "tablist", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("button", { role: "tab", "aria-selected": tab === "tree", className: tab === "tree" ? "is-active" : "", onClick: () => setTab("tree"), children: "Organization tree" }),
+      /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("button", { role: "tab", "aria-selected": tab === "cards", className: tab === "cards" ? "is-active" : "", onClick: () => setTab("cards"), children: [
         "Context cards (",
         openInScope,
         ")"
       ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("button", { className: "mc2-help-btn", "aria-label": "How to write cards", title: "How to write cards", onClick: () => host.showHelp(), children: "?" })
+      /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("button", { className: "mc2-help-btn", "aria-label": "How to write cards", title: "How to write cards", onClick: () => host.showHelp(), children: "?" })
     ] }),
-    /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(DuplicateBanner, { host }),
-    tab === "tree" ? /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "mc2-tree", children: [
-      tree.children.length === 0 && /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "mc2-muted mc2-empty", children: [
+    /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(DuplicateBanner, { host }),
+    tab === "tree" ? /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "mc2-tree", children: [
+      tree.children.length === 0 && /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "mc2-muted mc2-empty", children: [
         "No headings found in the minutes folder yet.",
         " ",
-        /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("a", { href: "#", onClick: (e) => {
+        /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("a", { href: "#", onClick: (e) => {
           e.preventDefault();
           host.showHelp();
         }, children: "How to write cards" })
       ] }),
-      tree.children.map((n) => /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(TreeRow, { node: n, depth: 0, expanded, toggle, pick, cursorSlug }, n.slug))
-    ] }) : /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "mc2-feed", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "mc2-scope", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: "mc2-muted", children: "Scope:" }),
+      tree.children.map((n) => /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(TreeRow, { node: n, depth: 0, expanded, toggle, pick, cursorSlug }, n.slug))
+    ] }) : /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "mc2-feed", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "mc2-scope", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { className: "mc2-muted", children: "Scope:" }),
         " ",
         scopeNode && scopeNode.slug ? scopeNode.segments.map((s) => s.text).join(" \u2192 ") : "All minutes",
-        /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("span", { className: "mc2-scope-actions", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(
+        /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("span", { className: "mc2-scope-actions", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(
             "button",
             {
               className: follow ? "is-active" : "",
@@ -26219,12 +26138,12 @@ function SidebarApp({ host, component }) {
               children: "\u{1F4CD} Follow cursor"
             }
           ),
-          !follow && manualScope && /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("button", { onClick: () => setManualScope(""), children: "All" })
+          !follow && manualScope && /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("button", { onClick: () => setManualScope(""), children: "All" })
         ] })
       ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "mc2-filters", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("div", { className: "mc2-segmented", children: ["open", "closed", "all"].map((s) => /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("button", { className: status === s ? "is-active" : "", onClick: () => setStatus2(s), children: s[0].toUpperCase() + s.slice(1) }, s)) }),
-        /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(
+      /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "mc2-filters", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { className: "mc2-segmented", children: ["open", "closed", "all"].map((s) => /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("button", { className: status === s ? "is-active" : "", onClick: () => setStatus2(s), children: s[0].toUpperCase() + s.slice(1) }, s)) }),
+        /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(
           "input",
           {
             type: "search",
@@ -26234,21 +26153,21 @@ function SidebarApp({ host, component }) {
           }
         )
       ] }),
-      cards.length === 0 && /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "mc2-muted mc2-empty", children: [
+      cards.length === 0 && /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "mc2-muted mc2-empty", children: [
         "No cards in this scope.",
         " ",
-        /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("a", { href: "#", onClick: (e) => {
+        /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("a", { href: "#", onClick: (e) => {
           e.preventDefault();
           host.showHelp();
         }, children: "How to write cards" })
       ] }),
-      cards.map((c) => /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: `mc2-card ${openCard === c.id ? "is-expanded" : ""}`, children: [
-        /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("div", { className: "mc2-card-click", onClick: () => setOpenCard(openCard === c.id ? null : c.id), children: /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(CardFace, { card: c }) }),
-        /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "mc2-card-actions", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("button", { className: "mod-cta", onClick: () => host.insertRecall(c), children: "Insert recall" }),
-          /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("button", { onClick: () => host.openCard(c), children: "Open" })
+      cards.map((c) => /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: `mc2-card ${openCard === c.id ? "is-expanded" : ""}`, children: [
+        /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("div", { className: "mc2-card-click", onClick: () => setOpenCard(openCard === c.id ? null : c.id), children: /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(CardFace, { card: c }) }),
+        /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "mc2-card-actions", children: [
+          /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("button", { className: "mod-cta", onClick: () => host.insertRecall(c), children: "Insert recall" }),
+          /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("button", { onClick: () => host.openCard(c), children: "Open" })
         ] }),
-        openCard === c.id && /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(CardHistory, { host, component, card: c })
+        openCard === c.id && /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(CardHistory, { host, component, card: c })
       ] }, c.id))
     ] })
   ] });
@@ -26259,14 +26178,14 @@ function TreeRow(props) {
   const hasChildren = node.children.length > 0;
   const active = cursorSlug === node.slug;
   const onPath = !active && cursorSlug.startsWith(node.slug + "/");
-  return /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "mc2-tree-node", children: [
-    /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)(
+  return /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)("div", { className: "mc2-tree-node", children: [
+    /* @__PURE__ */ (0, import_jsx_runtime2.jsxs)(
       "div",
       {
         className: `mc2-tree-row ${active ? "is-active" : ""} ${onPath ? "is-on-path" : ""}`,
         style: { paddingLeft: 4 + depth * 14 },
         children: [
-          /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(
+          /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(
             "span",
             {
               className: "mc2-tree-chevron",
@@ -26275,12 +26194,12 @@ function TreeRow(props) {
               children: hasChildren ? isOpen ? "\u25BC" : "\u25B6" : "\u2022"
             }
           ),
-          /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: "mc2-tree-name", onClick: () => pick(node), title: "Show cards for this branch", children: node.name }),
-          /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: `mc2-badge ${node.openCount ? "" : "is-zero"}`, title: `${plural(node.openCount, "open card")}`, children: node.openCount })
+          /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { className: "mc2-tree-name", onClick: () => pick(node), title: "Show cards for this branch", children: node.name }),
+          /* @__PURE__ */ (0, import_jsx_runtime2.jsx)("span", { className: `mc2-badge ${node.openCount ? "" : "is-zero"}`, title: `${plural(node.openCount, "open card")}`, children: node.openCount })
         ]
       }
     ),
-    isOpen && node.children.map((c) => /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(TreeRow, { ...props, node: c, depth: depth + 1 }, c.slug))
+    isOpen && node.children.map((c) => /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(TreeRow, { ...props, node: c, depth: depth + 1 }, c.slug))
   ] });
 }
 function findNode(root, slug) {
@@ -26572,7 +26491,7 @@ function structuredCloneSafe(v) {
 
 // src/views/CardDrawer.tsx
 var import_react3 = __toESM(require_react());
-var import_jsx_runtime4 = __toESM(require_jsx_runtime());
+var import_jsx_runtime3 = __toESM(require_jsx_runtime());
 function CardDrawer({ host, component, card, onClose }) {
   const [title, setTitle2] = (0, import_react3.useState)(card.title);
   const [desc, setDesc] = (0, import_react3.useState)(card.description);
@@ -26603,9 +26522,9 @@ function CardDrawer({ host, component, card, onClose }) {
     void host.mutator.addTag(card, tag);
     setNewTag("");
   };
-  return /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("aside", { className: "mc2-drawer", "aria-label": "Card details", children: [
-    /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("div", { className: "mc2-drawer-head", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(
+  return /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("aside", { className: "mc2-drawer", "aria-label": "Card details", children: [
+    /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "mc2-drawer-head", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(
         "input",
         {
           className: "mc2-drawer-title",
@@ -26623,17 +26542,17 @@ function CardDrawer({ host, component, card, onClose }) {
           "aria-label": "Card title"
         }
       ),
-      /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("button", { className: "mc2-icon-btn", onClick: onClose, "aria-label": "Close drawer", children: "\u2715" })
+      /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("button", { className: "mc2-icon-btn", onClick: onClose, "aria-label": "Close drawer", children: "\u2715" })
     ] }),
-    /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("div", { className: "mc2-drawer-sub", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(HierarchyPill, { h: card.hierarchy }),
-      /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("span", { className: "mc2-muted", children: [
+    /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "mc2-drawer-sub", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(HierarchyPill, { h: card.hierarchy }),
+      /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("span", { className: "mc2-muted", children: [
         "^",
         card.id
       ] })
     ] }),
-    /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("div", { className: "mc2-drawer-row", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(
+    /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "mc2-drawer-row", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(
         "button",
         {
           className: card.status === "open" ? "mod-cta" : "",
@@ -26641,13 +26560,13 @@ function CardDrawer({ host, component, card, onClose }) {
           children: card.status === "open" ? "Close card" : "Re-open card"
         }
       ),
-      /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("button", { onClick: () => host.openCard(card), children: "Open in note" }),
-      /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("button", { onClick: () => host.insertRecall(card), children: "Insert recall" })
+      /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("button", { onClick: () => host.openCard(card), children: "Open in note" }),
+      /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("button", { onClick: () => host.insertRecall(card), children: "Insert recall" })
     ] }),
-    /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("div", { className: "mc2-section-title", children: "Tags" }),
-    /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("div", { className: "mc2-drawer-row", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(TagChips, { tags: card.tags, onRemove: (t) => host.mutator.removeTag(card, t) }),
-      /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(
+    /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("div", { className: "mc2-section-title", children: "Tags" }),
+    /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "mc2-drawer-row", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(TagChips, { tags: card.tags, onRemove: (t) => host.mutator.removeTag(card, t) }),
+      /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(
         "input",
         {
           className: "mc2-tag-input",
@@ -26658,11 +26577,11 @@ function CardDrawer({ host, component, card, onClose }) {
         }
       )
     ] }),
-    /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("div", { className: "mc2-section-title", children: [
+    /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "mc2-section-title", children: [
       "Description",
       card.openedAt ? ` (opened ${card.openedAt})` : ""
     ] }),
-    /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(
+    /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(
       "textarea",
       {
         className: "mc2-drawer-desc",
@@ -26674,9 +26593,9 @@ function CardDrawer({ host, component, card, onClose }) {
         }
       }
     ),
-    descDirty && /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("div", { className: "mc2-drawer-row", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("button", { className: "mod-cta", onClick: saveDesc, children: "Save description" }),
-      /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(
+    descDirty && /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("div", { className: "mc2-drawer-row", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("button", { className: "mod-cta", onClick: saveDesc, children: "Save description" }),
+      /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(
         "button",
         {
           onClick: () => {
@@ -26687,7 +26606,7 @@ function CardDrawer({ host, component, card, onClose }) {
         }
       )
     ] }),
-    /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(CardHistory, { host, component, card, hideDescription: true })
+    /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(CardHistory, { host, component, card, hideDescription: true })
   ] });
 }
 
@@ -27170,7 +27089,7 @@ var NewBoardModal = class extends import_obsidian8.Modal {
 };
 
 // src/views/OrgBoardView.tsx
-var import_jsx_runtime5 = __toESM(require_jsx_runtime());
+var import_jsx_runtime4 = __toESM(require_jsx_runtime());
 var VIEW_TYPE_ORG_BOARD = "meeting-composer-orgboard";
 var ORGBOARD_EXT = "orgboard";
 var DRAG_MIME = "application/x-meeting-composer-card";
@@ -27248,7 +27167,7 @@ var OrgBoardView = class extends import_obsidian9.TextFileView {
     if (!this.root)
       return;
     this.root.render(
-      /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(
+      /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(
         BoardApp,
         {
           host: this.host,
@@ -27290,15 +27209,15 @@ function BoardApp({ host, view, board, error, onChange, onEditJson }) {
     return out;
   }, [version, preset, query]);
   if (error) {
-    return /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("div", { className: "mc2-board-error", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("h3", { children: "This board file could not be read" }),
-      /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("p", { className: "mc2-error", children: error }),
-      /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("p", { className: "mc2-muted", children: "The file is left untouched. Fix it in the JSON editor:" }),
-      /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("button", { className: "mod-cta", onClick: onEditJson, children: "Edit board JSON" })
+    return /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("div", { className: "mc2-board-error", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("h3", { children: "This board file could not be read" }),
+      /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("p", { className: "mc2-error", children: error }),
+      /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("p", { className: "mc2-muted", children: "The file is left untouched. Fix it in the JSON editor:" }),
+      /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("button", { className: "mod-cta", onClick: onEditJson, children: "Edit board JSON" })
     ] });
   }
   if (!board || !preset)
-    return /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("div", { className: "mc2-muted mc2-empty", children: "Loading\u2026" });
+    return /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("div", { className: "mc2-muted mc2-empty", children: "Loading\u2026" });
   const selectedCard = selected ? host.store.getCard(selected) : void 0;
   const setPreset = (id) => onChange({ ...board, activePresetId: id });
   const latest = () => {
@@ -27392,10 +27311,10 @@ function BoardApp({ host, view, board, error, onChange, onEditJson }) {
     var _a2;
     return { raw: c, norm: normalizeColumn(c, (_a2 = preset.scopeFilter) == null ? void 0 : _a2.hierarchyPrefix) };
   });
-  return /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("div", { className: `mc2-board ${selectedCard ? "has-drawer" : ""}`, children: [
-    /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("div", { className: "mc2-board-toolbar", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("div", { className: "mc2-presets", role: "tablist", children: [
-        board.presets.map((p) => /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(
+  return /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("div", { className: `mc2-board ${selectedCard ? "has-drawer" : ""}`, children: [
+    /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("div", { className: "mc2-board-toolbar", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("div", { className: "mc2-presets", role: "tablist", children: [
+        board.presets.map((p) => /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(
           "button",
           {
             role: "tab",
@@ -27408,23 +27327,23 @@ function BoardApp({ host, view, board, error, onChange, onEditJson }) {
           },
           p.id
         )),
-        /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("button", { className: "mc2-tool-btn", onClick: editView, title: "Edit this view: name, layout, followed tags\u2026", "aria-label": "Edit view", children: "\u2699" }),
-        /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("button", { className: "mc2-tool-btn", onClick: newView, title: "Add a new view (tab) to this board", children: "\uFF0B View" })
+        /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("button", { className: "mc2-tool-btn", onClick: editView, title: "Edit this view: name, layout, followed tags\u2026", "aria-label": "Edit view", children: "\u2699" }),
+        /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("button", { className: "mc2-tool-btn", onClick: newView, title: "Add a new view (tab) to this board", children: "\uFF0B View" })
       ] }),
-      /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("input", { type: "search", placeholder: "Filter cards\u2026", value: query, onChange: (e) => setQuery(e.target.value) }),
-      /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("button", { onClick: newColumn, title: "Add a column to this view", children: "\uFF0B Column" }),
-      /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("button", { onClick: () => {
+      /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("input", { type: "search", placeholder: "Filter cards\u2026", value: query, onChange: (e) => setQuery(e.target.value) }),
+      /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("button", { onClick: newColumn, title: "Add a column to this view", children: "\uFF0B Column" }),
+      /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("button", { onClick: () => {
         var _a2, _b;
         return host.promptNewBoard((_b = (_a2 = view.file) == null ? void 0 : _a2.parent) == null ? void 0 : _b.path);
       }, title: "Create a new board file next to this one", children: "\uFF0B Board" }),
-      /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("button", { onClick: onEditJson, title: "Edit the presets as JSON", children: "{ } JSON" })
+      /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("button", { onClick: onEditJson, title: "Edit the presets as JSON", children: "{ } JSON" })
     ] }),
-    /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("div", { className: "mc2-board-body", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("div", { className: `mc2-columns mc2-layout-${preset.layout}`, children: [
+    /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("div", { className: "mc2-board-body", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("div", { className: `mc2-columns mc2-layout-${preset.layout}`, children: [
         cols.map(({ raw, norm }, i) => {
           var _a2;
           const list = (_a2 = columns.get(raw.id)) != null ? _a2 : [];
-          return /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)(
+          return /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)(
             "section",
             {
               className: `mc2-column ${dragOver === raw.id ? "is-drag-over" : ""}`,
@@ -27443,18 +27362,18 @@ function BoardApp({ host, view, board, error, onChange, onEditJson }) {
               },
               onDrop: (e) => onDrop(raw.id, e),
               children: [
-                /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("header", { className: "mc2-column-head", children: [
-                  /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("button", { className: "mc2-column-title", title: "Edit column", onClick: () => editColumn(raw), children: raw.title }),
-                  /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("span", { className: "mc2-muted mc2-column-rule", children: ruleLabel(norm) }),
-                  /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("span", { className: "mc2-badge", children: list.length }),
-                  /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("span", { className: "mc2-column-tools", children: [
-                    /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("button", { className: "mc2-icon-btn", "aria-label": `Move ${raw.title} left`, disabled: i === 0, onClick: () => shiftColumn(raw.id, -1), children: "\u2039" }),
-                    /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("button", { className: "mc2-icon-btn", "aria-label": `Move ${raw.title} right`, disabled: i === cols.length - 1, onClick: () => shiftColumn(raw.id, 1), children: "\u203A" }),
-                    /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("button", { className: "mc2-icon-btn", "aria-label": `Edit column ${raw.title}`, onClick: () => editColumn(raw), children: "\u270E" })
+                /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("header", { className: "mc2-column-head", children: [
+                  /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("button", { className: "mc2-column-title", title: "Edit column", onClick: () => editColumn(raw), children: raw.title }),
+                  /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("span", { className: "mc2-muted mc2-column-rule", children: ruleLabel(norm) }),
+                  /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("span", { className: "mc2-badge", children: list.length }),
+                  /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("span", { className: "mc2-column-tools", children: [
+                    /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("button", { className: "mc2-icon-btn", "aria-label": `Move ${raw.title} left`, disabled: i === 0, onClick: () => shiftColumn(raw.id, -1), children: "\u2039" }),
+                    /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("button", { className: "mc2-icon-btn", "aria-label": `Move ${raw.title} right`, disabled: i === cols.length - 1, onClick: () => shiftColumn(raw.id, 1), children: "\u203A" }),
+                    /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("button", { className: "mc2-icon-btn", "aria-label": `Edit column ${raw.title}`, onClick: () => editColumn(raw), children: "\u270E" })
                   ] })
                 ] }),
-                /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("div", { className: "mc2-column-cards", children: [
-                  list.map((c) => /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(
+                /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("div", { className: "mc2-column-cards", children: [
+                  list.map((c) => /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(
                     "div",
                     {
                       className: `mc2-card mc2-board-card ${selected === c.id ? "is-selected" : ""}`,
@@ -27464,20 +27383,20 @@ function BoardApp({ host, view, board, error, onChange, onEditJson }) {
                         e.dataTransfer.effectAllowed = "move";
                       },
                       onClick: () => setSelected(selected === c.id ? null : c.id),
-                      children: /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(CardFace, { card: c })
+                      children: /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(CardFace, { card: c })
                     },
                     c.id
                   )),
-                  list.length === 0 && /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("div", { className: "mc2-muted mc2-drop-hint", children: "Drop cards here" })
+                  list.length === 0 && /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("div", { className: "mc2-muted mc2-drop-hint", children: "Drop cards here" })
                 ] })
               ]
             },
             raw.id
           );
         }),
-        cols.length === 0 && /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("div", { className: "mc2-muted mc2-empty", children: "This view has no columns. Use \uFF0B Column." })
+        cols.length === 0 && /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("div", { className: "mc2-muted mc2-empty", children: "This view has no columns. Use \uFF0B Column." })
       ] }),
-      selectedCard && /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(CardDrawer, { host, component: view, card: selectedCard, onClose: () => setSelected(null) })
+      selectedCard && /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(CardDrawer, { host, component: view, card: selectedCard, onClose: () => setSelected(null) })
     ] })
   ] });
 }
@@ -27924,11 +27843,822 @@ var MeetingComposerV2 = class {
   }
 };
 
+// src/topics/TopicIndex.ts
+var import_obsidian12 = require("obsidian");
+
+// src/topics/topicModel.ts
+function pathKey(path, name) {
+  return (name === void 0 ? path : [...path, name]).join("\0");
+}
+function isTagQuery(text) {
+  return text.trim().startsWith("#");
+}
+function categorize(name, lists) {
+  const lower = name.toLowerCase();
+  if (lists.priorityBeforeCities.some((t) => t.toLowerCase() === lower))
+    return "org";
+  if (lists.cities.some((c) => lower.includes(c.toLowerCase())))
+    return "sector";
+  return "important";
+}
+function groupRoots(roots, lists) {
+  const out = { org: [], sector: [], important: [] };
+  for (const node of roots)
+    out[categorize(node.name, lists)].push(node);
+  return out;
+}
+function filterTree(nodes, query) {
+  const q = query.trim().toLowerCase();
+  const open = /* @__PURE__ */ new Set();
+  let matches2 = 0;
+  if (!q)
+    return { nodes, open, matches: 0 };
+  const walk = (list) => {
+    const out = [];
+    for (const node of list) {
+      const self = node.name.toLowerCase().includes(q);
+      const kids = walk(node.children);
+      if (self)
+        matches2++;
+      if (kids.length > 0)
+        open.add(pathKey(node.path, node.name));
+      if (self)
+        out.push(kids.length > 0 ? { ...node, children: mergeChildren(node.children, kids) } : node);
+      else if (kids.length > 0)
+        out.push({ ...node, children: kids });
+    }
+    return out;
+  };
+  return { nodes: walk(nodes), open, matches: matches2 };
+}
+function mergeChildren(all, filtered) {
+  const byName = new Map(filtered.map((n) => [n.name, n]));
+  return all.map((n) => {
+    var _a;
+    return (_a = byName.get(n.name)) != null ? _a : n;
+  });
+}
+function resolveTopicName(text, names) {
+  var _a;
+  const t = text.trim();
+  if (names.includes(t))
+    return t;
+  const lower = t.toLowerCase();
+  return (_a = names.find((n) => n.toLowerCase() === lower)) != null ? _a : t;
+}
+function runQuery(parser, q) {
+  const text = q.text.trim();
+  if (!text)
+    return [];
+  if (isTagQuery(text))
+    return parser.getOrganizedTags(text.replace(/^#+/, ""));
+  const lowerCities = parser.cities.map((c) => c.toLowerCase());
+  const cityContext = q.scoped && q.parentPath.some((p) => lowerCities.includes(p.toLowerCase()));
+  if (cityContext) {
+    let sub = parser.getTree();
+    for (const parent of q.parentPath) {
+      if (sub && sub[parent])
+        sub = sub[parent];
+    }
+    return parser.getOrganizedTopicsFromTree(text, sub, false);
+  }
+  return parser.getOrganizedTopics(text, true);
+}
+function entryHeadingPath(entry, tagQuery) {
+  return tagQuery ? entry.parent : [...entry.parent, entry.name];
+}
+function entryLinkText(entry, tagQuery) {
+  const file = entry.path || entry.id;
+  const headings = entryHeadingPath(entry, tagQuery);
+  return headings.length ? `${file}#${headings.join("#")}` : file;
+}
+function queryLabel(q) {
+  return isTagQuery(q.text) ? `#${q.text.trim().replace(/^#+/, "")}` : q.text.trim();
+}
+
+// src/topics/TopicIndex.ts
+var TopicIndex = class extends import_obsidian12.Events {
+  constructor(app, parser, minutesDir) {
+    super();
+    this.app = app;
+    this.parser = parser;
+    this.minutesDir = minutesDir;
+    this.roots = [];
+    this.ready = false;
+    /** Global (false) or sector-scoped (true) search for tree clicks. */
+    this.scoped = false;
+    this.generation = 0;
+    this.timer = null;
+  }
+  on(name, cb) {
+    return super.on(name, cb);
+  }
+  /** Re-read every minutes file and rebuild the tree. Overlapping calls: only the latest one wins. */
+  async rebuild() {
+    var _a, _b;
+    const gen = ++this.generation;
+    const dir = this.minutesDir().replace(/\/+$/, "");
+    const texts = [];
+    let folder = this.app.vault.getAbstractFileByPath(dir);
+    if (!folder && dir) {
+      try {
+        await this.app.vault.createFolder(dir);
+      } catch (e) {
+      }
+      folder = this.app.vault.getAbstractFileByPath(dir);
+    }
+    if (folder instanceof import_obsidian12.TFolder) {
+      const live = /* @__PURE__ */ new Map();
+      this.app.workspace.getLeavesOfType("markdown").forEach((leaf) => {
+        const v = leaf.view;
+        if (v instanceof import_obsidian12.MarkdownView && v.file)
+          live.set(v.file.path, v.editor.getValue());
+      });
+      for (const child of folder.children) {
+        if (!(child instanceof import_obsidian12.TFile) || child.extension !== "md")
+          continue;
+        const text = (_a = live.get(child.path)) != null ? _a : await this.app.vault.cachedRead(child);
+        texts.push({ name: child.basename.trim(), path: child.path.replace(/\.md$/, ""), text });
+      }
+    }
+    if (gen !== this.generation)
+      return;
+    this.parser.resetTree();
+    for (const t of texts)
+      this.parser.AppendToExistingTree(t.text, t.name, t.path);
+    this.roots = (_b = this.parser.GenerateTopicTree(false).children) != null ? _b : [];
+    this.ready = true;
+    this.trigger("changed");
+  }
+  scheduleRebuild(delay = 1e3) {
+    if (this.timer !== null)
+      window.clearTimeout(this.timer);
+    this.timer = window.setTimeout(() => {
+      this.timer = null;
+      void this.rebuild();
+    }, delay);
+  }
+  cancelScheduled() {
+    if (this.timer !== null)
+      window.clearTimeout(this.timer);
+    this.timer = null;
+  }
+  setScoped(scoped) {
+    this.scoped = scoped;
+    this.trigger("scope-changed");
+  }
+  query(q) {
+    return runQuery(this.parser, q);
+  }
+  toMarkdown(entries) {
+    return this.parser.convertOrganizedTopicToMD(entries);
+  }
+  topicNames() {
+    return this.parser.getAllTopicNames();
+  }
+};
+
+// src/topics/host.ts
+var VIEW_TYPE_TOPICS = "meeting-composer-topics";
+var VIEW_TYPE_RESULTS = "meeting-composer-results";
+
+// src/topics/TopicsSidebarView.ts
+var import_obsidian13 = require("obsidian");
+var GROUPS = [
+  { id: "org", label: "Organizations" },
+  { id: "sector", label: "Sectors" },
+  { id: "important", label: "Important topics" }
+];
+var TopicsSidebarView = class extends import_obsidian13.ItemView {
+  constructor(leaf, host) {
+    super(leaf);
+    this.host = host;
+    this.expanded = /* @__PURE__ */ new Set();
+    this.collapsedGroups = /* @__PURE__ */ new Set();
+    /** Ancestors opened by the current filter (not saved). */
+    this.forcedOpen = /* @__PURE__ */ new Set();
+    this.activeKey = null;
+    this.filter = "";
+    this.filterTimer = null;
+    this.lastSuggestPick = 0;
+    this.rows = /* @__PURE__ */ new WeakMap();
+  }
+  getViewType() {
+    return VIEW_TYPE_TOPICS;
+  }
+  getDisplayText() {
+    return "Topics";
+  }
+  getIcon() {
+    return "scroll-text";
+  }
+  getState() {
+    const state = { expanded: [...this.expanded], collapsedGroups: [...this.collapsedGroups] };
+    return { ...super.getState(), ...state };
+  }
+  async setState(state, result) {
+    if (Array.isArray(state == null ? void 0 : state.expanded))
+      this.expanded = new Set(state.expanded);
+    if (Array.isArray(state == null ? void 0 : state.collapsedGroups))
+      this.collapsedGroups = new Set(state.collapsedGroups);
+    if (this.bodyEl)
+      this.renderTree();
+    await super.setState(state, result);
+  }
+  async onOpen() {
+    const root = this.contentEl;
+    root.empty();
+    root.addClass("mc-topics");
+    const header = root.createDiv("mc-topics-header");
+    const searchWrap = header.createDiv("search-input-container mc-topics-search");
+    this.inputEl = searchWrap.createEl("input", {
+      type: "search",
+      attr: { placeholder: "Search topics or #tags\u2026", spellcheck: "false", "aria-label": "Search topics or #tags" }
+    });
+    const actions = header.createDiv("mc-topics-actions");
+    const iconButton = (icon, label, onClick) => {
+      const b = actions.createDiv({ cls: "clickable-icon", attr: { "aria-label": label, role: "button", tabindex: "0" } });
+      (0, import_obsidian13.setIcon)(b, icon);
+      this.registerDomEvent(b, "click", onClick);
+      this.registerDomEvent(b, "keydown", (e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          onClick();
+        }
+      });
+      return b;
+    };
+    iconButton("rotate-cw", "Reload minutes", () => void this.host.index.rebuild());
+    this.scopeBtn = iconButton("globe", "", () => this.host.index.setScoped(!this.host.index.scoped));
+    iconButton("chevrons-down-up", "Collapse all", () => this.collapseAll());
+    this.updateScopeButton();
+    this.bodyEl = root.createDiv({ cls: "mc-topics-body", attr: { role: "tree" } });
+    if (this.host.autoCompleteEnabled()) {
+      new TopicNameSuggest(this.app, this.inputEl, () => this.host.index.topicNames(), (value, evt) => {
+        this.lastSuggestPick = Date.now();
+        this.inputEl.value = value;
+        this.setFilter(value, true);
+        this.submit(value, !!import_obsidian13.Keymap.isModEvent(evt));
+      });
+    }
+    this.registerDomEvent(this.inputEl, "input", () => this.setFilter(this.inputEl.value));
+    this.registerDomEvent(this.inputEl, "keydown", (e) => {
+      if (e.key === "Enter") {
+        const newTab = !!import_obsidian13.Keymap.isModEvent(e);
+        window.setTimeout(() => {
+          if (Date.now() - this.lastSuggestPick < 100)
+            return;
+          this.submit(this.inputEl.value, newTab);
+        }, 0);
+      } else if (e.key === "Escape" && this.inputEl.value) {
+        e.preventDefault();
+        this.inputEl.value = "";
+        this.setFilter("", true);
+      }
+    });
+    this.registerDomEvent(this.bodyEl, "click", (e) => this.onTreeClick(e));
+    this.registerDomEvent(this.bodyEl, "auxclick", (e) => {
+      if (e.button === 1)
+        this.onTreeClick(e);
+    });
+    this.registerDomEvent(this.bodyEl, "keydown", (e) => this.onTreeKey(e));
+    this.registerEvent(this.host.index.on("changed", () => this.renderTree()));
+    this.registerEvent(this.host.index.on("scope-changed", () => this.updateScopeButton()));
+    this.renderTree();
+  }
+  async onClose() {
+    if (this.filterTimer !== null)
+      window.clearTimeout(this.filterTimer);
+    this.contentEl.empty();
+  }
+  focusSearch() {
+    var _a, _b;
+    (_a = this.inputEl) == null ? void 0 : _a.focus();
+    (_b = this.inputEl) == null ? void 0 : _b.select();
+  }
+  // ---------- search ----------
+  setFilter(value, immediate = false) {
+    if (this.filterTimer !== null)
+      window.clearTimeout(this.filterTimer);
+    const apply = () => {
+      this.filterTimer = null;
+      if (value === this.filter)
+        return;
+      this.filter = value;
+      this.renderTree();
+    };
+    if (immediate)
+      apply();
+    else
+      this.filterTimer = window.setTimeout(apply, 150);
+  }
+  submit(raw, newTab) {
+    const text = raw.trim();
+    if (!text)
+      return;
+    if (isTagQuery(text)) {
+      const tag = text.replace(/^#+/, "").trim();
+      if (tag)
+        void this.host.showResults({ text: `#${tag}`, parentPath: [], scoped: false }, newTab);
+      return;
+    }
+    const name = resolveTopicName(text, this.host.index.topicNames());
+    void this.host.showResults({ text: name, parentPath: [], scoped: false }, newTab);
+  }
+  updateScopeButton() {
+    if (!this.scopeBtn)
+      return;
+    const scoped = this.host.index.scoped;
+    this.scopeBtn.empty();
+    (0, import_obsidian13.setIcon)(this.scopeBtn, scoped ? "map-pin" : "globe");
+    this.scopeBtn.toggleClass("is-active", scoped);
+    this.scopeBtn.setAttr(
+      "aria-label",
+      scoped ? "Scoped: clicks under a sector only search inside that sector. Click for global." : "Global: clicks search every minutes file. Click to scope to the sector."
+    );
+  }
+  // ---------- tree rendering ----------
+  renderTree() {
+    const body = this.bodyEl;
+    if (!body)
+      return;
+    body.empty();
+    const index = this.host.index;
+    if (!index.ready) {
+      body.createDiv({ cls: "mc-topics-empty", text: "Loading topics\u2026" });
+      return;
+    }
+    if (index.roots.length === 0) {
+      body.createDiv({
+        cls: "mc-topics-empty",
+        text: `No topics yet. Write headings (#, ##, \u2026) in the notes in \u201C${this.host.minutesDir()}\u201D to build the tree.`
+      });
+      return;
+    }
+    const tagMode = isTagQuery(this.filter);
+    const filtered = !tagMode && this.filter.trim() ? filterTree(index.roots, this.filter) : null;
+    this.forcedOpen = filtered ? filtered.open : /* @__PURE__ */ new Set();
+    const roots = filtered ? filtered.nodes : index.roots;
+    if (tagMode) {
+      const tag = this.filter.trim().replace(/^#+/, "");
+      body.createDiv({ cls: "mc-topics-hint", text: tag ? `Press Enter to show everything tagged #${tag}.` : "Type a tag name, then press Enter." });
+    }
+    if (filtered && roots.length === 0) {
+      body.createDiv({ cls: "mc-topics-empty", text: `No topics match \u201C${this.filter.trim()}\u201D.` });
+      return;
+    }
+    const groups = groupRoots(roots, index.parser);
+    for (const g of GROUPS) {
+      const nodes = groups[g.id];
+      if (nodes.length === 0)
+        continue;
+      const collapsed = !filtered && this.collapsedGroups.has(g.id);
+      const section = body.createDiv({ cls: "mc-topics-group", attr: { "data-group": g.id } });
+      const head = section.createDiv({
+        cls: "mc-topics-group-head",
+        attr: { role: "button", tabindex: "0", "aria-expanded": String(!collapsed) }
+      });
+      const chev = head.createDiv("mc-topics-group-chevron collapse-icon");
+      (0, import_obsidian13.setIcon)(chev, "right-triangle");
+      chev.toggleClass("is-collapsed", collapsed);
+      head.createSpan({ cls: "mc-topics-group-label", text: g.label });
+      head.createSpan({ cls: "mc-topics-group-count", text: String(nodes.length) });
+      const list = section.createDiv("mc-topics-group-items");
+      list.toggle(!collapsed);
+      for (const node of nodes)
+        this.renderNode(list, node);
+    }
+  }
+  renderNode(parent, node) {
+    const key = pathKey(node.path, node.name);
+    const hasKids = node.children.length > 0;
+    const item = parent.createDiv("tree-item mc-topics-item");
+    const self = item.createDiv({
+      cls: "tree-item-self is-clickable mc-topics-row",
+      attr: { role: "treeitem", tabindex: "0", "aria-label": node.name }
+    });
+    if (key === this.activeKey)
+      self.addClass("is-active");
+    const icon = self.createDiv("tree-item-icon collapse-icon mc-topics-chevron");
+    if (hasKids) {
+      self.addClass("mod-collapsible");
+      (0, import_obsidian13.setIcon)(icon, "right-triangle");
+    } else {
+      icon.addClass("is-leaf");
+    }
+    const inner = self.createDiv("tree-item-inner mc-topics-label");
+    appendHighlighted(inner, node.name, isTagQuery(this.filter) ? "" : this.filter.trim());
+    if (hasKids)
+      self.createDiv("tree-item-flair-outer").createSpan({ cls: "tree-item-flair", text: String(node.children.length) });
+    const state = { node, key, item, icon, children: null };
+    this.rows.set(self, state);
+    const open = hasKids && (this.forcedOpen.has(key) || this.expanded.has(key));
+    this.applyOpen(self, state, open);
+  }
+  applyOpen(self, state, open) {
+    var _a;
+    if (state.node.children.length === 0)
+      return;
+    state.icon.toggleClass("is-collapsed", !open);
+    state.item.toggleClass("is-collapsed", !open);
+    self.setAttr("aria-expanded", String(open));
+    if (open && !state.children) {
+      state.children = state.item.createDiv({ cls: "tree-item-children mc-topics-children", attr: { role: "group" } });
+      for (const child of state.node.children)
+        this.renderNode(state.children, child);
+    }
+    (_a = state.children) == null ? void 0 : _a.toggle(open);
+  }
+  toggle(self, state, open) {
+    if (state.node.children.length === 0)
+      return;
+    const next = open != null ? open : state.icon.hasClass("is-collapsed");
+    if (next)
+      this.expanded.add(state.key);
+    else {
+      this.expanded.delete(state.key);
+      this.forcedOpen.delete(state.key);
+    }
+    this.applyOpen(self, state, next);
+    this.app.workspace.requestSaveLayout();
+  }
+  select(self, state, newTab) {
+    this.activeKey = state.key;
+    this.bodyEl.querySelectorAll(".mc-topics-row.is-active").forEach((el) => el.removeClass("is-active"));
+    self.addClass("is-active");
+    void this.host.showResults({ text: state.node.name, parentPath: state.node.path, scoped: this.host.index.scoped }, newTab);
+  }
+  collapseAll() {
+    this.expanded.clear();
+    this.forcedOpen.clear();
+    this.renderTree();
+    this.app.workspace.requestSaveLayout();
+  }
+  toggleGroup(head) {
+    var _a;
+    const section = head.closest(".mc-topics-group");
+    const id = section == null ? void 0 : section.getAttr("data-group");
+    if (!section || !id)
+      return;
+    const list = section.querySelector(".mc-topics-group-items");
+    const collapse = !(list && list.style.display === "none");
+    if (collapse)
+      this.collapsedGroups.add(id);
+    else
+      this.collapsedGroups.delete(id);
+    list == null ? void 0 : list.toggle(!collapse);
+    (_a = head.querySelector(".mc-topics-group-chevron")) == null ? void 0 : _a.toggleClass("is-collapsed", collapse);
+    head.setAttr("aria-expanded", String(!collapse));
+    this.app.workspace.requestSaveLayout();
+  }
+  // ---------- events ----------
+  onTreeClick(e) {
+    const target = e.target;
+    const groupHead = target.closest(".mc-topics-group-head");
+    if (groupHead) {
+      this.toggleGroup(groupHead);
+      return;
+    }
+    const self = target.closest(".mc-topics-row");
+    const state = self && this.rows.get(self);
+    if (!self || !state)
+      return;
+    self.focus({ preventScroll: true });
+    if (target.closest(".mc-topics-chevron")) {
+      e.preventDefault();
+      e.stopPropagation();
+      this.toggle(self, state);
+      return;
+    }
+    this.select(self, state, e.button === 1 || !!import_obsidian13.Keymap.isModEvent(e));
+  }
+  onTreeKey(e) {
+    var _a, _b, _c, _d, _e, _f;
+    const target = e.target;
+    if (target.hasClass("mc-topics-group-head")) {
+      if (e.key === "Enter" || e.key === " ") {
+        e.preventDefault();
+        this.toggleGroup(target);
+      }
+      return;
+    }
+    const state = this.rows.get(target);
+    if (!state)
+      return;
+    const hasKids = state.node.children.length > 0;
+    const open = hasKids && !state.icon.hasClass("is-collapsed");
+    switch (e.key) {
+      case "Enter":
+        this.select(target, state, !!import_obsidian13.Keymap.isModEvent(e));
+        break;
+      case " ":
+        this.toggle(target, state);
+        break;
+      case "ArrowRight":
+        if (hasKids && !open)
+          this.toggle(target, state, true);
+        else if (open)
+          this.focusRow((_b = (_a = state.children) == null ? void 0 : _a.querySelector(".mc-topics-row")) != null ? _b : null);
+        break;
+      case "ArrowLeft":
+        if (open)
+          this.toggle(target, state, false);
+        else
+          this.focusRow((_e = (_d = (_c = state.item.parentElement) == null ? void 0 : _c.closest(".tree-item")) == null ? void 0 : _d.querySelector(":scope > .mc-topics-row")) != null ? _e : null);
+        break;
+      case "ArrowDown":
+      case "ArrowUp": {
+        const rows = this.visibleRows();
+        const i = rows.indexOf(target);
+        this.focusRow((_f = rows[i + (e.key === "ArrowDown" ? 1 : -1)]) != null ? _f : null);
+        break;
+      }
+      default:
+        return;
+    }
+    e.preventDefault();
+  }
+  visibleRows() {
+    return Array.from(this.bodyEl.querySelectorAll(".mc-topics-row")).filter((el) => el.offsetParent !== null);
+  }
+  focusRow(el) {
+    if (!el)
+      return;
+    el.focus();
+    el.scrollIntoView({ block: "nearest" });
+  }
+};
+function appendHighlighted(el, text, query) {
+  const i = query ? text.toLowerCase().indexOf(query.toLowerCase()) : -1;
+  if (i < 0) {
+    el.setText(text);
+    return;
+  }
+  if (i > 0)
+    el.appendText(text.slice(0, i));
+  el.createSpan({ cls: "mc-topics-match", text: text.slice(i, i + query.length) });
+  if (i + query.length < text.length)
+    el.appendText(text.slice(i + query.length));
+}
+var TopicNameSuggest = class extends import_obsidian13.AbstractInputSuggest {
+  constructor(app, inputEl, names, pick) {
+    super(app, inputEl);
+    this.names = names;
+    this.pick = pick;
+  }
+  selectSuggestion(value, evt) {
+    this.close();
+    this.pick(value, evt);
+  }
+  getSuggestions(query) {
+    const q = query.trim().toLowerCase();
+    if (!q || isTagQuery(q))
+      return [];
+    return this.names().filter((n) => n.toLowerCase().includes(q)).slice(0, 50);
+  }
+  renderSuggestion(value, el) {
+    el.setText(value);
+  }
+};
+
+// src/topics/TopicResultsView.ts
+var import_obsidian14 = require("obsidian");
+var TopicResultsView = class extends import_obsidian14.ItemView {
+  constructor(leaf, host) {
+    super(leaf);
+    this.host = host;
+    this.q = null;
+    this.entries = [];
+    this.lastMarkdown = null;
+    this.renderChild = null;
+    this.renderToken = 0;
+  }
+  getViewType() {
+    return VIEW_TYPE_RESULTS;
+  }
+  getDisplayText() {
+    if (!this.q)
+      return "Topic results";
+    return isTagQuery(this.q.text) ? `Tag: ${queryLabel(this.q)}` : `Topic: ${queryLabel(this.q)}`;
+  }
+  getIcon() {
+    return "file-search";
+  }
+  getState() {
+    var _a;
+    return { ...super.getState(), ...(_a = this.q) != null ? _a : {} };
+  }
+  async setState(state, result) {
+    if (state && typeof state.text === "string") {
+      this.setQuery({
+        text: state.text,
+        parentPath: Array.isArray(state.parentPath) ? state.parentPath : [],
+        scoped: !!state.scoped
+      });
+    }
+    await super.setState(state, result);
+  }
+  /** Show a new query (called by the plugin when a topic is clicked / searched). */
+  setQuery(q) {
+    var _a, _b, _c;
+    this.q = q;
+    this.lastMarkdown = null;
+    this.refresh(true);
+    (_b = (_a = this.leaf).updateHeader) == null ? void 0 : _b.call(_a);
+    (_c = this.titleEl) == null ? void 0 : _c.setText(this.getDisplayText());
+  }
+  async onOpen() {
+    const root = this.contentEl;
+    root.empty();
+    root.addClass("mc-results");
+    this.headerEl = root.createDiv("mc-results-header");
+    this.listEl = root.createDiv("mc-results-list");
+    this.registerDomEvent(this.listEl, "click", (e) => this.onLinkClick(e));
+    this.registerDomEvent(this.listEl, "auxclick", (e) => {
+      if (e.button === 1)
+        this.onLinkClick(e);
+    });
+    this.registerDomEvent(this.listEl, "mouseover", (e) => this.onLinkHover(e));
+    this.registerEvent(this.host.index.on("changed", () => this.refresh(false)));
+    this.refresh(true);
+  }
+  async onClose() {
+    this.clearRendered();
+    this.contentEl.empty();
+  }
+  /** Re-run the query. With `force` false, skip re-rendering when nothing changed (avoids flicker on rebuilds). */
+  refresh(force) {
+    if (!this.listEl)
+      return;
+    const index = this.host.index;
+    if (!this.q) {
+      this.renderHeader();
+      this.renderMessage("Click a topic in the Topics sidebar, or search for a topic or #tag.");
+      return;
+    }
+    if (!index.ready) {
+      this.renderHeader();
+      this.renderMessage("Loading minutes\u2026");
+      return;
+    }
+    this.entries = index.query(this.q);
+    const md = index.toMarkdown(this.entries);
+    if (!force && md === this.lastMarkdown)
+      return;
+    this.lastMarkdown = md;
+    this.renderHeader();
+    void this.renderEntries();
+  }
+  renderHeader() {
+    const h = this.headerEl;
+    h.empty();
+    const title = h.createDiv("mc-results-title");
+    if (!this.q) {
+      title.setText("Topic results");
+      return;
+    }
+    const tag = isTagQuery(this.q.text);
+    const crumbs = title.createDiv("mc-results-crumbs");
+    if (!tag) {
+      for (const p of this.q.parentPath) {
+        crumbs.createSpan({ cls: "mc-results-crumb", text: p });
+        crumbs.createSpan({ cls: "mc-results-sep", text: "\u203A" });
+      }
+    }
+    crumbs.createSpan({ cls: "mc-results-query", text: queryLabel(this.q) });
+    const meta = h.createDiv("mc-results-meta");
+    const n = this.entries.length;
+    const scope = tag ? "tag search" : this.q.scoped ? "scoped to sector" : "all minutes";
+    meta.createSpan({ text: `${n} ${n === 1 ? "entry" : "entries"} \xB7 ${scope}` });
+    const copy = meta.createDiv({ cls: "clickable-icon mc-results-copy", attr: { "aria-label": "Copy as Markdown", role: "button", tabindex: "0" } });
+    (0, import_obsidian14.setIcon)(copy, "copy");
+    const doCopy = async () => {
+      try {
+        await navigator.clipboard.writeText(this.host.index.toMarkdown(this.entries));
+        new import_obsidian14.Notice("Results copied as Markdown");
+      } catch (err) {
+        console.error("Meeting Composer: copy failed", err);
+        new import_obsidian14.Notice("Could not copy to the clipboard");
+      }
+    };
+    copy.onclick = () => void doCopy();
+    copy.onkeydown = (e) => {
+      if (e.key === "Enter" || e.key === " ") {
+        e.preventDefault();
+        void doCopy();
+      }
+    };
+  }
+  renderMessage(text) {
+    this.clearRendered();
+    this.listEl.empty();
+    this.listEl.createDiv({ cls: "mc-results-empty", text });
+  }
+  clearRendered() {
+    if (this.renderChild)
+      this.removeChild(this.renderChild);
+    this.renderChild = null;
+  }
+  async renderEntries() {
+    const token = ++this.renderToken;
+    this.clearRendered();
+    const child = this.renderChild = this.addChild(new import_obsidian14.Component());
+    const list = this.listEl;
+    const scrollTop = list.scrollTop;
+    list.empty();
+    const q = this.q;
+    if (this.entries.length === 0) {
+      list.createDiv({
+        cls: "mc-results-empty",
+        text: isTagQuery(q.text) ? `Nothing is tagged ${queryLabel(q)}.` : `No entries found for \u201C${queryLabel(q)}\u201D.`
+      });
+      return;
+    }
+    const tag = isTagQuery(q.text);
+    for (const entry of this.entries) {
+      const block = list.createDiv("mc-results-entry");
+      const head = block.createDiv("mc-results-entry-head");
+      const link = head.createEl("a", {
+        cls: "internal-link mc-results-source",
+        text: entry.id || entry.path || "source",
+        attr: { "data-href": entryLinkText(entry, tag), href: entryLinkText(entry, tag) }
+      });
+      link.setAttr("aria-label", `Open ${entryLinkText(entry, tag)}`);
+      const crumbs = head.createDiv("mc-results-entry-path");
+      const parts = entryHeadingPath(entry, tag);
+      parts.forEach((p, i) => {
+        if (i > 0)
+          crumbs.createSpan({ cls: "mc-results-sep", text: "\u203A" });
+        crumbs.createSpan({ cls: i === parts.length - 1 ? "mc-results-entry-topic" : "mc-results-crumb", text: p });
+      });
+      if (entry.tags.length) {
+        const tags = head.createDiv("mc-results-tags");
+        for (const t of entry.tags)
+          tags.createEl("a", { cls: "tag", text: `#${t}`, attr: { href: `#${t}` } });
+      }
+      const body = block.createDiv("mc-results-entry-body markdown-rendered");
+      const md = entry.content.join("\n").trim();
+      if (md) {
+        const sourcePath = entry.path ? `${entry.path}.md` : "";
+        await import_obsidian14.MarkdownRenderer.render(this.app, md, body, sourcePath, child);
+        if (token !== this.renderToken)
+          return;
+      } else {
+        body.createDiv({ cls: "mc-results-no-body", text: "(no notes under this heading)" });
+      }
+    }
+    list.scrollTop = scrollTop;
+  }
+  // ---------- links inside rendered results ----------
+  sourcePathFor(el) {
+    var _a, _b;
+    const entry = el.closest(".mc-results-entry");
+    const src = (_b = (_a = entry == null ? void 0 : entry.querySelector(".mc-results-source")) == null ? void 0 : _a.getAttr("data-href")) != null ? _b : "";
+    const file = src.split("#")[0];
+    return file ? `${file}.md` : "";
+  }
+  onLinkClick(e) {
+    var _a, _b, _c;
+    const target = e.target;
+    const tagEl = target.closest("a.tag");
+    if (tagEl) {
+      e.preventDefault();
+      const tag = ((_a = tagEl.getAttr("href")) != null ? _a : tagEl.getText()).replace(/^#+/, "");
+      if (tag)
+        void this.host.showResults({ text: `#${tag}`, parentPath: [], scoped: false }, e.button === 1 || !!import_obsidian14.Keymap.isModEvent(e));
+      return;
+    }
+    const link = target.closest("a.internal-link");
+    if (link) {
+      e.preventDefault();
+      const href = (_c = (_b = link.getAttr("data-href")) != null ? _b : link.getAttr("href")) != null ? _c : "";
+      if (href)
+        void this.app.workspace.openLinkText(href, this.sourcePathFor(link), e.button === 1 || import_obsidian14.Keymap.isModEvent(e));
+    }
+  }
+  onLinkHover(e) {
+    var _a, _b;
+    const link = e.target.closest("a.internal-link");
+    if (!link)
+      return;
+    const href = (_b = (_a = link.getAttr("data-href")) != null ? _a : link.getAttr("href")) != null ? _b : "";
+    if (!href)
+      return;
+    this.app.workspace.trigger("hover-link", {
+      event: e,
+      source: VIEW_TYPE_RESULTS,
+      hoverParent: this,
+      targetEl: link,
+      linktext: href,
+      sourcePath: this.sourcePathFor(link)
+    });
+  }
+};
+
 // main.ts
 var MDParser = new MarkdownParser();
-var OutputWindow = null;
-var VIEW_TYPE_EXAMPLE = "example-view";
-var VIEW_TYPE_FILE = "file-view";
+var LEGACY_VIEW_SEARCH = "example-view";
+var LEGACY_VIEW_TREE = "file-view";
 var DEFAULT_SETTINGS = {
   MeenutesDir: "Atas",
   OutputFileName: "output.md",
@@ -27942,74 +28672,54 @@ var DEFAULT_SETTINGS = {
   processedRecallCloses: [],
   recallClosedBy: []
 };
-var TreeView = null;
-var currentToggle = () => {
-};
-var MyPlugin = class extends import_obsidian12.Plugin {
+var MyPlugin = class extends import_obsidian15.Plugin {
   constructor() {
     super(...arguments);
-    this.topicTree = null;
-    this.scopedSearch = false;
-    this.reloadDebounce = null;
     this.reindexDebounce = null;
-  }
-  createTreeView(leaf) {
-    const view = new MyFolderItemView(leaf, this);
-    TreeView = view;
-    return view;
-  }
-  async loadTree() {
-    const dir = this.settings.MeenutesDir;
-    if (!this.app.vault.getFolderByPath(dir)) {
-      await this.app.vault.createFolder(dir);
-    }
-    const folder = this.app.vault.getFolderByPath(dir);
-    if (!folder)
-      return;
-    for (const child of folder.children) {
-      if (!(child instanceof import_obsidian12.TFile) || !child.name.endsWith(".md"))
-        continue;
-      const content = await this.app.vault.read(child);
-      const name = child.name.replace(".md", "").trim();
-      const filePath = child.path.replace(".md", "");
-      MDParser.AppendToExistingTree(content, name, filePath);
-    }
-  }
-  async reloadTree() {
-    this.topicTree = null;
-    if (TreeView)
-      TreeView.root = null;
-    TreeView == null ? void 0 : TreeView.onOpen();
   }
   async onload() {
     await this.loadSettings();
-    MDParser.setPriorityLists(
-      this.settings.priorityBeforeCities,
-      this.settings.cities,
-      this.settings.priorityAfterCities
-    );
-    this.app.workspace.onLayoutReady(() => this.loadTree());
-    this.registerView(VIEW_TYPE_EXAMPLE, (leaf) => new ExampleView(leaf, this));
-    this.registerView(VIEW_TYPE_FILE, (leaf) => this.createTreeView(leaf));
-    this.addRibbonIcon("scroll-text", "Open Meeting Composer", () => {
-      this.activateView();
-      this.activateFileView();
+    this.applyPriorityLists();
+    this.index = new TopicIndex(this.app, MDParser, () => this.settings.MeenutesDir);
+    this.app.workspace.onLayoutReady(() => void this.index.rebuild());
+    this.registerView(VIEW_TYPE_TOPICS, (leaf) => new TopicsSidebarView(leaf, this));
+    this.registerView(VIEW_TYPE_RESULTS, (leaf) => new TopicResultsView(leaf, this));
+    this.registerView(LEGACY_VIEW_TREE, (leaf) => new LegacyView(leaf, LEGACY_VIEW_TREE, () => leaf.setViewState({ type: VIEW_TYPE_TOPICS, active: false })));
+    this.registerView(LEGACY_VIEW_SEARCH, (leaf) => new LegacyView(leaf, LEGACY_VIEW_SEARCH, () => leaf.detach()));
+    this.registerHoverLinkSource(VIEW_TYPE_RESULTS, { display: "Meeting Composer results", defaultMod: true });
+    this.addRibbonIcon("scroll-text", "Open Meeting Composer topics", () => void this.activateTopicsView());
+    this.addCommand({ id: "open-topics-sidebar", name: "Open topics sidebar", callback: () => void this.activateTopicsView() });
+    this.addCommand({
+      id: "search-topics",
+      name: "Search topics\u2026",
+      callback: async () => {
+        const view = await this.activateTopicsView();
+        view == null ? void 0 : view.focusSearch();
+      }
     });
+    this.addCommand({ id: "reload-topics", name: "Reload minutes (rebuild topic tree)", callback: () => void this.index.rebuild() });
     this.addSettingTab(new MeetingComposerSettingTab(this.app, this));
     this.registerEditorSuggest(new TopicEditorSuggest(this.app, this));
     this.registerEvent(this.app.workspace.on("editor-change", (editor, info) => {
       if (!this.settings.autoReload)
         return;
       const file = info.file;
-      if (!file || !file.path.startsWith(this.settings.MeenutesDir + "/"))
+      if (!file || !this.inMinutes(file))
         return;
       const line = editor.getLine(editor.getCursor().line);
       if (!/^#{1,6} .+/.test(line))
         return;
-      if (this.reloadDebounce)
-        clearTimeout(this.reloadDebounce);
-      this.reloadDebounce = setTimeout(() => this.reloadTree(), 1e3);
+      this.index.scheduleRebuild(1e3);
     }));
+    const onFileSetChange = (file, oldPath) => {
+      if (this.inMinutes(file) || oldPath && oldPath.startsWith(this.minutesPrefix()))
+        this.index.scheduleRebuild(500);
+    };
+    this.app.workspace.onLayoutReady(() => {
+      this.registerEvent(this.app.vault.on("create", (f) => onFileSetChange(f)));
+      this.registerEvent(this.app.vault.on("delete", (f) => onFileSetChange(f)));
+      this.registerEvent(this.app.vault.on("rename", (f, old) => onFileSetChange(f, old)));
+    });
     this.v2 = new MeetingComposerV2(this, () => ({
       minutesDir: this.settings.MeenutesDir,
       outputDir: this.settings.OutputDir,
@@ -28026,6 +28736,52 @@ var MyPlugin = class extends import_obsidian12.Plugin {
     });
     this.v2.load();
   }
+  minutesPrefix() {
+    return this.settings.MeenutesDir.replace(/\/+$/, "") + "/";
+  }
+  inMinutes(file) {
+    return file instanceof import_obsidian15.TFile && file.extension === "md" && file.path.startsWith(this.minutesPrefix());
+  }
+  applyPriorityLists() {
+    MDParser.setPriorityLists(this.settings.priorityBeforeCities, this.settings.cities, this.settings.priorityAfterCities);
+  }
+  // ---------- TopicsHost ----------
+  autoCompleteEnabled() {
+    return this.settings.autoComplete;
+  }
+  minutesDir() {
+    return this.settings.MeenutesDir;
+  }
+  /** Show a query in the Results tab: reuse the open one (updated in place) or open one tab for it. */
+  async showResults(q, newTab = false) {
+    var _a;
+    const { workspace } = this.app;
+    const existing = (_a = workspace.getLeavesOfType(VIEW_TYPE_RESULTS)[0]) != null ? _a : null;
+    if (existing && !newTab)
+      await loadIfDeferred(existing);
+    if (existing && !newTab && existing.view instanceof TopicResultsView) {
+      existing.view.setQuery(q);
+      workspace.revealLeaf(existing);
+      return;
+    }
+    const leaf = workspace.getLeaf("tab");
+    await leaf.setViewState({ type: VIEW_TYPE_RESULTS, state: q, active: true });
+    workspace.revealLeaf(leaf);
+  }
+  async activateTopicsView() {
+    var _a;
+    const { workspace } = this.app;
+    let leaf = (_a = workspace.getLeavesOfType(VIEW_TYPE_TOPICS)[0]) != null ? _a : null;
+    if (!leaf) {
+      leaf = workspace.getRightLeaf(false);
+      if (!leaf)
+        return null;
+      await leaf.setViewState({ type: VIEW_TYPE_TOPICS, active: true });
+    }
+    workspace.revealLeaf(leaf);
+    await loadIfDeferred(leaf);
+    return leaf.view instanceof TopicsSidebarView ? leaf.view : null;
+  }
   /** Re-index v2 cards after the minutes/output folder setting changes. */
   scheduleCardReindex() {
     if (this.reindexDebounce)
@@ -28036,8 +28792,9 @@ var MyPlugin = class extends import_obsidian12.Plugin {
     }, 800);
   }
   onunload() {
-    var _a;
-    (_a = this.v2) == null ? void 0 : _a.unload();
+    var _a, _b;
+    (_a = this.index) == null ? void 0 : _a.cancelScheduled();
+    (_b = this.v2) == null ? void 0 : _b.unload();
   }
   async loadSettings() {
     const data = await this.loadData();
@@ -28050,122 +28807,29 @@ var MyPlugin = class extends import_obsidian12.Plugin {
   async saveSettings() {
     await this.saveData(this.settings);
   }
-  async activateView() {
-    const { workspace } = this.app;
-    const leaves = workspace.getLeavesOfType(VIEW_TYPE_EXAMPLE);
-    if (leaves.length > 0) {
-      workspace.revealLeaf(leaves[0]);
-      return;
-    }
-    const leaf = workspace.getRightLeaf(false);
-    if (leaf) {
-      await leaf.setViewState({ type: VIEW_TYPE_EXAMPLE, active: true });
-      workspace.revealLeaf(leaf);
-    }
-  }
-  async activateFileView() {
-    const { workspace } = this.app;
-    const leaves = workspace.getLeavesOfType(VIEW_TYPE_FILE);
-    if (leaves.length > 0) {
-      workspace.revealLeaf(leaves[0]);
-      return;
-    }
-    const leaf = workspace.getRightLeaf(false);
-    if (leaf) {
-      await leaf.setViewState({ type: VIEW_TYPE_FILE, active: true });
-      workspace.revealLeaf(leaf);
-    }
-  }
 };
-var MyFolderItemView = class extends import_obsidian12.ItemView {
-  constructor(leaf, plugin) {
+async function loadIfDeferred(leaf) {
+  const l = leaf;
+  if (l.isDeferred && l.loadIfDeferred)
+    await l.loadIfDeferred();
+}
+var LegacyView = class extends import_obsidian15.ItemView {
+  constructor(leaf, type, migrate) {
     super(leaf);
-    this.isOpen = false;
-    this.plugin = plugin;
+    this.type = type;
+    this.migrate = migrate;
   }
   getViewType() {
-    return VIEW_TYPE_FILE;
+    return this.type;
   }
   getDisplayText() {
-    return "Topic Tree";
-  }
-  async renderTreeContainer(TopicTree) {
-    const container = this.containerEl.children[1];
-    if (!this.root) {
-      container.empty();
-      this.root = (0, import_client3.createRoot)(container);
-    }
-    this.root.render(FileTreeRoot(
-      TopicTree,
-      () => this.plugin.reloadTree(),
-      this.plugin.scopedSearch,
-      () => {
-        this.plugin.scopedSearch = !this.plugin.scopedSearch;
-        this.renderTreeContainer(TopicTree);
-      },
-      MDParser.priorityBeforeCities,
-      MDParser.cities,
-      MDParser.priorityAfterCities
-    ));
+    return "Meeting Composer";
   }
   async onOpen() {
-    currentToggle = (data, root, self = true, name = "", parentPath = []) => {
-      if (self && data !== root) {
-        data.isOpen = !data.isOpen;
-        this.renderTreeContainer(root);
-      }
-      if (root.name !== data.name) {
-        if (!OutputWindow || OutputWindow.getViewState().type == "empty") {
-          OutputWindow = this.app.workspace.getLeaf("tab");
-        }
-        this.printSearch(data.name, OutputWindow, parentPath);
-      }
-    };
-    if (!this.plugin.topicTree) {
-      MDParser.resetTree();
-      await this.plugin.loadTree();
-      const toogleWrapper = (data, root, self, name, parentPath) => currentToggle(data, root, self, name, parentPath);
-      this.plugin.topicTree = MDParser.GenerateTopicTree(false, toogleWrapper);
-      this.plugin.topicTree.isOpen = true;
-    }
-    this.renderTreeContainer(this.plugin.topicTree);
-  }
-  async printSearch(search, WindowRef, parentPath = []) {
-    const MainOutput = this.plugin.settings.OutputDir + this.plugin.settings.OutputFileName;
-    const realMainDir = this.app.vault.adapter.basePath + "/" + this.plugin.settings.OutputDir;
-    const file = await this.app.vault.getFileByPath(MainOutput);
-    if (file) {
-      WindowRef.openFile(file);
-    }
-    if (!search.includes("#")) {
-      let display;
-      const cityContext = this.plugin.scopedSearch && parentPath.find((p) => MDParser.cities.some((c) => c.toLowerCase() === p.toLowerCase()));
-      if (cityContext) {
-        let subTree = MDParser.getTree();
-        for (const parent of parentPath) {
-          if (subTree && subTree[parent])
-            subTree = subTree[parent];
-        }
-        display = MDParser.getOrganizedTopicsFromTree(search, subTree, false);
-      } else {
-        display = MDParser.getOrganizedTopics(search, true);
-      }
-      const print = MDParser.convertOrganizedTopicToMD(display);
-      writeAnswer(realMainDir, this.plugin.settings.OutputFileName, print);
-    } else {
-      const ss = search.replace("#", "");
-      const display = MDParser.getOrganizedTags(ss);
-      const print = MDParser.convertOrganizedTopicToMD(display);
-      writeAnswer(realMainDir, this.plugin.settings.OutputFileName, print);
-    }
-  }
-  async onClose() {
-    var _a;
-    (_a = this.root) == null ? void 0 : _a.unmount();
-    this.root = null;
+    window.setTimeout(() => void this.migrate(), 0);
   }
 };
-var TopicEditorSuggest = class extends import_obsidian12.EditorSuggest {
+var TopicEditorSuggest = class extends import_obsidian15.EditorSuggest {
   constructor(app, plugin) {
     super(app);
     this.plugin = plugin;
@@ -28191,92 +28855,13 @@ var TopicEditorSuggest = class extends import_obsidian12.EditorSuggest {
     el.createEl("div", { text: topic });
   }
   selectSuggestion(topic) {
+    if (!this.context)
+      return;
     const { editor, start, end } = this.context;
     editor.replaceRange(topic, start, end);
   }
 };
-var TopicSuggest = class extends import_obsidian12.AbstractInputSuggest {
-  constructor(app, inputEl, getTopics) {
-    super(app, inputEl);
-    this.getTopics = getTopics;
-  }
-  getSuggestions(query) {
-    const lower = query.toLowerCase();
-    return this.getTopics().filter((t) => t.toLowerCase().includes(lower));
-  }
-  renderSuggestion(topic, el) {
-    el.createEl("div", { text: topic });
-  }
-  selectSuggestion(topic) {
-    this.inputEl.value = topic;
-    this.inputEl.dispatchEvent(new Event("input"));
-    this.close();
-  }
-};
-var ExampleView = class extends import_obsidian12.ItemView {
-  constructor(leaf, plugin) {
-    super(leaf);
-    this.plugin = plugin;
-  }
-  getViewType() {
-    return VIEW_TYPE_EXAMPLE;
-  }
-  getDisplayText() {
-    return "Meeting Composer";
-  }
-  async printSearch(search, WindowRef) {
-    const MainOutput = DEFAULT_SETTINGS.OutputDir + DEFAULT_SETTINGS.OutputFileName;
-    const realMainDir = this.app.vault.adapter.basePath + "/" + DEFAULT_SETTINGS.OutputDir;
-    const file = await this.app.vault.getFileByPath(MainOutput);
-    if (file) {
-      WindowRef.openFile(file);
-    }
-    if (!search.includes("#")) {
-      const display = MDParser.getOrganizedTopics(search, true);
-      const print = MDParser.convertOrganizedTopicToMD(display);
-      writeAnswer(realMainDir, DEFAULT_SETTINGS.OutputFileName, print);
-    } else {
-      const ss = search.replace("#", "");
-      const display = MDParser.getOrganizedTags(ss);
-      const print = MDParser.convertOrganizedTopicToMD(display);
-      writeAnswer(realMainDir, DEFAULT_SETTINGS.OutputFileName, print);
-    }
-  }
-  async onOpen() {
-    const MainOutput = DEFAULT_SETTINGS.OutputDir + DEFAULT_SETTINGS.OutputFileName;
-    const vault = this.app.vault;
-    const container = this.containerEl.children[1];
-    const { contentEl } = this;
-    container.empty();
-    container.createEl("h4", { text: "Meeting Composer" });
-    let search = "";
-    new import_obsidian12.Setting(contentEl).setName("Search").addText((item) => {
-      item.onChange((string) => {
-        search = string;
-      });
-      if (this.plugin.settings.autoComplete) {
-        new TopicSuggest(this.app, item.inputEl, () => MDParser.getAllTopicNames());
-      }
-    }).addButton((item) => {
-      item.setButtonText("Search");
-      item.onClick(async () => {
-        if (!OutputWindow || OutputWindow.getViewState().type == "empty") {
-          OutputWindow = this.app.workspace.getLeaf("tab");
-        }
-        this.printSearch(search, OutputWindow);
-      });
-    });
-    if (!vault.getFolderByPath(DEFAULT_SETTINGS.OutputDir)) {
-      await vault.createFolder(DEFAULT_SETTINGS.OutputDir);
-    }
-    if (!vault.getFileByPath(MainOutput)) {
-      await vault.create(MainOutput, "");
-    }
-  }
-  async onClose() {
-  }
-};
-var MeetingComposerSettingTab = class extends import_obsidian12.PluginSettingTab {
+var MeetingComposerSettingTab = class extends import_obsidian15.PluginSettingTab {
   constructor(app, plugin) {
     super(app, plugin);
     this.plugin = plugin;
@@ -28284,41 +28869,33 @@ var MeetingComposerSettingTab = class extends import_obsidian12.PluginSettingTab
   display() {
     const { containerEl } = this;
     containerEl.empty();
-    new import_obsidian12.Setting(containerEl).setName("How to write cards").setDesc('The text syntax for opening, closing and following up cards. Expand below, or open it in a window (also: command "Show card syntax help", or the ? button in the Meeting cards sidebar).').addButton((b) => b.setButtonText("Open guide").onClick(() => {
+    new import_obsidian15.Setting(containerEl).setName("How to write cards").setDesc('The text syntax for opening, closing and following up cards. Expand below, or open it in a window (also: command "Show card syntax help", or the ? button in the Meeting cards sidebar).').addButton((b) => b.setButtonText("Open guide").onClick(() => {
       var _a;
       return (_a = this.plugin.v2) == null ? void 0 : _a.showHelp();
     }));
     const helpDetails = containerEl.createEl("details", { cls: "mc2-help-details" });
     helpDetails.createEl("summary", { text: "Show the card syntax guide" });
     void renderCardHelp(this.app, helpDetails.createDiv(), this.plugin, this.plugin.settings.MeenutesDir);
-    new import_obsidian12.Setting(containerEl).setName("Settings").setHeading();
-    new import_obsidian12.Setting(containerEl).setName("Minutes directory").setDesc("Folder containing meeting minutes files, relative to the vault root").addText((text) => text.setPlaceholder("Atas").setValue(this.plugin.settings.MeenutesDir).onChange(async (value) => {
+    new import_obsidian15.Setting(containerEl).setName("Settings").setHeading();
+    new import_obsidian15.Setting(containerEl).setName("Minutes directory").setDesc("Folder containing meeting minutes files, relative to the vault root").addText((text) => text.setPlaceholder("Atas").setValue(this.plugin.settings.MeenutesDir).onChange(async (value) => {
       this.plugin.settings.MeenutesDir = value;
       await this.plugin.saveSettings();
       this.plugin.scheduleCardReindex();
+      this.plugin.index.scheduleRebuild(800);
     }));
-    new import_obsidian12.Setting(containerEl).setName("Output file name").setDesc("Name of the file where search results are written").addText((text) => text.setPlaceholder("output.md").setValue(this.plugin.settings.OutputFileName).onChange(async (value) => {
-      this.plugin.settings.OutputFileName = value;
-      await this.plugin.saveSettings();
-    }));
-    new import_obsidian12.Setting(containerEl).setName("Output directory").setDesc("Folder where search results are written, relative to the vault root").addText((text) => text.setPlaceholder("Meeting_Composer_Search/").setValue(this.plugin.settings.OutputDir).onChange(async (value) => {
-      this.plugin.settings.OutputDir = value;
-      await this.plugin.saveSettings();
-      this.plugin.scheduleCardReindex();
-    }));
-    new import_obsidian12.Setting(containerEl).setName("Search autocomplete").setDesc("Suggest topic names while typing in the search box and in heading lines").addToggle((toggle) => toggle.setValue(this.plugin.settings.autoComplete).onChange(async (value) => {
+    new import_obsidian15.Setting(containerEl).setName("Search autocomplete").setDesc("Suggest topic names while typing in the Topics search box and in heading lines (reopen the Topics sidebar to apply)").addToggle((toggle) => toggle.setValue(this.plugin.settings.autoComplete).onChange(async (value) => {
       this.plugin.settings.autoComplete = value;
       await this.plugin.saveSettings();
     }));
-    new import_obsidian12.Setting(containerEl).setName("Auto-reload tree on new heading").setDesc("Refresh the topic tree whenever a heading is written in a minutes file").addToggle((toggle) => toggle.setValue(this.plugin.settings.autoReload).onChange(async (value) => {
+    new import_obsidian15.Setting(containerEl).setName("Auto-reload tree on new heading").setDesc("Refresh the topic tree whenever a heading is written in a minutes file").addToggle((toggle) => toggle.setValue(this.plugin.settings.autoReload).onChange(async (value) => {
       this.plugin.settings.autoReload = value;
       await this.plugin.saveSettings();
     }));
-    new import_obsidian12.Setting(containerEl).setName("Auto-assign card ids").setDesc("Append a ^card-id when a line with #open-card / #open-ticket is written right under a heading (applied when the cursor leaves the line)").addToggle((toggle) => toggle.setValue(this.plugin.settings.autoCardIds).onChange(async (value) => {
+    new import_obsidian15.Setting(containerEl).setName("Auto-assign card ids").setDesc("Append a ^card-id when a line with #open-card / #open-ticket is written right under a heading (applied when the cursor leaves the line)").addToggle((toggle) => toggle.setValue(this.plugin.settings.autoCardIds).onChange(async (value) => {
       this.plugin.settings.autoCardIds = value;
       await this.plugin.saveSettings();
     }));
-    new import_obsidian12.Setting(containerEl).setName("Topic ordering").setHeading();
+    new import_obsidian15.Setting(containerEl).setName("Topic ordering").setHeading();
     const listsEl = containerEl.createDiv("mc-priority-lists");
     const makeListSection = (title, desc, getValue, setValue) => {
       const col = listsEl.createDiv("mc-priority-col");
@@ -28338,8 +28915,9 @@ var MeetingComposerSettingTab = class extends import_obsidian12.PluginSettingTab
       () => this.plugin.settings.priorityBeforeCities,
       async (lines) => {
         this.plugin.settings.priorityBeforeCities = lines;
-        MDParser.setPriorityLists(this.plugin.settings.priorityBeforeCities, this.plugin.settings.cities, this.plugin.settings.priorityAfterCities);
+        this.plugin.applyPriorityLists();
         await this.plugin.saveSettings();
+        this.plugin.index.scheduleRebuild(300);
       }
     );
     makeListSection(
@@ -28348,8 +28926,9 @@ var MeetingComposerSettingTab = class extends import_obsidian12.PluginSettingTab
       () => this.plugin.settings.cities,
       async (lines) => {
         this.plugin.settings.cities = lines;
-        MDParser.setPriorityLists(this.plugin.settings.priorityBeforeCities, this.plugin.settings.cities, this.plugin.settings.priorityAfterCities);
+        this.plugin.applyPriorityLists();
         await this.plugin.saveSettings();
+        this.plugin.index.scheduleRebuild(300);
       }
     );
     makeListSection(
@@ -28358,15 +28937,16 @@ var MeetingComposerSettingTab = class extends import_obsidian12.PluginSettingTab
       () => this.plugin.settings.priorityAfterCities,
       async (lines) => {
         this.plugin.settings.priorityAfterCities = lines;
-        MDParser.setPriorityLists(this.plugin.settings.priorityBeforeCities, this.plugin.settings.cities, this.plugin.settings.priorityAfterCities);
+        this.plugin.applyPriorityLists();
         await this.plugin.saveSettings();
+        this.plugin.index.scheduleRebuild(300);
       }
     );
-    new import_obsidian12.Setting(containerEl).setName("Reload minutes").setDesc("Re-scan the minutes folder and rebuild the topic tree").addButton((item) => {
+    new import_obsidian15.Setting(containerEl).setName("Reload minutes").setDesc("Re-scan the minutes folder and rebuild the topic tree").addButton((item) => {
       item.setButtonText("Reload");
-      item.onClick(() => {
-        this.plugin.reloadTree();
-        this.plugin.activateFileView();
+      item.onClick(async () => {
+        await this.plugin.index.rebuild();
+        await this.plugin.activateTopicsView();
       });
     });
   }

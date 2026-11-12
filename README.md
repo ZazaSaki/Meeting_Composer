@@ -5,21 +5,27 @@ An Obsidian plugin that scans your meeting minutes and lets you navigate all top
 ## How it works
 
 1. Write your meeting minutes as markdown files in a configured folder (default: `Atas/`). Use headings (`#`, `##`, etc.) to structure topics — the plugin parses the heading hierarchy to build a topic index.
-2. Open the **Topic Tree** panel from the ribbon icon. The sidebar shows every topic and sub-topic found across all your minutes files, sorted by priority and then alphabetically.
-3. Click any topic in the tree to compile all content related to that topic into an output note (`Meeting_Composer_Search/output.md`). Each entry links back to its source file via Obsidian wiki-links.
+2. Open the **Topics** sidebar from the ribbon icon (or the command *Open topics sidebar*). It has a search box at the top and every topic and sub-topic from all your minutes below it, grouped into **Organizations**, **Sectors** and **Important topics** and sorted by priority, then alphabetically.
+3. Click a topic's name to open its full history in the **Topic results** tab: every entry from every meeting file, newest first, each linking back to its heading in the source note. Nothing is written to your vault — results live in memory and update as you edit your minutes.
 
 ## Features
 
-- **Topic tree sidebar** — hierarchical view of all topics found across all meeting files, with expand/collapse navigation
-- **Cross-file search** — clicking a topic aggregates matching content from every meeting file, sorted chronologically
-- **City-scoped search** — toggle between 🌐 Global (all files) and 📍 Scoped (only results within the selected city's context) using the button in the tree panel
-- **Source links** — each result includes a wiki-link to the original heading in the source file
-- **Manual search** — the Meeting Composer panel also accepts free-text topic or `#tag` searches
-- **Refresh** — re-scan the minutes folder at any time with the ⟳ button or the Reload button in settings
+- **Topics sidebar** — a native, collapsible tree (Obsidian's own tree styling, indent guides and hover). The arrow (▸) only expands/collapses a topic; clicking the name loads its results. Keyboard: Tab/↑/↓ to move, ←/→ to collapse/expand, Enter to open, Space to toggle. Expanded topics are remembered.
+- **Search box** — typing filters the tree to matching topics (with their parents opened and the match highlighted). Press **Enter** (or pick a suggestion) to open the results for that topic, or type `#tag` + Enter to see everything tagged with it. **Esc** clears the box.
+- **Topic results tab** — one tab, reused for every search and restored after restarting Obsidian. Shows the path, the number of entries, and each entry's meeting date (a link to the exact heading, with hover preview), tags and rendered notes. Clicking a `#tag` inside the results searches for it. **Ctrl/Cmd-click** a topic or link to open it in a new tab instead.
+- **Copy as Markdown** — the copy button in the results header puts the whole compiled history on the clipboard, in the same Markdown format the old `output.md` used.
+- **Sector-scoped search** — the 🌐/📍 button in the sidebar header switches between Global (all minutes) and Scoped (clicking a topic under a sector only searches inside that sector).
+- **Live refresh** — the tree and the open results rebuild when you write a heading in a minutes file, or when files are added, renamed or removed; the ⟳ button (or *Reload minutes*) re-scans on demand.
+
+### Commands
+
+- Open topics sidebar
+- Search topics… (focuses the sidebar's search box)
+- Reload minutes (rebuild topic tree)
 
 ## v2: cards, recalls and boards
 
-Everything below lives in your meeting notes — no external database. The v1 Topic Tree and search keep working unchanged.
+Everything below lives in your meeting notes — no external database. The Topics sidebar and results keep working alongside it.
 
 ### Cards
 
@@ -83,8 +89,8 @@ Command **Create new org board**, the **＋ Board** button on a board, or right-
 | Setting | Default | Description |
 |---|---|---|
 | Minutes directory | `Atas` | Vault-relative path to the folder containing your `.md` meeting files |
-| Output file name | `output.md` | Name of the file where search results are written |
-| Output directory | `Meeting_Composer_Search/` | Vault-relative path where the output file is stored (never indexed for cards) |
+| Search autocomplete | on | Suggest topic names in the Topics search box and in heading lines |
+| Auto-reload tree on new heading | on | Rebuild the topic tree when a heading is written in a minutes file |
 | Auto-assign card ids | on | Append `^card-…` to new card lines when the cursor leaves them |
 
 ## Installation
@@ -100,7 +106,9 @@ Search for **Meeting Composer** in Settings → Community plugins.
 ## Requirements
 
 - Obsidian **1.4.10** or later
-- Desktop only (uses filesystem access to write output files)
+- Desktop only (the bundled parser module imports Node's `fs`)
+
+> **Upgrading from 1.x/early 2.0:** search results are no longer written to `Meeting_Composer_Search/output.md`. An old `output.md` is left untouched (you can delete it); that folder is still skipped when indexing cards. Old *Topic Tree* panels in a saved layout turn into the new Topics sidebar automatically.
 
 ## Development
 

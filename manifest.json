@@ -3,7 +3,7 @@
 	"name": "Meeting Composer",
 	"version": "2.0.0",
 	"minAppVersion": "1.4.10",
-	"description": "Scan meeting minutes and navigate topics across all files. A sidebar topic tree lets you click any topic to compile all related content into a single output note.",
+	"description": "Scan meeting minutes and navigate topics across all files. A searchable sidebar topic tree opens any topic's full history in a results tab, without writing files.",
 	"author": "ZazaSaki",
 	"authorUrl": "https://github.com/ZazaSaki",
 	"isDesktopOnly": true
