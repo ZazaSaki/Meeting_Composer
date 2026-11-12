@@ -28208,12 +28208,15 @@ var TopicsSidebarView = class extends import_obsidian13.ItemView {
       return;
     }
     const groups = groupRoots(roots, index.parser);
-    for (const g of GROUPS) {
+    const shown = GROUPS.filter((g) => groups[g.id].length > 0);
+    const columns = body.createDiv("mc-topics-columns");
+    const isCollapsed = (id) => !filtered && this.collapsedGroups.has(id);
+    columns.style.gridTemplateColumns = shown.map((g) => isCollapsed(g.id) ? "max-content" : "minmax(var(--mc-topics-col-min), 1fr)").join(" ");
+    for (const g of shown) {
       const nodes = groups[g.id];
-      if (nodes.length === 0)
-        continue;
-      const collapsed = !filtered && this.collapsedGroups.has(g.id);
-      const section = body.createDiv({ cls: "mc-topics-group", attr: { "data-group": g.id } });
+      const collapsed = isCollapsed(g.id);
+      const section = columns.createDiv({ cls: "mc-topics-group", attr: { "data-group": g.id } });
+      section.toggleClass("is-collapsed", collapsed);
       const head = section.createDiv({
         cls: "mc-topics-group-head",
         attr: { role: "button", tabindex: "0", "aria-expanded": String(!collapsed) }
@@ -28300,15 +28303,26 @@ var TopicsSidebarView = class extends import_obsidian13.ItemView {
     const id = section == null ? void 0 : section.getAttr("data-group");
     if (!section || !id)
       return;
-    const list = section.querySelector(".mc-topics-group-items");
-    const collapse = !(list && list.style.display === "none");
-    if (collapse)
-      this.collapsedGroups.add(id);
-    else
+    if (this.collapsedGroups.has(id))
       this.collapsedGroups.delete(id);
-    list == null ? void 0 : list.toggle(!collapse);
-    (_a = head.querySelector(".mc-topics-group-chevron")) == null ? void 0 : _a.toggleClass("is-collapsed", collapse);
-    head.setAttr("aria-expanded", String(!collapse));
+    else
+      this.collapsedGroups.add(id);
+    const scroll = /* @__PURE__ */ new Map();
+    this.bodyEl.querySelectorAll(".mc-topics-group").forEach((s) => {
+      var _a2;
+      const items = s.querySelector(".mc-topics-group-items");
+      if (items)
+        scroll.set((_a2 = s.getAttr("data-group")) != null ? _a2 : "", items.scrollTop);
+    });
+    this.renderTree();
+    this.bodyEl.querySelectorAll(".mc-topics-group").forEach((s) => {
+      var _a2;
+      const items = s.querySelector(".mc-topics-group-items");
+      const top = scroll.get((_a2 = s.getAttr("data-group")) != null ? _a2 : "");
+      if (items && top)
+        items.scrollTop = top;
+    });
+    (_a = this.bodyEl.querySelector(`.mc-topics-group[data-group="${id}"] .mc-topics-group-head`)) == null ? void 0 : _a.focus();
     this.app.workspace.requestSaveLayout();
   }
   // ---------- events ----------

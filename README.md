@@ -5,7 +5,7 @@ An Obsidian plugin that scans your meeting minutes and lets you navigate all top
 ## How it works
 
 1. Write your meeting minutes as markdown files in a configured folder (default: `Atas/`). Use headings (`#`, `##`, etc.) to structure topics — the plugin parses the heading hierarchy to build a topic index.
-2. Open the **Topics** sidebar from the ribbon icon (or the command *Open topics sidebar*). It has a search box at the top and every topic and sub-topic from all your minutes below it, grouped into **Organizations**, **Sectors** and **Important topics** and sorted by priority, then alphabetically.
+2. Open the **Topics** sidebar from the ribbon icon (or the command *Open topics sidebar*). It has a search box at the top and every topic and sub-topic from all your minutes below it, grouped into **Organizations**, **Sectors** and **Important topics** — shown as three columns side by side, each scrolling on its own (click a column's heading to fold it into a thin strip) — and sorted by priority, then alphabetically.
 3. Click a topic's name to open its full history in the **Topic results** tab: every entry from every meeting file, newest first, each linking back to its heading in the source note. Nothing is written to your vault — results live in memory and update as you edit your minutes.
 
 ## Features

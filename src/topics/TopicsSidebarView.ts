@@ -221,12 +221,20 @@ export class TopicsSidebarView extends ItemView {
 			return;
 		}
 
+		// the three groups sit side by side, each column scrolling on its own;
+		// a collapsed group shrinks to a thin vertical strip
 		const groups = groupRoots(roots, index.parser);
-		for (const g of GROUPS) {
+		const shown = GROUPS.filter(g => groups[g.id].length > 0);
+		const columns = body.createDiv("mc-topics-columns");
+		const isCollapsed = (id: TopicGroup) => !filtered && this.collapsedGroups.has(id);
+		columns.style.gridTemplateColumns = shown
+			.map(g => (isCollapsed(g.id) ? "max-content" : "minmax(var(--mc-topics-col-min), 1fr)"))
+			.join(" ");
+		for (const g of shown) {
 			const nodes = groups[g.id];
-			if (nodes.length === 0) continue;
-			const collapsed = !filtered && this.collapsedGroups.has(g.id);
-			const section = body.createDiv({ cls: "mc-topics-group", attr: { "data-group": g.id } });
+			const collapsed = isCollapsed(g.id);
+			const section = columns.createDiv({ cls: "mc-topics-group", attr: { "data-group": g.id } });
+			section.toggleClass("is-collapsed", collapsed);
 			const head = section.createDiv({
 				cls: "mc-topics-group-head",
 				attr: { role: "button", tabindex: "0", "aria-expanded": String(!collapsed) },
@@ -314,13 +322,21 @@ export class TopicsSidebarView extends ItemView {
 		const section = head.closest<HTMLElement>(".mc-topics-group");
 		const id = section?.getAttr("data-group") as TopicGroup | null;
 		if (!section || !id) return;
-		const list = section.querySelector<HTMLElement>(".mc-topics-group-items");
-		const collapse = !(list && list.style.display === "none");
-		if (collapse) this.collapsedGroups.add(id);
-		else this.collapsedGroups.delete(id);
-		list?.toggle(!collapse);
-		head.querySelector(".mc-topics-group-chevron")?.toggleClass("is-collapsed", collapse);
-		head.setAttr("aria-expanded", String(!collapse));
+		if (this.collapsedGroups.has(id)) this.collapsedGroups.delete(id);
+		else this.collapsedGroups.add(id);
+		// re-render so the column widths follow; keep scroll positions and focus
+		const scroll = new Map<string, number>();
+		this.bodyEl.querySelectorAll<HTMLElement>(".mc-topics-group").forEach(s => {
+			const items = s.querySelector<HTMLElement>(".mc-topics-group-items");
+			if (items) scroll.set(s.getAttr("data-group") ?? "", items.scrollTop);
+		});
+		this.renderTree();
+		this.bodyEl.querySelectorAll<HTMLElement>(".mc-topics-group").forEach(s => {
+			const items = s.querySelector<HTMLElement>(".mc-topics-group-items");
+			const top = scroll.get(s.getAttr("data-group") ?? "");
+			if (items && top) items.scrollTop = top;
+		});
+		this.bodyEl.querySelector<HTMLElement>(`.mc-topics-group[data-group="${id}"] .mc-topics-group-head`)?.focus();
 		this.app.workspace.requestSaveLayout();
 	}
 
