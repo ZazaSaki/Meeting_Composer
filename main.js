@@ -25297,6 +25297,10 @@ var VaultCardStore = class extends import_obsidian.Events {
   getParsed(path) {
     return this.files.get(path);
   }
+  /** Every indexed meeting file with its date (file name, else ctime). */
+  getFileDates() {
+    return [...this.files].map(([path, f]) => ({ path, date: f.openedAt }));
+  }
 };
 
 // src/sync/MarkdownMutator.ts
@@ -26721,6 +26725,84 @@ function planDrop(card, fromId, toId, preset) {
   return ops;
 }
 
+// src/core/pendingTopics.ts
+var PENDING_TOPICS = "pending-topics";
+function latestFile(files) {
+  var _a, _b, _c;
+  let best = null;
+  for (const f of files) {
+    if (!best) {
+      best = f;
+      continue;
+    }
+    const a = (_a = f.date) != null ? _a : "";
+    const b = (_b = best.date) != null ? _b : "";
+    if (a > b || a === b && f.path > best.path)
+      best = f;
+  }
+  return (_c = best == null ? void 0 : best.path) != null ? _c : null;
+}
+function mentionPaths(card) {
+  return [card.filePath, ...card.recalls.map((r) => r.sourceFilePath)];
+}
+function isMentionedIn(card, path) {
+  return mentionPaths(card).includes(path);
+}
+function lastMention(card, fileDate, excludePath) {
+  let best = null;
+  for (const p of mentionPaths(card)) {
+    if (p === excludePath)
+      continue;
+    const d = fileDate(p);
+    if (d && (!best || d > best))
+      best = d;
+  }
+  return best;
+}
+function lineIn(card, path) {
+  const lines = card.recalls.filter((r) => r.sourceFilePath === path).map((r) => r.anchorLine);
+  if (card.filePath === path)
+    lines.push(card.titleLine);
+  return lines.length ? Math.min(...lines) : Number.MAX_SAFE_INTEGER;
+}
+function splitPending(cards, latestPath, fileDate) {
+  const pending = [];
+  const discussed = [];
+  const last = /* @__PURE__ */ new Map();
+  for (const c of cards) {
+    if (c.status !== "open" || c.duplicateOf)
+      continue;
+    last.set(c.id, lastMention(c, fileDate, latestPath));
+    if (latestPath && isMentionedIn(c, latestPath))
+      discussed.push(c);
+    else
+      pending.push(c);
+  }
+  pending.sort((a, b) => {
+    var _a, _b;
+    const da = (_a = last.get(a.id)) != null ? _a : "";
+    const db = (_b = last.get(b.id)) != null ? _b : "";
+    return da.localeCompare(db) || a.title.localeCompare(b.title) || a.id.localeCompare(b.id);
+  });
+  if (latestPath)
+    discussed.sort((a, b) => lineIn(a, latestPath) - lineIn(b, latestPath));
+  return { latestPath, pending, discussed, lastMention: last };
+}
+function pendingTopicsPreset(id = "view-pending", name = "Pending topics") {
+  return {
+    id,
+    name,
+    layout: "kanban",
+    dropMode: "tag",
+    smart: PENDING_TOPICS,
+    scopeFilter: { showClosed: false },
+    columns: [
+      { id: `${id}-todo`, title: "Still to discuss", ruleType: "status", ruleValue: "open" },
+      { id: `${id}-done`, title: "Discussed this meeting", ruleType: "status", ruleValue: "open" }
+    ]
+  };
+}
+
 // src/core/boardFile.ts
 var DEFAULT_BOARD = {
   version: 1,
@@ -26764,7 +26846,8 @@ var DEFAULT_BOARD = {
         { id: "q-delegate", title: "Delegate", ruleType: "tag", ruleValue: "#urgent" },
         { id: "q-backlog", title: "Backlog", ruleType: "status", ruleValue: "open" }
       ]
-    }
+    },
+    pendingTopicsPreset()
   ]
 };
 function isPreset(p) {
@@ -26793,6 +26876,7 @@ function parseBoardFile(text) {
   const presets = o.presets.map((p) => ({
     ...p,
     layout: p.layout === "matrix" ? "matrix" : "kanban",
+    smart: p.smart === "pending-topics" ? "pending-topics" : void 0,
     dropMode: p.dropMode === "header" ? "header" : "tag",
     columns: p.columns.filter((c) => c && typeof c.id === "string" && typeof c.ruleValue === "string")
   }));
@@ -27088,6 +27172,8 @@ function blankPreset(id, name, layout, dropMode, start, copyFrom) {
   if (start === "copy" && copyFrom) {
     return { ...JSON.parse(JSON.stringify(copyFrom)), id, name, layout, dropMode };
   }
+  if (start === "pending-topics")
+    return pendingTopicsPreset(id, name);
   const columns = start === "open-closed" && dropMode === "tag" ? [
     { id: `${id}-open`, title: "Open", ruleType: "status", ruleValue: "open" },
     { id: `${id}-closed`, title: "Closed", ruleType: "status", ruleValue: "closed" }
@@ -27312,7 +27398,7 @@ var ViewEditModal = class extends import_obsidian8.Modal {
     if (!this.opts.preset) {
       new import_obsidian8.Setting(el).setName("Start with").addDropdown((x) => {
         var _a2;
-        x.addOption("open-closed", "Open and Closed columns").addOption("empty", "No columns");
+        x.addOption("open-closed", "Open and Closed columns").addOption("empty", "No columns").addOption("pending-topics", "Pending topics (still to discuss in the latest meeting)");
         if (this.opts.currentName)
           x.addOption("copy", `A copy of \u201C${this.opts.currentName}\u201D`);
         x.setValue((_a2 = d.start) != null ? _a2 : "open-closed").onChange((v) => d.start = v);
@@ -27524,14 +27610,30 @@ function BoardApp({ host, view, board, error, onChange, onEditJson }) {
   const [query, setQuery] = (0, import_react4.useState)("");
   const [dragOver, setDragOver] = (0, import_react4.useState)(null);
   const preset = (_a = board == null ? void 0 : board.presets.find((p) => p.id === board.activePresetId)) != null ? _a : board == null ? void 0 : board.presets[0];
-  const columns = (0, import_react4.useMemo)(() => {
+  const smart = (preset == null ? void 0 : preset.smart) === PENDING_TOPICS;
+  const { columns, pending } = (0, import_react4.useMemo)(() => {
     var _a2;
     const out = /* @__PURE__ */ new Map();
     if (!preset)
-      return out;
+      return { columns: out, pending: null };
     preset.columns.forEach((c) => out.set(c.id, []));
     const q = query.trim().toLowerCase();
-    for (const c of cardsForPreset(host.store.getCards(), preset)) {
+    const cards = cardsForPreset(host.store.getCards(), preset);
+    if (preset.smart === PENDING_TOPICS) {
+      const latestPath = latestFile(host.store.getFileDates());
+      const split = splitPending(cards, latestPath, (p) => {
+        var _a3, _b;
+        return (_b = (_a3 = host.store.getParsed(p)) == null ? void 0 : _a3.openedAt) != null ? _b : null;
+      });
+      const keep = (list) => q ? list.filter((c) => matches(c, q)) : list;
+      const [todo, done] = preset.columns;
+      if (todo)
+        out.set(todo.id, keep(split.pending));
+      if (done)
+        out.set(done.id, keep(split.discussed));
+      return { columns: out, pending: split };
+    }
+    for (const c of cards) {
       if (q && !matches(c, q))
         continue;
       const col = assignColumn(c, preset);
@@ -27542,7 +27644,7 @@ function BoardApp({ host, view, board, error, onChange, onEditJson }) {
       var _a3, _b;
       return ((_a3 = b.lastUpdated) != null ? _a3 : "").localeCompare((_b = a.lastUpdated) != null ? _b : "");
     }));
-    return out;
+    return { columns: out, pending: null };
   }, [version, preset, query]);
   if (error) {
     return /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("div", { className: "mc2-board-error", children: [
@@ -27628,6 +27730,8 @@ function BoardApp({ host, view, board, error, onChange, onEditJson }) {
   const onDrop = async (toId, e) => {
     e.preventDefault();
     setDragOver(null);
+    if (smart)
+      return;
     let payload;
     try {
       payload = JSON.parse(e.dataTransfer.getData(DRAG_MIME));
@@ -27667,13 +27771,27 @@ function BoardApp({ host, view, board, error, onChange, onEditJson }) {
         /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("button", { className: "mc2-tool-btn", onClick: newView, title: "Add a new view (tab) to this board", children: "\uFF0B View" })
       ] }),
       /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("input", { type: "search", placeholder: "Filter cards\u2026", value: query, onChange: (e) => setQuery(e.target.value) }),
-      /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("button", { onClick: newColumn, title: "Add a column to this view", children: "\uFF0B Column" }),
+      !smart && /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("button", { onClick: newColumn, title: "Add a column to this view", children: "\uFF0B Column" }),
       /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("button", { onClick: () => {
         var _a2, _b;
         return host.promptNewBoard((_b = (_a2 = view.file) == null ? void 0 : _a2.parent) == null ? void 0 : _b.path);
       }, title: "Create a new board file next to this one", children: "\uFF0B Board" }),
       /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("button", { onClick: onEditJson, title: "Edit the presets as JSON", children: "{ } JSON" })
     ] }),
+    pending && /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("div", { className: "mc2-pending-summary", children: pending.latestPath ? /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)(import_jsx_runtime4.Fragment, { children: [
+      /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("span", { children: "Latest meeting: " }),
+      /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("a", { className: "internal-link", onClick: () => host.openLocation(pending.latestPath, 0), children: baseName2(pending.latestPath) }),
+      /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("span", { className: "mc2-pending-counts", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("strong", { children: pending.discussed.length }),
+        " discussed \xB7 ",
+        /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("strong", { children: pending.pending.length }),
+        " remaining",
+        " ",
+        "of ",
+        pending.discussed.length + pending.pending.length,
+        " open"
+      ] })
+    ] }) : /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("span", { className: "mc2-muted", children: "No meeting files yet." }) }),
     /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("div", { className: "mc2-board-body", children: [
       /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("div", { className: `mc2-columns mc2-layout-${preset.layout}`, children: [
         cols.map(({ raw, norm }, i) => {
@@ -27700,7 +27818,7 @@ function BoardApp({ host, view, board, error, onChange, onEditJson }) {
               children: [
                 /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("header", { className: "mc2-column-head", children: [
                   /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("button", { className: "mc2-column-title", title: "Edit column", onClick: () => editColumn(raw), children: raw.title }),
-                  /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("span", { className: "mc2-muted mc2-column-rule", children: ruleLabel(norm) }),
+                  /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("span", { className: "mc2-muted mc2-column-rule", children: smart ? i === 0 ? "oldest mention first" : "in the latest meeting" : ruleLabel(norm) }),
                   /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("span", { className: "mc2-badge", children: list.length }),
                   /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("span", { className: "mc2-column-tools", children: [
                     /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("button", { className: "mc2-icon-btn", "aria-label": `Move ${raw.title} left`, disabled: i === 0, onClick: () => shiftColumn(raw.id, -1), children: "\u2039" }),
@@ -27709,21 +27827,30 @@ function BoardApp({ host, view, board, error, onChange, onEditJson }) {
                   ] })
                 ] }),
                 /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("div", { className: "mc2-column-cards", children: [
-                  list.map((c) => /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(
-                    "div",
-                    {
-                      className: `mc2-card mc2-board-card ${selected === c.id ? "is-selected" : ""}`,
-                      draggable: true,
-                      onDragStart: (e) => {
-                        e.dataTransfer.setData(DRAG_MIME, JSON.stringify({ id: c.id, from: raw.id }));
-                        e.dataTransfer.effectAllowed = "move";
+                  list.map((c) => {
+                    var _a3;
+                    return /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)(
+                      "div",
+                      {
+                        className: `mc2-card mc2-board-card ${selected === c.id ? "is-selected" : ""}`,
+                        draggable: !smart,
+                        onDragStart: (e) => {
+                          e.dataTransfer.setData(DRAG_MIME, JSON.stringify({ id: c.id, from: raw.id }));
+                          e.dataTransfer.effectAllowed = "move";
+                        },
+                        onClick: () => setSelected(selected === c.id ? null : c.id),
+                        children: [
+                          /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(CardFace, { card: c }),
+                          smart && i === 0 && /* @__PURE__ */ (0, import_jsx_runtime4.jsxs)("div", { className: "mc2-muted mc2-last-mention", children: [
+                            "last mentioned ",
+                            (_a3 = pending == null ? void 0 : pending.lastMention.get(c.id)) != null ? _a3 : "\u2014"
+                          ] })
+                        ]
                       },
-                      onClick: () => setSelected(selected === c.id ? null : c.id),
-                      children: /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(CardFace, { card: c })
-                    },
-                    c.id
-                  )),
-                  list.length === 0 && /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("div", { className: "mc2-muted mc2-drop-hint", children: "Drop cards here" })
+                      c.id
+                    );
+                  }),
+                  list.length === 0 && /* @__PURE__ */ (0, import_jsx_runtime4.jsx)("div", { className: "mc2-muted mc2-drop-hint", children: smart ? i === 0 ? "Everything open was discussed \u{1F389}" : "Nothing discussed yet" : "Drop cards here" })
                 ] })
               ]
             },
@@ -27735,6 +27862,9 @@ function BoardApp({ host, view, board, error, onChange, onEditJson }) {
       selectedCard && /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(CardDrawer, { host, component: view, card: selectedCard, onClose: () => setSelected(null) })
     ] })
   ] });
+}
+function baseName2(path) {
+  return path.split("/").pop().replace(/\.md$/, "");
 }
 function ruleLabel(c) {
   var _a;
@@ -28165,14 +28295,14 @@ var MeetingComposerV2 = class {
   promptNewBoard(folderPath) {
     new NewBoardModal(this.app, (name, template) => void this.createBoard(folderPath, name, template)).open();
   }
-  async createBoard(folderPath, baseName2 = "Operations", template = "examples") {
+  async createBoard(folderPath, baseName3 = "Operations", template = "examples") {
     var _a, _b;
     const folder = folderPath != null ? folderPath : this.app.fileManager.getNewFileParent((_b = (_a = this.app.workspace.getActiveFile()) == null ? void 0 : _a.path) != null ? _b : "").path;
     const base = folder && folder !== "/" ? folder + "/" : "";
-    let name = baseName2;
+    let name = baseName3;
     let i = 1;
     while (this.app.vault.getAbstractFileByPath((0, import_obsidian11.normalizePath)(`${base}${name}.${ORGBOARD_EXT}`)))
-      name = `${baseName2} ${i++}`;
+      name = `${baseName3} ${i++}`;
     const content = serializeBoard(template === "simple" ? simpleBoard() : DEFAULT_BOARD);
     const file = await this.app.vault.create((0, import_obsidian11.normalizePath)(`${base}${name}.${ORGBOARD_EXT}`), content);
     await this.app.workspace.getLeaf("tab").openFile(file);

@@ -154,4 +154,9 @@ export class VaultCardStore extends Events {
 	getParsed(path: string): IndexedFile | undefined {
 		return this.files.get(path);
 	}
+
+	/** Every indexed meeting file with its date (file name, else ctime). */
+	getFileDates(): { path: string; date: string | null }[] {
+		return [...this.files].map(([path, f]) => ({ path, date: f.openedAt }));
+	}
 }

@@ -1,6 +1,7 @@
 // .orgboard file format: parse/validate + the default board (spec §8.2, with its bugs fixed).
 
 import { BoardViewPreset, OrgBoardFileSchema } from "../types";
+import { pendingTopicsPreset } from "./pendingTopics";
 
 export const DEFAULT_BOARD: OrgBoardFileSchema = {
 	version: 1,
@@ -45,6 +46,7 @@ export const DEFAULT_BOARD: OrgBoardFileSchema = {
 				{ id: "q-backlog", title: "Backlog", ruleType: "status", ruleValue: "open" },
 			],
 		},
+		pendingTopicsPreset(),
 	],
 };
 
@@ -72,6 +74,7 @@ export function parseBoardFile(text: string): BoardParseResult {
 	const presets = (o.presets as BoardViewPreset[]).map(p => ({
 		...p,
 		layout: p.layout === "matrix" ? "matrix" : "kanban",
+		smart: p.smart === "pending-topics" ? "pending-topics" : undefined,
 		dropMode: p.dropMode === "header" ? "header" : "tag",
 		columns: p.columns.filter(c => c && typeof c.id === "string" && typeof c.ruleValue === "string"),
 	})) as BoardViewPreset[];

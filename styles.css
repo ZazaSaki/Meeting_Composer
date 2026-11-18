@@ -470,6 +470,18 @@
     border-bottom: 1px solid var(--background-modifier-border);
 }
 .mc2-presets { display: flex; flex-wrap: wrap; gap: 4px; margin-right: auto; }
+.mc2-pending-summary {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    align-items: baseline;
+    padding: 6px 12px;
+    border-bottom: 1px solid var(--background-modifier-border);
+    font-size: var(--font-ui-small);
+}
+.mc2-pending-summary a { cursor: pointer; }
+.mc2-pending-counts { margin-left: auto; }
+.mc2-last-mention { font-size: var(--font-ui-smaller); margin-top: 4px; }
 .mc2-board-body { display: flex; flex: 1; min-height: 0; }
 .mc2-columns { flex: 1; min-width: 0; overflow: auto; padding: 12px; gap: 12px; }
 .mc2-layout-kanban { display: flex; align-items: flex-start; }

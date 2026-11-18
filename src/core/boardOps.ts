@@ -3,6 +3,7 @@
 
 import { BoardColumnRule, BoardScopeFilter, BoardViewPreset, OrgBoardFileSchema } from "../types";
 import { normalizeTag } from "./syntax";
+import { pendingTopicsPreset } from "./pendingTopics";
 
 const TAG_OK = /^#[\p{L}\p{N}_/-]+$/u;
 
@@ -75,7 +76,7 @@ function cleanColumn(c: BoardColumnRule): BoardColumnRule {
 
 // ---------- views (presets) ----------
 
-export type ViewStart = "open-closed" | "empty" | "copy";
+export type ViewStart = "open-closed" | "empty" | "copy" | "pending-topics";
 
 export function blankPreset(
 	id: string,
@@ -88,6 +89,7 @@ export function blankPreset(
 	if (start === "copy" && copyFrom) {
 		return { ...JSON.parse(JSON.stringify(copyFrom)), id, name, layout, dropMode };
 	}
+	if (start === "pending-topics") return pendingTopicsPreset(id, name);
 	const columns: BoardColumnRule[] =
 		start === "open-closed" && dropMode === "tag"
 			? [

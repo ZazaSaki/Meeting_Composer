@@ -103,7 +103,7 @@ describe("cardsForPreset — sample board fixes (§8.2)", () => {
 describe("parseBoardFile", () => {
 	it("empty file gives the default board", () => {
 		const r = parseBoardFile("");
-		expect(r.ok && r.board.presets.length).toBe(3);
+		expect(r.ok && r.board.presets.length).toBe(4);
 	});
 	it("reports invalid JSON instead of throwing", () => {
 		const r = parseBoardFile("{ nope");

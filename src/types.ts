@@ -96,6 +96,8 @@ export interface BoardViewPreset {
 	dropMode: "tag" | "header";
 	scopeFilter?: BoardScopeFilter;
 	columns: BoardColumnRule[];
+	/** Built-in view logic instead of the column rules. "pending-topics": still to discuss / discussed in the latest meeting. */
+	smart?: "pending-topics";
 }
 
 export interface OrgBoardFileSchema {

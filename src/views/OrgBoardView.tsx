@@ -16,6 +16,7 @@ import { matches } from "./CardsSidebarView";
 import { flattenTree, JsonEditModal } from "./modals";
 import { addColumn, addPreset, blankPreset, moveColumn, movePreset, removeColumn, removePreset, uniqueId, updateColumn, updatePreset } from "../core/boardOps";
 import { ColumnDraft, ColumnEditModal, ViewDraft, ViewEditModal } from "./boardEditors";
+import { latestFile, PENDING_TOPICS, splitPending } from "../core/pendingTopics";
 
 export const VIEW_TYPE_ORG_BOARD = "meeting-composer-orgboard";
 export const ORGBOARD_EXT = "orgboard";
@@ -133,18 +134,30 @@ function BoardApp({ host, view, board, error, onChange, onEditJson }: BoardAppPr
 
 	const preset = board?.presets.find(p => p.id === board.activePresetId) ?? board?.presets[0];
 
-	const columns = useMemo(() => {
+	const smart = preset?.smart === PENDING_TOPICS;
+
+	const { columns, pending } = useMemo(() => {
 		const out = new Map<string, CardNode[]>();
-		if (!preset) return out;
+		if (!preset) return { columns: out, pending: null };
 		preset.columns.forEach(c => out.set(c.id, []));
 		const q = query.trim().toLowerCase();
-		for (const c of cardsForPreset(host.store.getCards(), preset)) {
+		const cards = cardsForPreset(host.store.getCards(), preset);
+		if (preset.smart === PENDING_TOPICS) {
+			const latestPath = latestFile(host.store.getFileDates());
+			const split = splitPending(cards, latestPath, p => host.store.getParsed(p)?.openedAt ?? null);
+			const keep = (list: CardNode[]) => (q ? list.filter(c => matches(c, q)) : list);
+			const [todo, done] = preset.columns;
+			if (todo) out.set(todo.id, keep(split.pending));
+			if (done) out.set(done.id, keep(split.discussed));
+			return { columns: out, pending: split };
+		}
+		for (const c of cards) {
 			if (q && !matches(c, q)) continue;
 			const col = assignColumn(c, preset);
 			if (col) out.get(col)?.push(c);
 		}
 		out.forEach(list => list.sort((a, b) => (b.lastUpdated ?? "").localeCompare(a.lastUpdated ?? "")));
-		return out;
+		return { columns: out, pending: null };
 	}, [version, preset, query]);
 
 	if (error) {
@@ -240,6 +253,7 @@ function BoardApp({ host, view, board, error, onChange, onEditJson }: BoardAppPr
 	const onDrop = async (toId: string, e: React.DragEvent) => {
 		e.preventDefault();
 		setDragOver(null);
+		if (smart) return;
 		let payload: { id: string; from: string | null };
 		try {
 			payload = JSON.parse(e.dataTransfer.getData(DRAG_MIME));
@@ -281,12 +295,31 @@ function BoardApp({ host, view, board, error, onChange, onEditJson }: BoardAppPr
 					</button>
 				</div>
 				<input type="search" placeholder="Filter cards…" value={query} onChange={e => setQuery(e.target.value)} />
-				<button onClick={newColumn} title="Add a column to this view">＋ Column</button>
+				{!smart && <button onClick={newColumn} title="Add a column to this view">＋ Column</button>}
 				<button onClick={() => host.promptNewBoard(view.file?.parent?.path)} title="Create a new board file next to this one">
 					＋ Board
 				</button>
 				<button onClick={onEditJson} title="Edit the presets as JSON">{"{ } JSON"}</button>
 			</div>
+
+			{pending && (
+				<div className="mc2-pending-summary">
+					{pending.latestPath ? (
+						<>
+							<span>Latest meeting: </span>
+							<a className="internal-link" onClick={() => host.openLocation(pending.latestPath!, 0)}>
+								{baseName(pending.latestPath)}
+							</a>
+							<span className="mc2-pending-counts">
+								<strong>{pending.discussed.length}</strong> discussed · <strong>{pending.pending.length}</strong> remaining
+								{" "}of {pending.discussed.length + pending.pending.length} open
+							</span>
+						</>
+					) : (
+						<span className="mc2-muted">No meeting files yet.</span>
+					)}
+				</div>
+			)}
 
 			<div className="mc2-board-body">
 				<div className={`mc2-columns mc2-layout-${preset.layout}`}>
@@ -312,7 +345,7 @@ function BoardApp({ host, view, board, error, onChange, onEditJson }: BoardAppPr
 									<button className="mc2-column-title" title="Edit column" onClick={() => editColumn(raw)}>
 										{raw.title}
 									</button>
-									<span className="mc2-muted mc2-column-rule">{ruleLabel(norm)}</span>
+									<span className="mc2-muted mc2-column-rule">{smart ? (i === 0 ? "oldest mention first" : "in the latest meeting") : ruleLabel(norm)}</span>
 									<span className="mc2-badge">{list.length}</span>
 									<span className="mc2-column-tools">
 										<button className="mc2-icon-btn" aria-label={`Move ${raw.title} left`} disabled={i === 0} onClick={() => shiftColumn(raw.id, -1)}>
@@ -331,7 +364,7 @@ function BoardApp({ host, view, board, error, onChange, onEditJson }: BoardAppPr
 										<div
 											key={c.id}
 											className={`mc2-card mc2-board-card ${selected === c.id ? "is-selected" : ""}`}
-											draggable
+											draggable={!smart}
 											onDragStart={e => {
 												e.dataTransfer.setData(DRAG_MIME, JSON.stringify({ id: c.id, from: raw.id }));
 												e.dataTransfer.effectAllowed = "move";
@@ -339,9 +372,18 @@ function BoardApp({ host, view, board, error, onChange, onEditJson }: BoardAppPr
 											onClick={() => setSelected(selected === c.id ? null : c.id)}
 										>
 											<CardFace card={c} />
+											{smart && i === 0 && (
+												<div className="mc2-muted mc2-last-mention">
+													last mentioned {pending?.lastMention.get(c.id) ?? "—"}
+												</div>
+											)}
 										</div>
 									))}
-									{list.length === 0 && <div className="mc2-muted mc2-drop-hint">Drop cards here</div>}
+									{list.length === 0 && (
+										<div className="mc2-muted mc2-drop-hint">
+											{smart ? (i === 0 ? "Everything open was discussed 🎉" : "Nothing discussed yet") : "Drop cards here"}
+										</div>
+									)}
 								</div>
 							</section>
 						);
@@ -354,6 +396,10 @@ function BoardApp({ host, view, board, error, onChange, onEditJson }: BoardAppPr
 			</div>
 		</div>
 	);
+}
+
+function baseName(path: string): string {
+	return path.split("/").pop()!.replace(/\.md$/, "");
 }
 
 function ruleLabel(c: { ruleType: string; ruleValue: string; requiredTags?: string[] }): string {

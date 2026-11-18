@@ -282,7 +282,9 @@ export class ViewEditModal extends Modal {
 			new Setting(el)
 				.setName("Start with")
 				.addDropdown(x => {
-					x.addOption("open-closed", "Open and Closed columns").addOption("empty", "No columns");
+					x.addOption("open-closed", "Open and Closed columns")
+						.addOption("empty", "No columns")
+						.addOption("pending-topics", "Pending topics (still to discuss in the latest meeting)");
 					if (this.opts.currentName) x.addOption("copy", `A copy of “${this.opts.currentName}”`);
 					x.setValue(d.start ?? "open-closed").onChange(v => (d.start = v as ViewStart));
 				});
