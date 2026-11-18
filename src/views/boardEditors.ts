@@ -324,6 +324,11 @@ export class ViewEditModal extends Modal {
 			);
 
 		new Setting(el)
+			.setName("Only for topic")
+			.setDesc("Optional. Cards under any heading named like this, at any level: “Coimbra” also covers “Coimbra 1”; “Quorum” covers “Quorum de Elders” in every city.")
+			.addText(t => t.setValue(d.scopeFilter.topic ?? "").setPlaceholder("Quorum").onChange(v => (d.scopeFilter.topic = v)));
+
+		new Setting(el)
 			.setName("Show closed cards")
 			.setDesc("A “Closed” column always shows them.")
 			.addToggle(t => t.setValue(d.scopeFilter.showClosed !== false).onChange(v => (d.scopeFilter.showClosed = v)));
@@ -365,6 +370,7 @@ export class ViewEditModal extends Modal {
 				includeTags: follow.tags.length ? follow.tags : undefined,
 				excludeTags: hide.tags.length ? hide.tags : undefined,
 				hierarchyPrefix: d.scopeFilter.hierarchyPrefix?.trim() || undefined,
+				topic: d.scopeFilter.topic?.trim() || undefined,
 			},
 		});
 		return null;

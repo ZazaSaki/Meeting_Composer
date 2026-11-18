@@ -84,6 +84,8 @@ export interface BoardColumnRule {
 
 export interface BoardScopeFilter {
 	hierarchyPrefix?: string;
+	/** Topic name: any heading of the card equals it or starts with it ("Coimbra" → "Coimbra 1"), at any level. */
+	topic?: string;
 	includeTags?: string[]; // card must have at least one of these OR match a tag column
 	excludeTags?: string[];
 	showClosed?: boolean;

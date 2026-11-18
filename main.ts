@@ -28,6 +28,8 @@ interface MyPluginSettings {
 	autoCardIds: boolean;
 	processedRecallCloses: string[];
 	recallClosedBy: string[];
+	/** Folder for the default Sectors / Organizations / Important topics boards. */
+	boardsFolder: string;
 }
 
 const DEFAULT_SETTINGS: MyPluginSettings = {
@@ -42,6 +44,7 @@ const DEFAULT_SETTINGS: MyPluginSettings = {
 	autoCardIds: true,
 	processedRecallCloses: [],
 	recallClosedBy: [],
+	boardsFolder: 'Boards',
 }
 
 export default class MyPlugin extends Plugin implements TopicsHost {
@@ -106,6 +109,7 @@ export default class MyPlugin extends Plugin implements TopicsHost {
 			priorityBefore: this.settings.priorityBeforeCities,
 			cities: this.settings.cities,
 			priorityAfter: this.settings.priorityAfterCities,
+			boardsFolder: this.settings.boardsFolder,
 		}), async ({ processed, closedBy }) => {
 			this.settings.processedRecallCloses = processed;
 			this.settings.recallClosedBy = closedBy;
@@ -379,6 +383,34 @@ class MeetingComposerSettingTab extends PluginSettingTab {
 				this.plugin.index.scheduleRebuild(300);
 			},
 		);
+
+		new Setting(containerEl).setName('Default boards').setHeading();
+
+		new Setting(containerEl)
+			.setName('Boards folder')
+			.setDesc('Where the default boards are saved, relative to the vault root')
+			.addText(text => text
+				.setPlaceholder('Boards')
+				.setValue(this.plugin.settings.boardsFolder)
+				.onChange(async (value) => {
+					this.plugin.settings.boardsFolder = value.trim();
+					await this.plugin.saveSettings();
+				}));
+
+		new Setting(containerEl)
+			.setName('Create / update default boards')
+			.setDesc('Makes three boards from the lists above: Sectors, Organizations and Important topics, with one view per entry. Run it again after adding entries: it only adds the missing views and never removes or changes the ones you edited.')
+			.addButton(b => b
+				.setButtonText('Create / update boards')
+				.setCta()
+				.onClick(async () => {
+					b.setDisabled(true);
+					try {
+						await this.plugin.v2?.syncTopicBoards();
+					} finally {
+						b.setDisabled(false);
+					}
+				}));
 
 		new Setting(containerEl)
 			.setName('Reload minutes')

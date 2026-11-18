@@ -26565,6 +26565,62 @@ var import_react4 = __toESM(require_react());
 var import_obsidian9 = require("obsidian");
 var import_client2 = __toESM(require_client());
 
+// src/core/topicBoards.ts
+var TOPIC_BOARDS = [
+  { kind: "sectors", fileName: "Sectors" },
+  { kind: "organizations", fileName: "Organizations" },
+  { kind: "important", fileName: "Important topics" }
+];
+function topicMatches(cardSlug, topic) {
+  const t = slugify(topic);
+  if (!t)
+    return true;
+  return cardSlug.split("/").some((seg) => seg === t || seg.startsWith(t + "-"));
+}
+function topicPresetId(name) {
+  return `view-topic-${slugify(name)}`;
+}
+function topicPreset(name) {
+  const id = topicPresetId(name);
+  return {
+    id,
+    name,
+    layout: "kanban",
+    dropMode: "tag",
+    scopeFilter: { topic: name, showClosed: true },
+    columns: [
+      { id: `${id}-open`, title: "Open", ruleType: "status", ruleValue: "open" },
+      { id: `${id}-closed`, title: "Closed", ruleType: "status", ruleValue: "closed" }
+    ]
+  };
+}
+function syncTopicBoard(existing, names) {
+  const presets = existing ? [...existing.presets] : [];
+  const have = new Set(
+    presets.flatMap((p) => {
+      var _a;
+      return [p.id, ((_a = p.scopeFilter) == null ? void 0 : _a.topic) ? topicPresetId(p.scopeFilter.topic) : ""];
+    }).filter(Boolean)
+  );
+  const added = [];
+  for (const raw of names) {
+    const name = raw.trim();
+    if (!slugify(name))
+      continue;
+    const id = topicPresetId(name);
+    if (have.has(id))
+      continue;
+    have.add(id);
+    presets.push(topicPreset(name));
+    added.push(name);
+  }
+  if (presets.length === 0)
+    return { board: null, added };
+  if (existing)
+    return { board: { ...existing, presets }, added };
+  return { board: { version: 1, activePresetId: presets[0].id, presets }, added };
+}
+
 // src/core/boardEngine.ts
 function slugPath(v) {
   return v.split("/").map(slugify).filter(Boolean).join("/");
@@ -26614,6 +26670,8 @@ function cardsForPreset(cards, preset) {
   const columnTagSet = new Set(cols.flatMap(columnTags));
   return cards.filter((c) => {
     if (f.hierarchyPrefix && !inScope(c.hierarchy.slug, slugPath(f.hierarchyPrefix)))
+      return false;
+    if (f.topic && !topicMatches(c.hierarchy.slug, f.topic))
       return false;
     if (exclude.some((t) => c.tags.includes(t)))
       return false;
@@ -27207,15 +27265,17 @@ function movePreset(board, presetId, delta) {
   return { ...board, presets };
 }
 function cleanScope(f) {
-  var _a, _b, _c;
+  var _a, _b, _c, _d;
   if (!f)
     return void 0;
   const out = {};
   if ((_a = f.hierarchyPrefix) == null ? void 0 : _a.trim())
     out.hierarchyPrefix = f.hierarchyPrefix.trim();
-  if ((_b = f.includeTags) == null ? void 0 : _b.length)
+  if ((_b = f.topic) == null ? void 0 : _b.trim())
+    out.topic = f.topic.trim();
+  if ((_c = f.includeTags) == null ? void 0 : _c.length)
     out.includeTags = Array.from(new Set(f.includeTags.map(normalizeTag)));
-  if ((_c = f.excludeTags) == null ? void 0 : _c.length)
+  if ((_d = f.excludeTags) == null ? void 0 : _d.length)
     out.excludeTags = Array.from(new Set(f.excludeTags.map(normalizeTag)));
   if (f.showClosed !== void 0)
     out.showClosed = f.showClosed;
@@ -27422,6 +27482,10 @@ var ViewEditModal = class extends import_obsidian8.Modal {
         this.render();
       })
     );
+    new import_obsidian8.Setting(el).setName("Only for topic").setDesc("Optional. Cards under any heading named like this, at any level: \u201CCoimbra\u201D also covers \u201CCoimbra 1\u201D; \u201CQuorum\u201D covers \u201CQuorum de Elders\u201D in every city.").addText((t) => {
+      var _a2;
+      return t.setValue((_a2 = d.scopeFilter.topic) != null ? _a2 : "").setPlaceholder("Quorum").onChange((v) => d.scopeFilter.topic = v);
+    });
     new import_obsidian8.Setting(el).setName("Show closed cards").setDesc("A \u201CClosed\u201D column always shows them.").addToggle((t) => t.setValue(d.scopeFilter.showClosed !== false).onChange((v) => d.scopeFilter.showClosed = v));
     const showError = errorLine(el);
     const buttons = new import_obsidian8.Setting(el);
@@ -27451,7 +27515,7 @@ var ViewEditModal = class extends import_obsidian8.Modal {
     );
   }
   save() {
-    var _a;
+    var _a, _b;
     const d = this.d;
     if (!d.name.trim())
       return "Give the view a name.";
@@ -27467,7 +27531,8 @@ var ViewEditModal = class extends import_obsidian8.Modal {
         ...d.scopeFilter,
         includeTags: follow.tags.length ? follow.tags : void 0,
         excludeTags: hide.tags.length ? hide.tags : void 0,
-        hierarchyPrefix: ((_a = d.scopeFilter.hierarchyPrefix) == null ? void 0 : _a.trim()) || void 0
+        hierarchyPrefix: ((_a = d.scopeFilter.hierarchyPrefix) == null ? void 0 : _a.trim()) || void 0,
+        topic: ((_b = d.scopeFilter.topic) == null ? void 0 : _b.trim()) || void 0
       }
     });
     return null;
@@ -28103,6 +28168,11 @@ var MeetingComposerV2 = class {
     p.addCommand({ id: "assign-missing-ids", name: "Assign missing card ids & fix card blocks in minutes folder", callback: () => this.assignAllMissingIds() });
     p.addCommand({ id: "reindex-cards", name: "Re-index meeting cards", callback: () => this.store.reindexAll() });
     p.addCommand({ id: "card-syntax-help", name: "Show card syntax help", callback: () => this.showHelp() });
+    p.addCommand({
+      id: "sync-topic-boards",
+      name: "Create / update default boards (sectors, organizations, important topics)",
+      callback: () => void this.syncTopicBoards()
+    });
     reg(this.app.workspace.on("file-menu", (menu, file) => {
       const folder = file instanceof import_obsidian11.TFolder ? file : file.parent;
       if (!folder)
@@ -28306,6 +28376,53 @@ var MeetingComposerV2 = class {
     const content = serializeBoard(template === "simple" ? simpleBoard() : DEFAULT_BOARD);
     const file = await this.app.vault.create((0, import_obsidian11.normalizePath)(`${base}${name}.${ORGBOARD_EXT}`), content);
     await this.app.workspace.getLeaf("tab").openFile(file);
+  }
+  /**
+   * One board per topic list in settings (Sectors / Organizations / Important topics), one view per entry.
+   * Existing boards only gain the views they are missing; nothing is removed or overwritten.
+   */
+  async syncTopicBoards() {
+    const s = this.settings();
+    const lists = {
+      sectors: s.cities,
+      organizations: s.priorityBefore,
+      important: s.priorityAfter
+    };
+    const { vault } = this.app;
+    const folder = (0, import_obsidian11.normalizePath)(s.boardsFolder.trim() || "/");
+    const base = folder === "/" ? "" : folder + "/";
+    if (base && !vault.getAbstractFileByPath(folder))
+      await vault.createFolder(folder);
+    const report = [];
+    for (const { kind, fileName } of TOPIC_BOARDS) {
+      const path = (0, import_obsidian11.normalizePath)(`${base}${fileName}.${ORGBOARD_EXT}`);
+      const existing = vault.getAbstractFileByPath(path);
+      if (existing && !(existing instanceof import_obsidian11.TFile)) {
+        report.push(`${fileName}: skipped (a folder has that name)`);
+        continue;
+      }
+      if (existing) {
+        const parsed = parseBoardFile(await vault.read(existing));
+        if (!parsed.ok) {
+          report.push(`${fileName}: skipped, the file isn't valid (${parsed.error})`);
+          continue;
+        }
+        const { board, added } = syncTopicBoard(parsed.board, lists[kind]);
+        if (board && added.length)
+          await vault.modify(existing, serializeBoard(board));
+        report.push(added.length ? `${fileName}: added ${added.join(", ")}` : `${fileName}: up to date`);
+      } else {
+        const { board } = syncTopicBoard(null, lists[kind]);
+        if (!board) {
+          report.push(`${fileName}: skipped (its list in settings is empty)`);
+          continue;
+        }
+        await vault.create(path, serializeBoard(board));
+        report.push(`${fileName}: created with ${board.presets.length} views`);
+      }
+    }
+    new import_obsidian11.Notice(`Meeting Composer \u2014 default boards in \u201C${folder}\u201D:
+${report.join("\n")}`, 1e4);
   }
 };
 
@@ -29122,7 +29239,8 @@ var DEFAULT_SETTINGS = {
   autoReload: true,
   autoCardIds: true,
   processedRecallCloses: [],
-  recallClosedBy: []
+  recallClosedBy: [],
+  boardsFolder: "Boards"
 };
 var MyPlugin = class extends import_obsidian15.Plugin {
   constructor() {
@@ -29180,7 +29298,8 @@ var MyPlugin = class extends import_obsidian15.Plugin {
       recallClosedBy: this.settings.recallClosedBy,
       priorityBefore: this.settings.priorityBeforeCities,
       cities: this.settings.cities,
-      priorityAfter: this.settings.priorityAfterCities
+      priorityAfter: this.settings.priorityAfterCities,
+      boardsFolder: this.settings.boardsFolder
     }), async ({ processed, closedBy }) => {
       this.settings.processedRecallCloses = processed;
       this.settings.recallClosedBy = closedBy;
@@ -29394,6 +29513,20 @@ var MeetingComposerSettingTab = class extends import_obsidian15.PluginSettingTab
         this.plugin.index.scheduleRebuild(300);
       }
     );
+    new import_obsidian15.Setting(containerEl).setName("Default boards").setHeading();
+    new import_obsidian15.Setting(containerEl).setName("Boards folder").setDesc("Where the default boards are saved, relative to the vault root").addText((text) => text.setPlaceholder("Boards").setValue(this.plugin.settings.boardsFolder).onChange(async (value) => {
+      this.plugin.settings.boardsFolder = value.trim();
+      await this.plugin.saveSettings();
+    }));
+    new import_obsidian15.Setting(containerEl).setName("Create / update default boards").setDesc("Makes three boards from the lists above: Sectors, Organizations and Important topics, with one view per entry. Run it again after adding entries: it only adds the missing views and never removes or changes the ones you edited.").addButton((b) => b.setButtonText("Create / update boards").setCta().onClick(async () => {
+      var _a;
+      b.setDisabled(true);
+      try {
+        await ((_a = this.plugin.v2) == null ? void 0 : _a.syncTopicBoards());
+      } finally {
+        b.setDisabled(false);
+      }
+    }));
     new import_obsidian15.Setting(containerEl).setName("Reload minutes").setDesc("Re-scan the minutes folder and rebuild the topic tree").addButton((item) => {
       item.setButtonText("Reload");
       item.onClick(async () => {

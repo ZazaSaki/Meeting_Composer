@@ -133,6 +133,7 @@ function cleanScope(f: BoardScopeFilter | undefined): BoardScopeFilter | undefin
 	if (!f) return undefined;
 	const out: BoardScopeFilter = {};
 	if (f.hierarchyPrefix?.trim()) out.hierarchyPrefix = f.hierarchyPrefix.trim();
+	if (f.topic?.trim()) out.topic = f.topic.trim();
 	if (f.includeTags?.length) out.includeTags = Array.from(new Set(f.includeTags.map(normalizeTag)));
 	if (f.excludeTags?.length) out.excludeTags = Array.from(new Set(f.excludeTags.map(normalizeTag)));
 	if (f.showClosed !== undefined) out.showClosed = f.showClosed;

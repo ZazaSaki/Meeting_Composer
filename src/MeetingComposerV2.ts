@@ -18,7 +18,8 @@ import { assignMissingIds } from "./core/autoId";
 import { planRecallInsert } from "./core/recallInsert";
 import { newCardId } from "./core/ids";
 import { formatTimestamp } from "./core/syntax";
-import { DEFAULT_BOARD, serializeBoard, simpleBoard } from "./core/boardFile";
+import { DEFAULT_BOARD, parseBoardFile, serializeBoard, simpleBoard } from "./core/boardFile";
+import { syncTopicBoard, TOPIC_BOARDS, TopicGroupKind } from "./core/topicBoards";
 import { BoardTemplate, NewBoardModal } from "./views/boardEditors";
 
 export interface V2Settings {
@@ -30,6 +31,7 @@ export interface V2Settings {
 	priorityBefore: string[];
 	cities: string[];
 	priorityAfter: string[];
+	boardsFolder: string;
 }
 
 export class MeetingComposerV2 implements V2Host {
@@ -110,6 +112,11 @@ export class MeetingComposerV2 implements V2Host {
 		p.addCommand({ id: "assign-missing-ids", name: "Assign missing card ids & fix card blocks in minutes folder", callback: () => this.assignAllMissingIds() });
 		p.addCommand({ id: "reindex-cards", name: "Re-index meeting cards", callback: () => this.store.reindexAll() });
 		p.addCommand({ id: "card-syntax-help", name: "Show card syntax help", callback: () => this.showHelp() });
+		p.addCommand({
+			id: "sync-topic-boards",
+			name: "Create / update default boards (sectors, organizations, important topics)",
+			callback: () => void this.syncTopicBoards(),
+		});
 
 		reg(this.app.workspace.on("file-menu", (menu: Menu, file: TAbstractFile) => {
 			const folder = file instanceof TFolder ? file : file.parent;
@@ -309,5 +316,51 @@ export class MeetingComposerV2 implements V2Host {
 		const content = serializeBoard(template === "simple" ? simpleBoard() : DEFAULT_BOARD);
 		const file = await this.app.vault.create(normalizePath(`${base}${name}.${ORGBOARD_EXT}`), content);
 		await this.app.workspace.getLeaf("tab").openFile(file);
+	}
+
+	/**
+	 * One board per topic list in settings (Sectors / Organizations / Important topics), one view per entry.
+	 * Existing boards only gain the views they are missing; nothing is removed or overwritten.
+	 */
+	async syncTopicBoards(): Promise<void> {
+		const s = this.settings();
+		const lists: Record<TopicGroupKind, string[]> = {
+			sectors: s.cities,
+			organizations: s.priorityBefore,
+			important: s.priorityAfter,
+		};
+		const { vault } = this.app;
+		const folder = normalizePath(s.boardsFolder.trim() || "/");
+		const base = folder === "/" ? "" : folder + "/";
+		if (base && !vault.getAbstractFileByPath(folder)) await vault.createFolder(folder);
+
+		const report: string[] = [];
+		for (const { kind, fileName } of TOPIC_BOARDS) {
+			const path = normalizePath(`${base}${fileName}.${ORGBOARD_EXT}`);
+			const existing = vault.getAbstractFileByPath(path);
+			if (existing && !(existing instanceof TFile)) {
+				report.push(`${fileName}: skipped (a folder has that name)`);
+				continue;
+			}
+			if (existing) {
+				const parsed = parseBoardFile(await vault.read(existing));
+				if (!parsed.ok) {
+					report.push(`${fileName}: skipped, the file isn't valid (${parsed.error})`);
+					continue;
+				}
+				const { board, added } = syncTopicBoard(parsed.board, lists[kind]);
+				if (board && added.length) await vault.modify(existing, serializeBoard(board));
+				report.push(added.length ? `${fileName}: added ${added.join(", ")}` : `${fileName}: up to date`);
+			} else {
+				const { board } = syncTopicBoard(null, lists[kind]);
+				if (!board) {
+					report.push(`${fileName}: skipped (its list in settings is empty)`);
+					continue;
+				}
+				await vault.create(path, serializeBoard(board));
+				report.push(`${fileName}: created with ${board.presets.length} views`);
+			}
+		}
+		new Notice(`Meeting Composer — default boards in “${folder}”:\n${report.join("\n")}`, 10000);
 	}
 }

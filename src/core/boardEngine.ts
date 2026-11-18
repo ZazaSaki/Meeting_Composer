@@ -11,6 +11,7 @@
 import { BoardColumnRule, BoardViewPreset, CardNode, CardStatus } from "../types";
 import { CLOSED_TAGS, OPEN_TAGS, normalizeTag, slugify } from "./syntax";
 import { inScope } from "./tree";
+import { topicMatches } from "./topicBoards";
 
 export interface CardLike {
 	status: CardStatus;
@@ -66,6 +67,7 @@ export function cardsForPreset<T extends CardLike>(cards: T[], preset: BoardView
 	const columnTagSet = new Set(cols.flatMap(columnTags));
 	return cards.filter(c => {
 		if (f.hierarchyPrefix && !inScope(c.hierarchy.slug, slugPath(f.hierarchyPrefix))) return false;
+		if (f.topic && !topicMatches(c.hierarchy.slug, f.topic)) return false;
 		if (exclude.some(t => c.tags.includes(t))) return false;
 		// include filter also admits cards matching any tag column (so a drag never makes a card vanish)
 		if (include.length && !include.some(t => c.tags.includes(t)) && !c.tags.some(t => columnTagSet.has(t))) {
